@@ -14,16 +14,250 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      contact_tags: {
+        Row: {
+          contact_id: string
+          id: string
+          tag_id: string
+        }
+        Insert: {
+          contact_id: string
+          id?: string
+          tag_id: string
+        }
+        Update: {
+          contact_id?: string
+          id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_tags_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contact_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contacts: {
+        Row: {
+          archived: boolean
+          birthday: string | null
+          circle: Database["public"]["Enums"]["circle_tier"]
+          created_at: string
+          email: string | null
+          id: string
+          last_interaction_at: string | null
+          name: string
+          next_nudge_at: string | null
+          notes: string | null
+          nudge_frequency: Database["public"]["Enums"]["nudge_frequency"]
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          archived?: boolean
+          birthday?: string | null
+          circle?: Database["public"]["Enums"]["circle_tier"]
+          created_at?: string
+          email?: string | null
+          id?: string
+          last_interaction_at?: string | null
+          name: string
+          next_nudge_at?: string | null
+          notes?: string | null
+          nudge_frequency?: Database["public"]["Enums"]["nudge_frequency"]
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          archived?: boolean
+          birthday?: string | null
+          circle?: Database["public"]["Enums"]["circle_tier"]
+          created_at?: string
+          email?: string | null
+          id?: string
+          last_interaction_at?: string | null
+          name?: string
+          next_nudge_at?: string | null
+          notes?: string | null
+          nudge_frequency?: Database["public"]["Enums"]["nudge_frequency"]
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      interactions: {
+        Row: {
+          contact_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          type: Database["public"]["Enums"]["interaction_type"]
+          user_id: string
+        }
+        Insert: {
+          contact_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          type: Database["public"]["Enums"]["interaction_type"]
+          user_id: string
+        }
+        Update: {
+          contact_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          type?: Database["public"]["Enums"]["interaction_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interactions_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      life_events: {
+        Row: {
+          contact_id: string
+          created_at: string
+          description: string | null
+          event_date: string
+          id: string
+          recurring: boolean
+          title: string
+          user_id: string
+        }
+        Insert: {
+          contact_id: string
+          created_at?: string
+          description?: string | null
+          event_date: string
+          id?: string
+          recurring?: boolean
+          title: string
+          user_id: string
+        }
+        Update: {
+          contact_id?: string
+          created_at?: string
+          description?: string | null
+          event_date?: string
+          id?: string
+          recurring?: boolean
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "life_events_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tags: {
+        Row: {
+          color: string | null
+          created_at: string
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
+      circle_tier: "inner_circle" | "close_friends" | "extended"
+      interaction_type: "texted" | "called" | "met_up" | "video_call"
+      nudge_frequency: "weekly" | "biweekly" | "monthly" | "quarterly"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +384,11 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+      circle_tier: ["inner_circle", "close_friends", "extended"],
+      interaction_type: ["texted", "called", "met_up", "video_call"],
+      nudge_frequency: ["weekly", "biweekly", "monthly", "quarterly"],
+    },
   },
 } as const
