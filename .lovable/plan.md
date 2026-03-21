@@ -1,87 +1,53 @@
 
 
-# Kinship Test Plan (Expanded)
+# Playwright E2E Tests for Kinship
 
-## Part 1 — Functional Testing Plan
+## What We're Building
 
-### Authentication
+Four end-to-end test files covering the critical user flows, using the existing Playwright fixture setup.
 
-**Happy path:**
-- Sign-in form renders with email, password, and submit button
-- Toggling to sign-up shows a name field
-- Authenticated users are redirected away from /auth
-- Unauthenticated users are redirected to /auth from protected pages
+## Test Files to Create
 
-**Negative scenarios:**
-- Sign in with wrong password shows error toast
-- Sign up with already-registered email shows error toast
-- Sign in with empty email/password prevents submission (HTML validation)
-- Sign up with password shorter than 6 characters shows error
-- Sign up with invalid email format is rejected
-- Submitting while already in-progress disables the button (no double submit)
+### 1. `e2e/auth.spec.ts` — Sign Up & Sign In
+- Navigate to `/auth`, verify sign-in form renders
+- Toggle to sign-up, fill name/email/password, submit
+- Verify confirmation message appears ("Check your email")
+- Toggle back to sign-in, verify form switches
 
-### Nudges Dashboard
+### 2. `e2e/add-contact.spec.ts` — Add a Contact
+- Requires authenticated session (sign in first)
+- Navigate to `/people`
+- Click "Add someone" button
+- Fill the form: name, circle, nudge frequency
+- Submit and verify the new contact appears in the list
+- Click the contact card and verify detail page loads
 
-**Happy path:**
-- Empty state shows "Your inner circle starts here" with CTA when no contacts exist
-- Loading state shows skeleton placeholders
-- Circle summary cards display correct reached/total counts for each tier
-- Overdue contacts appear sorted by urgency with amber indicators
-- Upcoming life events display within the 30-day window
+### 3. `e2e/log-interaction.spec.ts` — Log an Interaction
+- Requires authenticated session + existing contact
+- Navigate to a contact's detail page
+- Click "Log interaction" button
+- Select an interaction type (e.g. "Texted")
+- Click "Save"
+- Verify the interaction appears in the History section
 
-**Negative scenarios:**
-- Contacts with no `last_interaction_at` show "No interactions yet" instead of crashing
-- Contacts with no `next_nudge_at` do not appear in the overdue section
-- Life events with past dates do not appear in upcoming events
-- Circle summary shows 0/0 for circles with no contacts assigned
+### 4. `e2e/archive.spec.ts` — Archive & Restore
+- Requires authenticated session + existing contact
+- From contact detail page, click the Archive button
+- Verify redirect to `/people` and contact is gone from list
+- Navigate to `/archive`
+- Verify the archived contact appears
+- Click "Restore" and verify contact returns to People list
 
-### People List
+## Technical Approach
 
-**Happy path:**
-- Contact cards render with name, circle badge, and last interaction
-- Search filters contacts by name in real time
-- Circle filter narrows the list correctly
-- "Add someone" opens creation form with required fields
+- **Auth helper**: Create a shared helper function that signs up/in a test user via the UI before each test suite, using a unique email per test run (`test-{timestamp}@example.com`)
+- **Sequential flows**: Tests within each file run in order since they depend on prior state (e.g. add contact before logging interaction)
+- **Selectors**: Use text content, roles, and placeholder text for resilient selectors (e.g. `getByRole('button', { name: 'Add someone' })`)
+- **Auto-confirm**: Email auto-confirm must be enabled for E2E tests to work without email verification; we'll use the configure_auth tool if needed
 
-**Negative scenarios:**
-- Search with no matching results shows empty state
-- Creating a contact without a name is prevented (required field)
-- Creating a contact without selecting a circle is prevented
-- Duplicate contact names are allowed (not a unique constraint)
-- Very long contact names render without breaking layout
-- Special characters in search input do not cause errors
-
-### Contact Detail
-
-**Happy path:**
-- Displays contact name, circle, tags, and interaction stats
-- "Log interaction" opens sheet with type options
-- Logging an interaction updates "last seen" and resets the nudge timer
-- Life events timeline renders in reverse chronological order
-- Adding a life event appends to the timeline
-
-**Negative scenarios:**
-- Navigating to a non-existent contact ID shows not-found or redirects
-- Adding a life event with empty title is prevented
-- Adding a life event with a date in the far future is accepted (no artificial limit)
-- Logging an interaction while offline shows an error toast (network failure)
-- Deleting all tags from a contact leaves an empty tag section without errors
-
-### Archive
-
-**Happy path:**
-- Archiving a contact removes it from the People list
-- Archived contacts appear on the Archive page
-- Restoring a contact moves it back to People
-
-**Negative scenarios:**
-- Archive page with zero archived contacts shows "No archived contacts" message
-- Archiving the last remaining contact shows empty state on People page
-- Rapidly clicking Archive/Restore does not create duplicate operations
-
----
-
-## Part 2 — Technical Testing Plan
-
-*(Unchanged from previous version — unit tests for `calcNextNudge`, integration tests with RTL, mocking strategy for Supabase/Auth/React Query/Router, and test fixtures.)*
+## Files to Create
+- `e2e/auth.spec.ts`
+- `e2e/add-contact.spec.ts`
+- `e2e/log-interaction.spec.ts`
+- `e2e/archive.spec.ts`
 
