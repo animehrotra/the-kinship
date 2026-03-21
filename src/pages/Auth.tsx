@@ -128,10 +128,14 @@ export default function Auth() {
                   id="email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => { setEmail(e.target.value); setEmailError(""); }}
                   placeholder="you@example.com"
                   required
+                  className={emailError ? "border-destructive" : ""}
                 />
+                {emailError && (
+                  <p className="text-xs text-destructive">{emailError}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
