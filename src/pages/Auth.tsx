@@ -19,6 +19,7 @@ export default function Auth() {
   const [displayName, setDisplayName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [switchMessage, setSwitchMessage] = useState("");
+  const [emailError, setEmailError] = useState("");
 
   if (loading) {
     return (
@@ -28,9 +29,7 @@ export default function Auth() {
     );
   }
 
-  if (session) return <Navigate to="/" replace />;
-
-  const [emailError, setEmailError] = useState("");
+  if (session) return <Navigate to="/dashboard" replace />;
 
   const isValidEmail = (value: string) => {
     const parts = value.split("@");
