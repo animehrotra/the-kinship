@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const items = [
-  { title: "Nudges", url: "/", icon: Heart },
+  { title: "Nudges", url: "/dashboard", icon: Heart },
   { title: "People", url: "/people", icon: Users },
   { title: "Archive", url: "/archive", icon: Archive },
 ];
@@ -46,7 +46,7 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={item.url}
-                      end={item.url === "/"}
+                      end={item.url === "/dashboard"}
                       className="hover:bg-sidebar-accent/50"
                       activeClassName="bg-sidebar-accent text-primary font-medium"
                     >

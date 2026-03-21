@@ -19,6 +19,7 @@ export default function Auth() {
   const [displayName, setDisplayName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [switchMessage, setSwitchMessage] = useState("");
+  const [emailError, setEmailError] = useState("");
 
   if (loading) {
     return (
@@ -28,10 +29,27 @@ export default function Auth() {
     );
   }
 
-  if (session) return <Navigate to="/" replace />;
+  if (session) return <Navigate to="/dashboard" replace />;
+
+  const isValidEmail = (value: string) => {
+    const parts = value.split("@");
+    if (parts.length !== 2) return false;
+    const [local, domain] = parts;
+    if (!local || !domain) return false;
+    if (!domain.includes(".")) return false;
+    if (domain.startsWith(".") || domain.endsWith(".")) return false;
+    return true;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setEmailError("");
+
+    if (!isValidEmail(email)) {
+      setEmailError("Please enter a valid email address (e.g. you@example.com)");
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -110,10 +128,14 @@ export default function Auth() {
                   id="email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => { setEmail(e.target.value); setEmailError(""); }}
                   placeholder="you@example.com"
                   required
+                  className={emailError ? "border-destructive" : ""}
                 />
+                {emailError && (
+                  <p className="text-xs text-destructive">{emailError}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>

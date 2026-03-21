@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/lib/auth";
 import { AppLayout } from "@/components/AppLayout";
+import LandingPage from "./pages/LandingPage";
 import Index from "./pages/Index";
 import People from "./pages/People";
 import ContactDetail from "./pages/ContactDetail";
@@ -22,9 +23,10 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            <Route path="/" element={<LandingPage />} />
             <Route path="/auth" element={<Auth />} />
             <Route element={<AppLayout />}>
-              <Route path="/" element={<Index />} />
+              <Route path="/dashboard" element={<Index />} />
               <Route path="/people" element={<People />} />
               <Route path="/people/:id" element={<ContactDetail />} />
               <Route path="/archive" element={<ArchivePage />} />

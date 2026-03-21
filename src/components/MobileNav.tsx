@@ -2,7 +2,7 @@ import { Heart, Users, Archive } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 
 const items = [
-  { title: "Nudges", url: "/", icon: Heart },
+  { title: "Nudges", url: "/dashboard", icon: Heart },
   { title: "People", url: "/people", icon: Users },
   { title: "Archive", url: "/archive", icon: Archive },
 ];
@@ -15,7 +15,7 @@ export function MobileNav() {
           <NavLink
             key={item.title}
             to={item.url}
-            end={item.url === "/"}
+            end={item.url === "/dashboard"}
             className="flex flex-col items-center gap-0.5 px-3 py-1.5 text-muted-foreground transition-colors"
             activeClassName="text-primary"
           >
