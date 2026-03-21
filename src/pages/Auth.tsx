@@ -97,7 +97,7 @@ export default function Auth() {
           },
         });
         if (error) throw error;
-        toast({ title: "Check your email", description: "We sent you a confirmation link." });
+        toast({ title: "Check your email", description: "We sent you a confirmation link. If you don't see it, check your spam or junk folder." });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
