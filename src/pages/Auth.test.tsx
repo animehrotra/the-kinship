@@ -108,6 +108,7 @@ describe("Auth Page", () => {
     renderAuth();
     const pw = screen.getByLabelText(/password/i);
     expect(pw).toHaveAttribute("minLength", "8");
+  });
 
   // Negative: email required via HTML
   it("email input has required attribute", () => {
