@@ -19,20 +19,20 @@ test.describe("Authentication", () => {
     await expect(page.getByLabel("Your name")).toBeVisible();
   });
 
-  test("sign up with valid credentials redirects to dashboard", async ({ page }) => {
+  test("sign up with valid credentials shows confirmation message", async ({ page }) => {
     await page.goto("/auth");
     await page.getByText("Need an account? Sign up").click();
 
     const email = `test-${Date.now()}@example.com`;
     await page.getByLabel("Your name").fill("E2E Tester");
     await page.getByLabel("Email").fill(email);
-    await page.getByLabel("Password").fill("testpass123");
+    await page.getByLabel("Password").fill("Testpass123!");
 
     await page.getByRole("button", { name: "Create account" }).click();
 
-    // Auto-confirm is on, so user gets signed in and redirected
-    await page.waitForURL("/", { timeout: 10000 });
-    await expect(page).toHaveURL("/");
+    // Auto-confirm is off — user should see "Check your email" and stay on auth page
+    await expect(page.getByText("Check your email")).toBeVisible({ timeout: 10000 });
+    await expect(page).toHaveURL(/\/auth/);
   });
 
   test("toggle back from sign-up to sign-in", async ({ page }) => {
