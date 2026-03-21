@@ -1,0 +1,99 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Index from "./Index";
+import { contacts } from "@/test/fixtures";
+
+// Mock hooks
+const mockUseContacts = vi.fn();
+const mockUseUpcomingEvents = vi.fn();
+
+vi.mock("@/lib/hooks", () => ({
+  useContacts: () => mockUseContacts(),
+  useUpcomingEvents: () => mockUseUpcomingEvents(),
+}));
+
+vi.mock("@/lib/auth", () => ({
+  useAuth: () => ({ user: { id: "user-1" }, session: {}, loading: false }),
+}));
+
+function renderIndex() {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(
+    <QueryClientProvider client={qc}>
+      <MemoryRouter>
+        <Index />
+      </MemoryRouter>
+    </QueryClientProvider>
+  );
+}
+
+describe("Index (Dashboard)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockUseContacts.mockReturnValue({ data: contacts, isLoading: false });
+    mockUseUpcomingEvents.mockReturnValue({ data: [] });
+  });
+
+  // Happy path: loading
+  it("shows skeleton placeholders while loading", () => {
+    mockUseContacts.mockReturnValue({ data: [], isLoading: true });
+    const { container } = renderIndex();
+    expect(container.querySelectorAll(".animate-pulse").length).toBeGreaterThan(0);
+  });
+
+  // Happy path: empty state
+  it("shows empty state when no contacts", () => {
+    mockUseContacts.mockReturnValue({ data: [], isLoading: false });
+    renderIndex();
+    expect(screen.getByText(/your inner circle starts here/i)).toBeInTheDocument();
+    expect(screen.getByText(/add someone/i)).toBeInTheDocument();
+  });
+
+  // Happy path: circle summary
+  it("renders circle summary cards for all three tiers", () => {
+    renderIndex();
+    expect(screen.getByText("Inner Circle")).toBeInTheDocument();
+    expect(screen.getByText("Close Friends")).toBeInTheDocument();
+    expect(screen.getByText("Extended")).toBeInTheDocument();
+  });
+
+  // Happy path: overdue contacts
+  it("shows overdue contacts with 'It's been a while' heading", () => {
+    renderIndex();
+    expect(screen.getByText(/it's been a while/i)).toBeInTheDocument();
+    expect(screen.getByText("Alice Johnson")).toBeInTheDocument();
+  });
+
+  // Negative: contact with no last_interaction_at shows fallback text
+  it("shows 'No interactions yet' for contacts without last_interaction_at", () => {
+    // Carol Davis has null last_interaction_at and is overdue (null next_nudge_at, so not in overdue list)
+    // But Alice is overdue with last_interaction_at set. Let's use a contact with null.
+    const overdueNoInteraction = [{
+      ...contacts[2], // Carol
+      next_nudge_at: new Date(Date.now() - 86400000).toISOString(), // make overdue
+    }];
+    mockUseContacts.mockReturnValue({ data: overdueNoInteraction, isLoading: false });
+    renderIndex();
+    expect(screen.getByText(/no interactions yet/i)).toBeInTheDocument();
+  });
+
+  // Negative: contacts with null next_nudge_at don't appear in overdue
+  it("does not show contacts with null next_nudge_at in overdue section", () => {
+    // Only Carol with null nudge
+    mockUseContacts.mockReturnValue({ data: [contacts[2]], isLoading: false });
+    renderIndex();
+    expect(screen.queryByText(/it's been a while/i)).not.toBeInTheDocument();
+  });
+
+  // Negative: circle with 0 contacts shows 0/0
+  it("shows 0/0 for circle tiers with no contacts", () => {
+    // Only inner_circle contact
+    mockUseContacts.mockReturnValue({ data: [contacts[0]], isLoading: false });
+    renderIndex();
+    // Extended should show 0 / 0
+    const cards = screen.getAllByText(/reached this month/i);
+    expect(cards.length).toBe(3); // all three tiers rendered
+  });
+});

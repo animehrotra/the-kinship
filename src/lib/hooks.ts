@@ -11,7 +11,7 @@ type LifeEvent = Database["public"]["Tables"]["life_events"]["Row"];
 type Tag = Database["public"]["Tables"]["tags"]["Row"];
 
 // Helper to calculate next nudge date
-function calcNextNudge(frequency: string, from: Date = new Date()): string {
+export function calcNextNudge(frequency: string, from: Date = new Date()): string {
   const d = new Date(from);
   switch (frequency) {
     case "weekly": d.setDate(d.getDate() + 7); break;
