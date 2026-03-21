@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -16,6 +18,7 @@ export default function Auth() {
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [switchMessage, setSwitchMessage] = useState("");
 
   if (loading) {
     return (
@@ -45,7 +48,14 @@ export default function Auth() {
         toast({ title: "Check your email", description: "We sent you a confirmation link." });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        if (error) {
+          if (error.message === "Invalid login credentials") {
+            setIsSignUp(true);
+            setSwitchMessage("We couldn't find an account with that email. Create one below to get started!");
+            return;
+          }
+          throw error;
+        }
       }
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
@@ -73,6 +83,14 @@ export default function Auth() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {switchMessage && (
+              <Alert className="mb-4 border-primary/30 bg-primary/5">
+                <AlertCircle className="h-4 w-4 text-primary" />
+                <AlertDescription className="text-sm text-foreground">
+                  {switchMessage}
+                </AlertDescription>
+              </Alert>
+            )}
             <form onSubmit={handleSubmit} className="space-y-4">
               {isSignUp && (
                 <div className="space-y-2">
@@ -116,7 +134,10 @@ export default function Auth() {
             <div className="mt-4 text-center">
               <button
                 type="button"
-                onClick={() => setIsSignUp(!isSignUp)}
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  setSwitchMessage("");
+                }}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 {isSignUp ? "Already have an account? Sign in" : "Need an account? Sign up"}
