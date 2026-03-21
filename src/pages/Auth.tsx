@@ -30,8 +30,27 @@ export default function Auth() {
 
   if (session) return <Navigate to="/" replace />;
 
+  const [emailError, setEmailError] = useState("");
+
+  const isValidEmail = (value: string) => {
+    const parts = value.split("@");
+    if (parts.length !== 2) return false;
+    const [local, domain] = parts;
+    if (!local || !domain) return false;
+    if (!domain.includes(".")) return false;
+    if (domain.startsWith(".") || domain.endsWith(".")) return false;
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setEmailError("");
+
+    if (!isValidEmail(email)) {
+      setEmailError("Please enter a valid email address (e.g. you@example.com)");
+      return;
+    }
+
     setSubmitting(true);
 
     try {
