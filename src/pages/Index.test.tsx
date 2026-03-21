@@ -54,9 +54,12 @@ describe("Index (Dashboard)", () => {
   // Happy path: circle summary
   it("renders circle summary cards for all three tiers", () => {
     renderIndex();
-    expect(screen.getByText("Inner Circle")).toBeInTheDocument();
-    expect(screen.getByText("Close Friends")).toBeInTheDocument();
-    expect(screen.getByText("Extended")).toBeInTheDocument();
+    expect(screen.getAllByText("Inner Circle").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Close Friends").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Extended").length).toBeGreaterThanOrEqual(1);
+    // Verify summary stat text exists
+    const reached = screen.getAllByText(/reached this month/i);
+    expect(reached.length).toBe(3);
   });
 
   // Happy path: overdue contacts
