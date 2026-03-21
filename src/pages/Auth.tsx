@@ -18,6 +18,7 @@ export default function Auth() {
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [switchMessage, setSwitchMessage] = useState("");
 
   if (loading) {
     return (
