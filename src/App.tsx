@@ -12,6 +12,7 @@ import ContactDetail from "./pages/ContactDetail";
 import ArchivePage from "./pages/ArchivePage";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route element={<AppLayout />}>
               <Route path="/dashboard" element={<Index />} />
               <Route path="/people" element={<People />} />
