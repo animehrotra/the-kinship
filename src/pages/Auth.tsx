@@ -83,6 +83,14 @@ export default function Auth() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {switchMessage && (
+              <Alert className="mb-4 border-primary/30 bg-primary/5">
+                <AlertCircle className="h-4 w-4 text-primary" />
+                <AlertDescription className="text-sm text-foreground">
+                  {switchMessage}
+                </AlertDescription>
+              </Alert>
+            )}
             <form onSubmit={handleSubmit} className="space-y-4">
               {isSignUp && (
                 <div className="space-y-2">
