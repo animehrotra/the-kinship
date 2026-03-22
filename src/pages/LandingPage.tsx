@@ -8,7 +8,7 @@ const features = [
     icon: Users,
     title: "Organize your circles",
     description:
-      "Group the people who matter into Inner Circle, Close Friends, and Extended — so you know where to focus.",
+      "Group the people who matter into Inner Circle, Friends, Family, Acquaintances, and more — so you know where to focus.",
   },
   {
     icon: Bell,

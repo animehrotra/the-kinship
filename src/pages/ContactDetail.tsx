@@ -13,12 +13,7 @@ import { ArrowLeft, MessageSquare, Phone, Video, Users, Calendar, Archive, Plus 
 import { formatDistanceToNow, format, isPast, differenceInDays } from "date-fns";
 import type { Database } from "@/integrations/supabase/types";
 import TagPicker from "@/components/TagPicker";
-
-const circleLabels: Record<string, string> = {
-  inner_circle: "Inner Circle",
-  close_friends: "Close Friends",
-  extended: "Extended",
-};
+import { circleLabels } from "@/lib/constants";
 
 const interactionMeta: Record<string, { icon: typeof MessageSquare; label: string }> = {
   texted: { icon: MessageSquare, label: "Texted" },

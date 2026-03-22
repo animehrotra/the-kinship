@@ -83,7 +83,7 @@ export const archivedContacts: Contact[] = [
     id: "c4",
     user_id: "user-1",
     name: "Dave Archived",
-    circle: "extended",
+    circle: "others",
     nudge_frequency: "monthly",
     last_interaction_at: null,
     next_nudge_at: null,

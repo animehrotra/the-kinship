@@ -72,7 +72,7 @@ export default function Index() {
 
       {/* Circle Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {(["inner_circle", "close_friends", "extended"] as const).map((circle) => {
+        {circleOptions.map(({ value: circle }) => {
           const stats = circleSummary[circle] || { total: 0, reached: 0 };
           return (
             <Card key={circle} className="border-border/50">

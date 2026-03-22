@@ -169,9 +169,9 @@ export default function People() {
           <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Circles</SelectItem>
-            <SelectItem value="inner_circle">Inner Circle</SelectItem>
-            <SelectItem value="close_friends">Close Friends</SelectItem>
-            <SelectItem value="extended">Extended</SelectItem>
+            {circleOptions.map((o) => (
+              <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
