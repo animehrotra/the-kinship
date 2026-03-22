@@ -23,9 +23,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
         setSession(session);
         setLoading(false);
+
+        if (event === "SIGNED_IN" && window.location.hash.includes("type=signup")) {
+          toast({
+            title: "Email verified",
+            description: "Your account is active! Welcome to Kinship.",
+          });
+          window.history.replaceState(null, "", window.location.pathname);
+        }
       }
     );
 

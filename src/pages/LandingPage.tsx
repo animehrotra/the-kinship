@@ -28,6 +28,12 @@ export default function LandingPage() {
   const { session, loading } = useAuth();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (window.location.hash.includes("access_token")) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate]);
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
