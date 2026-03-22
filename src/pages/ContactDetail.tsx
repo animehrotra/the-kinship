@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useContact, useInteractions, useLifeEvents, useLogInteraction, useCreateLifeEvent, useUpdateContact } from "@/lib/hooks";
+import { useContact, useInteractions, useLifeEvents, useLogInteraction, useCreateLifeEvent, useUpdateContact, useContactTags, useAddContactTag, useRemoveContactTag } from "@/lib/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ArrowLeft, MessageSquare, Phone, Video, Users, Calendar, Archive, Plus } from "lucide-react";
 import { formatDistanceToNow, format, isPast, differenceInDays } from "date-fns";
 import type { Database } from "@/integrations/supabase/types";
+import TagPicker from "@/components/TagPicker";
 
 const circleLabels: Record<string, string> = {
   inner_circle: "Inner Circle",
@@ -34,9 +35,15 @@ export default function ContactDetail() {
   const { data: contact, isLoading } = useContact(id!);
   const { data: interactions = [] } = useInteractions(id!);
   const { data: lifeEvents = [] } = useLifeEvents(id!);
+  const { data: contactTagsData = [] } = useContactTags(id!);
   const logInteraction = useLogInteraction();
   const createLifeEvent = useCreateLifeEvent();
   const updateContact = useUpdateContact();
+  const addContactTag = useAddContactTag();
+  const removeContactTag = useRemoveContactTag();
+
+  const contactTagIds = contactTagsData.map((ct: any) => ct.tag_id);
+  const contactTags = contactTagsData.map((ct: any) => ct.tags).filter(Boolean);
 
   const [logType, setLogType] = useState<InteractionType>("texted");
   const [logSheetOpen, setLogSheetOpen] = useState(false);
@@ -104,9 +111,34 @@ export default function ContactDetail() {
                 Overdue
               </Badge>
             )}
+            {contactTags.map((tag: any) => (
+              <Badge
+                key={tag.id}
+                variant="secondary"
+                className="text-[10px]"
+                style={tag.color ? { backgroundColor: tag.color, color: "#fff" } : undefined}
+              >
+                {tag.name}
+              </Badge>
+            ))}
           </div>
         </div>
       </div>
+
+      {/* Tags management */}
+      <TagPicker
+        selectedTagIds={contactTagIds}
+        onChange={async (newTagIds) => {
+          const added = newTagIds.filter((id) => !contactTagIds.includes(id));
+          const removed = contactTagIds.filter((id: string) => !newTagIds.includes(id));
+          for (const tagId of added) {
+            await addContactTag.mutateAsync({ contactId: contact.id, tagId });
+          }
+          for (const tagId of removed) {
+            await removeContactTag.mutateAsync({ contactId: contact.id, tagId });
+          }
+        }}
+      />
 
       {/* Quick stats */}
       <div className="grid grid-cols-2 gap-3">
