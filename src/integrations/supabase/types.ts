@@ -255,7 +255,12 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
-      circle_tier: "inner_circle" | "close_friends" | "extended"
+      circle_tier:
+        | "inner_circle"
+        | "friends"
+        | "acquaintances"
+        | "family"
+        | "others"
       interaction_type: "texted" | "called" | "met_up" | "video_call"
       nudge_frequency: "weekly" | "biweekly" | "monthly" | "quarterly"
     }
@@ -386,7 +391,13 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
-      circle_tier: ["inner_circle", "close_friends", "extended"],
+      circle_tier: [
+        "inner_circle",
+        "friends",
+        "acquaintances",
+        "family",
+        "others",
+      ],
       interaction_type: ["texted", "called", "met_up", "video_call"],
       nudge_frequency: ["weekly", "biweekly", "monthly", "quarterly"],
     },

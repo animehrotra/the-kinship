@@ -3,12 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArchiveRestore } from "lucide-react";
-
-const circleLabels: Record<string, string> = {
-  inner_circle: "Inner Circle",
-  close_friends: "Close Friends",
-  extended: "Extended",
-};
+import { circleLabels } from "@/lib/constants";
 
 export default function ArchivePage() {
   const { data: contacts = [], isLoading } = useContacts(true);

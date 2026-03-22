@@ -13,12 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow, isPast } from "date-fns";
 import type { Database } from "@/integrations/supabase/types";
 import TagPicker from "@/components/TagPicker";
-
-const circleLabels: Record<string, string> = {
-  inner_circle: "Inner Circle",
-  close_friends: "Close Friends",
-  extended: "Extended",
-};
+import { circleLabels, circleOptions } from "@/lib/constants";
 
 type CircleTier = Database["public"]["Enums"]["circle_tier"];
 
@@ -38,7 +33,7 @@ export default function People() {
     email: "",
     birthday: "",
     notes: "",
-    circle: "extended" as CircleTier,
+    circle: "others" as CircleTier,
     nudge_frequency: "monthly" as Database["public"]["Enums"]["nudge_frequency"],
   });
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
@@ -64,7 +59,7 @@ export default function People() {
     for (const tagId of selectedTagIds) {
       await addContactTag.mutateAsync({ contactId: newContact.id, tagId });
     }
-    setForm({ name: "", phone: "", email: "", birthday: "", notes: "", circle: "extended", nudge_frequency: "monthly" });
+    setForm({ name: "", phone: "", email: "", birthday: "", notes: "", circle: "others", nudge_frequency: "monthly" });
     setSelectedTagIds([]);
     setDialogOpen(false);
   };
@@ -95,9 +90,9 @@ export default function People() {
                   <Select value={form.circle} onValueChange={(v) => setForm({ ...form, circle: v as CircleTier })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="inner_circle">Inner Circle</SelectItem>
-                      <SelectItem value="close_friends">Close Friends</SelectItem>
-                      <SelectItem value="extended">Extended</SelectItem>
+                      {circleOptions.map((o) => (
+                        <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -174,9 +169,9 @@ export default function People() {
           <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Circles</SelectItem>
-            <SelectItem value="inner_circle">Inner Circle</SelectItem>
-            <SelectItem value="close_friends">Close Friends</SelectItem>
-            <SelectItem value="extended">Extended</SelectItem>
+            {circleOptions.map((o) => (
+              <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>

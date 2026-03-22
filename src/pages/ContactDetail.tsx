@@ -13,12 +13,7 @@ import { ArrowLeft, MessageSquare, Phone, Video, Users, Calendar, Archive, Plus 
 import { formatDistanceToNow, format, isPast, differenceInDays } from "date-fns";
 import type { Database } from "@/integrations/supabase/types";
 import TagPicker from "@/components/TagPicker";
-
-const circleLabels: Record<string, string> = {
-  inner_circle: "Inner Circle",
-  close_friends: "Close Friends",
-  extended: "Extended",
-};
+import { circleLabels } from "@/lib/constants";
 
 const interactionMeta: Record<string, { icon: typeof MessageSquare; label: string }> = {
   texted: { icon: MessageSquare, label: "Texted" },
@@ -49,6 +44,7 @@ export default function ContactDetail() {
   const [logSheetOpen, setLogSheetOpen] = useState(false);
 
   const [eventForm, setEventForm] = useState({ title: "", description: "", event_date: "", recurring: false });
+  const [eventType, setEventType] = useState<"birthday" | "anniversary" | "custom">("custom");
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
 
   if (isLoading || !contact) {
@@ -84,6 +80,7 @@ export default function ContactDetail() {
       recurring: eventForm.recurring,
     });
     setEventForm({ title: "", description: "", event_date: "", recurring: false });
+    setEventType("custom");
     setEventDialogOpen(false);
   };
 
@@ -265,14 +262,48 @@ export default function ContactDetail() {
               </DialogHeader>
               <form onSubmit={handleAddEvent} className="space-y-3">
                 <div className="space-y-2">
-                  <Label>What happened?</Label>
-                  <Input
-                    value={eventForm.title}
-                    onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })}
-                    placeholder="Started new job, moved to NYC..."
-                    required
-                  />
+                  <Label>Type</Label>
+                  <div className="flex gap-2">
+                    {([
+                      { key: "birthday", label: "🎂 Birthday" },
+                      { key: "anniversary", label: "💍 Anniversary" },
+                      { key: "custom", label: "✏️ Custom" },
+                    ] as const).map(({ key, label }) => (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => {
+                          setEventType(key);
+                          if (key === "birthday") {
+                            setEventForm({ ...eventForm, title: "Birthday", recurring: true });
+                          } else if (key === "anniversary") {
+                            setEventForm({ ...eventForm, title: "Anniversary", recurring: true });
+                          } else {
+                            setEventForm({ ...eventForm, title: "", recurring: false });
+                          }
+                        }}
+                        className={`flex-1 px-3 py-2 rounded-lg border-2 text-sm font-medium transition-all ${
+                          eventType === key
+                            ? "border-primary bg-primary/5"
+                            : "border-border hover:border-primary/30"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
+                {eventType === "custom" && (
+                  <div className="space-y-2">
+                    <Label>What happened?</Label>
+                    <Input
+                      value={eventForm.title}
+                      onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })}
+                      placeholder="Started new job, moved to NYC..."
+                      required
+                    />
+                  </div>
+                )}
                 <div className="space-y-2">
                   <Label>Date</Label>
                   <Input
@@ -282,16 +313,18 @@ export default function ContactDetail() {
                     required
                   />
                 </div>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="recurring"
-                    checked={eventForm.recurring}
-                    onChange={(e) => setEventForm({ ...eventForm, recurring: e.target.checked })}
-                    className="rounded"
-                  />
-                  <Label htmlFor="recurring" className="text-sm">Recurring yearly (e.g. birthday)</Label>
-                </div>
+                {eventType === "custom" && (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="recurring"
+                      checked={eventForm.recurring}
+                      onChange={(e) => setEventForm({ ...eventForm, recurring: e.target.checked })}
+                      className="rounded"
+                    />
+                    <Label htmlFor="recurring" className="text-sm">Recurring yearly</Label>
+                  </div>
+                )}
                 <Button type="submit" className="w-full" disabled={createLifeEvent.isPending}>
                   {createLifeEvent.isPending ? "Saving..." : "Add event"}
                 </Button>

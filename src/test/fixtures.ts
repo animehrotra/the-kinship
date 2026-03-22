@@ -48,7 +48,7 @@ export const contacts: Contact[] = [
     id: "c2",
     user_id: "user-1",
     name: "Bob Smith",
-    circle: "close_friends",
+    circle: "friends",
     nudge_frequency: "monthly",
     last_interaction_at: monthAgo.toISOString(),
     next_nudge_at: inTenDays.toISOString(), // not overdue
@@ -64,7 +64,7 @@ export const contacts: Contact[] = [
     id: "c3",
     user_id: "user-1",
     name: "Carol Davis",
-    circle: "extended",
+    circle: "others",
     nudge_frequency: "quarterly",
     last_interaction_at: null, // never interacted
     next_nudge_at: null, // no nudge set
@@ -83,7 +83,7 @@ export const archivedContacts: Contact[] = [
     id: "c4",
     user_id: "user-1",
     name: "Dave Archived",
-    circle: "extended",
+    circle: "others",
     nudge_frequency: "monthly",
     last_interaction_at: null,
     next_nudge_at: null,

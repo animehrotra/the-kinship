@@ -4,12 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, Clock, Calendar, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow, isPast, format } from "date-fns";
-
-const circleLabels: Record<string, string> = {
-  inner_circle: "Inner Circle",
-  close_friends: "Close Friends",
-  extended: "Extended",
-};
+import { circleLabels, circleOptions } from "@/lib/constants";
 
 const interactionIcons: Record<string, string> = {
   texted: "💬",
@@ -77,7 +72,7 @@ export default function Index() {
 
       {/* Circle Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {(["inner_circle", "close_friends", "extended"] as const).map((circle) => {
+        {circleOptions.map(({ value: circle }) => {
           const stats = circleSummary[circle] || { total: 0, reached: 0 };
           return (
             <Card key={circle} className="border-border/50">
