@@ -1,7 +1,7 @@
+import { useEffect } from "react";
 import { Heart, Users, Bell, ArchiveRestore, ArrowRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
-import { Navigate } from "react-router-dom";
 
 const features = [
   {
@@ -27,6 +27,12 @@ const features = [
 export default function LandingPage() {
   const { session, loading } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (window.location.hash.includes("access_token")) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate]);
 
   if (loading) {
     return (
