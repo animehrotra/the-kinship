@@ -64,12 +64,13 @@ export function useCreateContact() {
   return useMutation({
     mutationFn: async (data: Omit<ContactInsert, "user_id">) => {
       const nextNudge = calcNextNudge(data.nudge_frequency || "monthly");
-      const { error } = await supabase.from("contacts").insert({
+      const { data: row, error } = await supabase.from("contacts").insert({
         ...data,
         user_id: user!.id,
         next_nudge_at: nextNudge,
-      });
+      }).select().single();
       if (error) throw error;
+      return row as Contact;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["contacts"] });
