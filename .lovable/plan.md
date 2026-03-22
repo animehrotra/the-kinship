@@ -1,21 +1,30 @@
 
 
-# Disable Email Auto-Confirm
+# Post-Email-Verification Flow Fix
 
 ## Summary
-Turn off email auto-confirmation so new sign-ups must verify their email before signing in. Update the sign-up flow to show a "Check your email" message and stay on the auth page instead of redirecting.
+After clicking the email verification link, users should be redirected to the dashboard with a confirmation message that their account is active.
+
+## Current Issues
+1. `emailRedirectTo` points to `/` (landing page) — no redirect to dashboard
+2. No confirmation message shown after verification
+3. Landing page doesn't handle the auth token in the URL
 
 ## Changes
 
-### 1. Backend: Disable auto-confirm
-Use `configure_auth` to set `auto_confirm_email: false`.
+### 1. Update `emailRedirectTo` in Auth.tsx
+Change from `window.location.origin` to `window.location.origin + '/dashboard'` so verified users land on the dashboard directly.
 
-### 2. Update E2E helpers & tests
-The E2E auth tests currently expect immediate redirect after sign-up. Update:
-- `e2e/helpers.ts` — after sign-up, wait for the confirmation toast instead of redirect
-- `e2e/auth.spec.ts` — the "sign up redirects to dashboard" test should expect the "Check your email" message instead of a URL change
-- Note: Other E2E tests (add-contact, log-interaction, archive) that depend on `signUpTestUser` will need a different strategy (e.g. use a pre-existing test account or re-enable auto-confirm in CI only). For now, they'll be documented as requiring manual email confirmation.
+### 2. Detect email verification in AuthProvider
+Listen for the `SIGNED_IN` event (which fires after email verification redirect) in `onAuthStateChange` within `src/lib/auth.tsx`. When the event is triggered from a verification flow, show a toast: "Email verified — your account is active!"
 
-### 3. No changes needed to Auth.tsx
-The sign-up flow already shows a "Check your email" toast on success and does not force-redirect — the redirect only happens when a session is detected, which won't occur without email confirmation.
+### 3. Handle redirect on the dashboard
+Since the dashboard is behind auth (via `AppLayout`), if the session is valid after verification, the user will see the dashboard. If for some reason the session isn't picked up, they'll be redirected to `/auth` where they can sign in normally.
+
+### 4. Handle the landing page case
+Update `LandingPage.tsx` to check for auth tokens in the URL hash (fallback if the user somehow lands on `/` with tokens) and redirect to `/dashboard`.
+
+## Technical Detail
+- The `onAuthStateChange` callback receives event types including `SIGNED_IN`. We can show a toast when this fires and the URL contains verification-related hash fragments (`access_token`, `type=signup`).
+- Alternatively, check for `event === 'SIGNED_IN'` combined with `session?.user?.email_confirmed_at` being very recent.
 
