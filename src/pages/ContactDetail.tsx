@@ -35,9 +35,15 @@ export default function ContactDetail() {
   const { data: contact, isLoading } = useContact(id!);
   const { data: interactions = [] } = useInteractions(id!);
   const { data: lifeEvents = [] } = useLifeEvents(id!);
+  const { data: contactTagsData = [] } = useContactTags(id!);
   const logInteraction = useLogInteraction();
   const createLifeEvent = useCreateLifeEvent();
   const updateContact = useUpdateContact();
+  const addContactTag = useAddContactTag();
+  const removeContactTag = useRemoveContactTag();
+
+  const contactTagIds = contactTagsData.map((ct: any) => ct.tag_id);
+  const contactTags = contactTagsData.map((ct: any) => ct.tags).filter(Boolean);
 
   const [logType, setLogType] = useState<InteractionType>("texted");
   const [logSheetOpen, setLogSheetOpen] = useState(false);
