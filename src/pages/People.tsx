@@ -33,7 +33,7 @@ export default function People() {
     email: "",
     birthday: "",
     notes: "",
-    circle: "extended" as CircleTier,
+    circle: "others" as CircleTier,
     nudge_frequency: "monthly" as Database["public"]["Enums"]["nudge_frequency"],
   });
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
