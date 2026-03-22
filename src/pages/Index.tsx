@@ -4,12 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, Clock, Calendar, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow, isPast, format } from "date-fns";
-
-const circleLabels: Record<string, string> = {
-  inner_circle: "Inner Circle",
-  close_friends: "Close Friends",
-  extended: "Extended",
-};
+import { circleLabels, circleOptions } from "@/lib/constants";
 
 const interactionIcons: Record<string, string> = {
   texted: "💬",
