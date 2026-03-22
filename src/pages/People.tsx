@@ -59,7 +59,7 @@ export default function People() {
     for (const tagId of selectedTagIds) {
       await addContactTag.mutateAsync({ contactId: newContact.id, tagId });
     }
-    setForm({ name: "", phone: "", email: "", birthday: "", notes: "", circle: "extended", nudge_frequency: "monthly" });
+    setForm({ name: "", phone: "", email: "", birthday: "", notes: "", circle: "others", nudge_frequency: "monthly" });
     setSelectedTagIds([]);
     setDialogOpen(false);
   };
