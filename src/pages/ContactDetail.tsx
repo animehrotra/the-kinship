@@ -80,6 +80,7 @@ export default function ContactDetail() {
       recurring: eventForm.recurring,
     });
     setEventForm({ title: "", description: "", event_date: "", recurring: false });
+    setEventType("custom");
     setEventDialogOpen(false);
   };
 
