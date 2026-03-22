@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useContact, useInteractions, useLifeEvents, useLogInteraction, useCreateLifeEvent, useUpdateContact } from "@/lib/hooks";
+import { useContact, useInteractions, useLifeEvents, useLogInteraction, useCreateLifeEvent, useUpdateContact, useContactTags, useAddContactTag, useRemoveContactTag } from "@/lib/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ArrowLeft, MessageSquare, Phone, Video, Users, Calendar, Archive, Plus } from "lucide-react";
 import { formatDistanceToNow, format, isPast, differenceInDays } from "date-fns";
 import type { Database } from "@/integrations/supabase/types";
+import TagPicker from "@/components/TagPicker";
 
 const circleLabels: Record<string, string> = {
   inner_circle: "Inner Circle",
