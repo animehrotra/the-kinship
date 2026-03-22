@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useContacts, useCreateContact } from "@/lib/hooks";
+import { useContacts, useCreateContact, useAddContactTag } from "@/lib/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,10 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow, isPast } from "date-fns";
 import type { Database } from "@/integrations/supabase/types";
+import TagPicker from "@/components/TagPicker";
 
 const circleLabels: Record<string, string> = {
   inner_circle: "Inner Circle",
@@ -24,6 +25,7 @@ type CircleTier = Database["public"]["Enums"]["circle_tier"];
 export default function People() {
   const { data: contacts = [], isLoading } = useContacts();
   const createContact = useCreateContact();
+  const addContactTag = useAddContactTag();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [circleFilter, setCircleFilter] = useState<string>("all");
@@ -39,6 +41,7 @@ export default function People() {
     circle: "extended" as CircleTier,
     nudge_frequency: "monthly" as Database["public"]["Enums"]["nudge_frequency"],
   });
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
   const filtered = contacts.filter((c) => {
     const matchName = c.name.toLowerCase().includes(search.toLowerCase());
@@ -48,7 +51,7 @@ export default function People() {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    await createContact.mutateAsync({
+    const newContact = await createContact.mutateAsync({
       name: form.name,
       phone: form.phone || null,
       email: form.email || null,
@@ -57,7 +60,12 @@ export default function People() {
       circle: form.circle,
       nudge_frequency: form.nudge_frequency,
     });
+    // Associate selected tags
+    for (const tagId of selectedTagIds) {
+      await addContactTag.mutateAsync({ contactId: newContact.id, tagId });
+    }
     setForm({ name: "", phone: "", email: "", birthday: "", notes: "", circle: "extended", nudge_frequency: "monthly" });
+    setSelectedTagIds([]);
     setDialogOpen(false);
   };
 
@@ -118,11 +126,30 @@ export default function People() {
               </div>
               <div className="space-y-2">
                 <Label>Birthday</Label>
-                <Input type="date" value={form.birthday} onChange={(e) => setForm({ ...form, birthday: e.target.value })} />
+                <div className="relative">
+                  <Input
+                    type="date"
+                    value={form.birthday}
+                    onChange={(e) => setForm({ ...form, birthday: e.target.value })}
+                  />
+                  {form.birthday && (
+                    <button
+                      type="button"
+                      onClick={() => setForm({ ...form, birthday: "" })}
+                      className="absolute right-8 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-muted text-muted-foreground"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="space-y-2">
                 <Label>Notes</Label>
                 <Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={2} />
+              </div>
+              <div className="space-y-2">
+                <Label>Tags</Label>
+                <TagPicker selectedTagIds={selectedTagIds} onChange={setSelectedTagIds} />
               </div>
               <Button type="submit" className="w-full" disabled={createContact.isPending}>
                 {createContact.isPending ? "Adding..." : "Add to your circle"}

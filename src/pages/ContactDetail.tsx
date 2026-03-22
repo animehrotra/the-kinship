@@ -111,7 +111,34 @@ export default function ContactDetail() {
                 Overdue
               </Badge>
             )}
+            {contactTags.map((tag: any) => (
+              <Badge
+                key={tag.id}
+                variant="secondary"
+                className="text-[10px]"
+                style={tag.color ? { backgroundColor: tag.color, color: "#fff" } : undefined}
+              >
+                {tag.name}
+              </Badge>
+            ))}
           </div>
+        </div>
+      </div>
+
+      {/* Tags management */}
+      <TagPicker
+        selectedTagIds={contactTagIds}
+        onChange={async (newTagIds) => {
+          const added = newTagIds.filter((id) => !contactTagIds.includes(id));
+          const removed = contactTagIds.filter((id: string) => !newTagIds.includes(id));
+          for (const tagId of added) {
+            await addContactTag.mutateAsync({ contactId: contact.id, tagId });
+          }
+          for (const tagId of removed) {
+            await removeContactTag.mutateAsync({ contactId: contact.id, tagId });
+          }
+        }}
+      />
         </div>
       </div>
 
