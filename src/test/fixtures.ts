@@ -48,7 +48,7 @@ export const contacts: Contact[] = [
     id: "c2",
     user_id: "user-1",
     name: "Bob Smith",
-    circle: "close_friends",
+    circle: "friends",
     nudge_frequency: "monthly",
     last_interaction_at: monthAgo.toISOString(),
     next_nudge_at: inTenDays.toISOString(), // not overdue
