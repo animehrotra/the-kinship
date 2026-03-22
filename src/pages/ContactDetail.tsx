@@ -139,8 +139,6 @@ export default function ContactDetail() {
           }
         }}
       />
-        </div>
-      </div>
 
       {/* Quick stats */}
       <div className="grid grid-cols-2 gap-3">
