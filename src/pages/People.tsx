@@ -13,12 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow, isPast } from "date-fns";
 import type { Database } from "@/integrations/supabase/types";
 import TagPicker from "@/components/TagPicker";
-
-const circleLabels: Record<string, string> = {
-  inner_circle: "Inner Circle",
-  close_friends: "Close Friends",
-  extended: "Extended",
-};
+import { circleLabels, circleOptions } from "@/lib/constants";
 
 type CircleTier = Database["public"]["Enums"]["circle_tier"];
 
