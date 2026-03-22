@@ -234,3 +234,57 @@ export function useUpcomingEvents() {
     enabled: !!user,
   });
 }
+
+export function useCreateTag() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ name, color }: { name: string; color?: string }) => {
+      const { data, error } = await supabase.from("tags").insert({
+        name,
+        color: color || null,
+        user_id: user!.id,
+      }).select().single();
+      if (error) throw error;
+      return data as Tag;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["tags"] });
+    },
+    onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),
+  });
+}
+
+export function useAddContactTag() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ contactId, tagId }: { contactId: string; tagId: string }) => {
+      const { error } = await supabase.from("contact_tags").insert({
+        contact_id: contactId,
+        tag_id: tagId,
+      });
+      if (error) throw error;
+    },
+    onSuccess: (_, vars) => {
+      qc.invalidateQueries({ queryKey: ["contact_tags", vars.contactId] });
+    },
+    onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),
+  });
+}
+
+export function useRemoveContactTag() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ contactId, tagId }: { contactId: string; tagId: string }) => {
+      const { error } = await supabase.from("contact_tags")
+        .delete()
+        .eq("contact_id", contactId)
+        .eq("tag_id", tagId);
+      if (error) throw error;
+    },
+    onSuccess: (_, vars) => {
+      qc.invalidateQueries({ queryKey: ["contact_tags", vars.contactId] });
+    },
+    onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),
+  });
+}
