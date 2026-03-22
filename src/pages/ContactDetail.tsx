@@ -44,6 +44,7 @@ export default function ContactDetail() {
   const [logSheetOpen, setLogSheetOpen] = useState(false);
 
   const [eventForm, setEventForm] = useState({ title: "", description: "", event_date: "", recurring: false });
+  const [eventType, setEventType] = useState<"birthday" | "anniversary" | "custom">("custom");
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
 
   if (isLoading || !contact) {
