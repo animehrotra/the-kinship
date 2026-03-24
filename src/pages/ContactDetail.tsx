@@ -307,12 +307,24 @@ export default function ContactDetail() {
                 )}
                 <div className="space-y-2">
                   <Label>Date</Label>
-                  <Input
-                    type="date"
-                    value={eventForm.event_date}
-                    onChange={(e) => setEventForm({ ...eventForm, event_date: e.target.value })}
-                    required
-                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    <Select value={eventForm.month} onValueChange={(v) => setEventForm({ ...eventForm, month: v })}>
+                      <SelectTrigger><SelectValue placeholder="Month" /></SelectTrigger>
+                      <SelectContent>
+                        {["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].map((m, idx) => (
+                          <SelectItem key={m} value={String(idx + 1)}>{m}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select value={eventForm.day} onValueChange={(v) => setEventForm({ ...eventForm, day: v })}>
+                      <SelectTrigger><SelectValue placeholder="Day" /></SelectTrigger>
+                      <SelectContent>
+                        {Array.from({ length: 31 }, (_, idx) => (
+                          <SelectItem key={idx + 1} value={String(idx + 1)}>{idx + 1}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 {eventType === "custom" && (
                   <div className="flex items-center gap-2">
