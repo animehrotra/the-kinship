@@ -1,19 +1,21 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useContacts, useUpcomingEvents } from "@/lib/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Clock, Calendar, Users } from "lucide-react";
+import { Heart, Clock, Calendar, Users, Bell, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { formatDistanceToNow, isPast, format } from "date-fns";
+import { formatDistanceToNow, isPast, isFuture, format } from "date-fns";
 import { circleLabels, circleOptions } from "@/lib/constants";
 import AddContactDialog from "@/components/AddContactDialog";
+import { Button } from "@/components/ui/button";
 
 export default function Index() {
   const { data: contacts = [], isLoading } = useContacts();
   const { data: upcomingEvents = [] } = useUpcomingEvents();
   const navigate = useNavigate();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-
+  const [nudgePage, setNudgePage] = useState(0);
+  const NUDGES_PER_PAGE = 5;
   const overdueContacts = contacts
     .filter((c) => c.next_nudge_at && isPast(new Date(c.next_nudge_at)))
     .sort((a, b) => new Date(a.next_nudge_at!).getTime() - new Date(b.next_nudge_at!).getTime());
@@ -31,6 +33,15 @@ export default function Index() {
     }
     return groups;
   })();
+
+  const upcomingNudges = useMemo(() => {
+    return contacts
+      .filter((c) => c.next_nudge_at && isFuture(new Date(c.next_nudge_at)))
+      .sort((a, b) => new Date(a.next_nudge_at!).getTime() - new Date(b.next_nudge_at!).getTime());
+  }, [contacts]);
+
+  const totalNudgePages = Math.max(1, Math.ceil(upcomingNudges.length / NUDGES_PER_PAGE));
+  const pagedNudges = upcomingNudges.slice(nudgePage * NUDGES_PER_PAGE, (nudgePage + 1) * NUDGES_PER_PAGE);
 
   if (isLoading) {
     return (
@@ -121,6 +132,65 @@ export default function Index() {
               </Card>
             ))}
           </div>
+        </section>
+      )}
+
+      {/* Upcoming Nudges */}
+      {upcomingNudges.length > 0 && (
+        <section>
+          <div className="flex items-center gap-2 mb-3">
+            <Bell className="w-4 h-4 text-primary" />
+            <h2 className="font-medium">Upcoming nudges</h2>
+          </div>
+          <div className="space-y-2">
+            {pagedNudges.map((c) => (
+              <Card
+                key={c.id}
+                className="border-border/50 cursor-pointer hover:shadow-md transition-shadow active:scale-[0.98]"
+                onClick={() => navigate(`/people/${c.id}`)}
+              >
+                <CardContent className="p-4 flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
+                      <span className="font-medium">{c.name}</span>
+                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                        {circleLabels[c.circle]}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-0.5">
+                      Due {formatDistanceToNow(new Date(c.next_nudge_at!), { addSuffix: true })}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          {totalNudgePages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-3">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                disabled={nudgePage === 0}
+                onClick={() => setNudgePage((p) => p - 1)}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                {nudgePage + 1} / {totalNudgePages}
+              </span>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                disabled={nudgePage >= totalNudgePages - 1}
+                onClick={() => setNudgePage((p) => p + 1)}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </section>
       )}
 
