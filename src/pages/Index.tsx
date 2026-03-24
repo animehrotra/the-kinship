@@ -1,22 +1,18 @@
+import { useState } from "react";
 import { useContacts, useUpcomingEvents } from "@/lib/hooks";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Heart, Clock, Calendar, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow, isPast, format } from "date-fns";
 import { circleLabels, circleOptions } from "@/lib/constants";
-
-const interactionIcons: Record<string, string> = {
-  texted: "💬",
-  called: "📞",
-  met_up: "🤝",
-  video_call: "📹",
-};
+import AddContactDialog from "@/components/AddContactDialog";
 
 export default function Index() {
   const { data: contacts = [], isLoading } = useContacts();
   const { data: upcomingEvents = [] } = useUpcomingEvents();
   const navigate = useNavigate();
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   const overdueContacts = contacts
     .filter((c) => c.next_nudge_at && isPast(new Date(c.next_nudge_at)))
@@ -57,11 +53,12 @@ export default function Index() {
           Add people you care about and Kinship will help you stay in touch.
         </p>
         <button
-          onClick={() => navigate("/people")}
+          onClick={() => setAddDialogOpen(true)}
           className="px-6 py-2.5 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
         >
           Add someone
         </button>
+        <AddContactDialog open={addDialogOpen} onOpenChange={setAddDialogOpen} />
       </div>
     );
   }
