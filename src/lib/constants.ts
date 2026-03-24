@@ -13,3 +13,10 @@ export const circleOptions = [
   { value: "family", label: "Family" },
   { value: "others", label: "Others" },
 ] as const;
+
+export const nudgeFrequencyLabels: Record<string, string> = {
+  weekly: "Weekly",
+  biweekly: "Biweekly",
+  monthly: "Monthly",
+  quarterly: "Quarterly",
+};

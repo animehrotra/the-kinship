@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, Clock, Calendar, Users, Bell, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow, isPast, isFuture, format } from "date-fns";
-import { circleLabels, circleOptions } from "@/lib/constants";
+import { circleLabels, circleOptions, nudgeFrequencyLabels } from "@/lib/constants";
 import AddContactDialog from "@/components/AddContactDialog";
 import { Button } from "@/components/ui/button";
 
@@ -157,9 +157,12 @@ export default function Index() {
                       <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
                         {circleLabels[c.circle]}
                       </Badge>
+                      <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                        {nudgeFrequencyLabels[c.nudge_frequency]}
+                      </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground mt-0.5">
-                      Due {formatDistanceToNow(new Date(c.next_nudge_at!), { addSuffix: true })}
+                      {format(new Date(c.next_nudge_at!), "MMM d, yyyy")}
                     </p>
                   </div>
                 </CardContent>
