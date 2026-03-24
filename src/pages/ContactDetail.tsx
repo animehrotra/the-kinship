@@ -43,7 +43,7 @@ export default function ContactDetail() {
   const [logType, setLogType] = useState<InteractionType>("texted");
   const [logSheetOpen, setLogSheetOpen] = useState(false);
 
-  const [eventForm, setEventForm] = useState({ title: "", description: "", event_date: "", recurring: false });
+  const [eventForm, setEventForm] = useState({ title: "", description: "", month: "", day: "", recurring: false });
   const [eventType, setEventType] = useState<"birthday" | "anniversary" | "custom">("custom");
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
 
@@ -72,14 +72,15 @@ export default function ContactDetail() {
 
   const handleAddEvent = async (e: React.FormEvent) => {
     e.preventDefault();
+    const eventDate = `2000-${eventForm.month.padStart(2, "0")}-${eventForm.day.padStart(2, "0")}`;
     await createLifeEvent.mutateAsync({
       contact_id: contact.id,
       title: eventForm.title,
       description: eventForm.description || undefined,
-      event_date: eventForm.event_date,
+      event_date: eventDate,
       recurring: eventForm.recurring,
     });
-    setEventForm({ title: "", description: "", event_date: "", recurring: false });
+    setEventForm({ title: "", description: "", month: "", day: "", recurring: false });
     setEventType("custom");
     setEventDialogOpen(false);
   };
@@ -306,12 +307,24 @@ export default function ContactDetail() {
                 )}
                 <div className="space-y-2">
                   <Label>Date</Label>
-                  <Input
-                    type="date"
-                    value={eventForm.event_date}
-                    onChange={(e) => setEventForm({ ...eventForm, event_date: e.target.value })}
-                    required
-                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    <Select value={eventForm.month} onValueChange={(v) => setEventForm({ ...eventForm, month: v })}>
+                      <SelectTrigger><SelectValue placeholder="Month" /></SelectTrigger>
+                      <SelectContent>
+                        {["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].map((m, idx) => (
+                          <SelectItem key={m} value={String(idx + 1)}>{m}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select value={eventForm.day} onValueChange={(v) => setEventForm({ ...eventForm, day: v })}>
+                      <SelectTrigger><SelectValue placeholder="Day" /></SelectTrigger>
+                      <SelectContent>
+                        {Array.from({ length: 31 }, (_, idx) => (
+                          <SelectItem key={idx + 1} value={String(idx + 1)}>{idx + 1}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 {eventType === "custom" && (
                   <div className="flex items-center gap-2">
@@ -344,7 +357,7 @@ export default function ContactDetail() {
                   {event.description && <p className="text-muted-foreground text-xs">{event.description}</p>}
                 </div>
                 <span className="text-muted-foreground ml-auto text-xs shrink-0">
-                  {format(new Date(event.event_date), "MMM d, yyyy")}
+                  {format(new Date(event.event_date), "MMM d")}
                 </span>
               </div>
             ))}
