@@ -43,6 +43,7 @@ export default function Index() {
   const totalNudgePages = Math.max(1, Math.ceil(upcomingNudges.length / NUDGES_PER_PAGE));
   const pagedNudges = upcomingNudges.slice(nudgePage * NUDGES_PER_PAGE, (nudgePage + 1) * NUDGES_PER_PAGE);
 
+  if (isLoading) {
     return (
       <div className="p-6 max-w-2xl mx-auto space-y-4">
         {[1, 2, 3].map((i) => (
@@ -131,6 +132,65 @@ export default function Index() {
               </Card>
             ))}
           </div>
+        </section>
+      )}
+
+      {/* Upcoming Nudges */}
+      {upcomingNudges.length > 0 && (
+        <section>
+          <div className="flex items-center gap-2 mb-3">
+            <Bell className="w-4 h-4 text-primary" />
+            <h2 className="font-medium">Upcoming nudges</h2>
+          </div>
+          <div className="space-y-2">
+            {pagedNudges.map((c) => (
+              <Card
+                key={c.id}
+                className="border-border/50 cursor-pointer hover:shadow-md transition-shadow active:scale-[0.98]"
+                onClick={() => navigate(`/people/${c.id}`)}
+              >
+                <CardContent className="p-4 flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
+                      <span className="font-medium">{c.name}</span>
+                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                        {circleLabels[c.circle]}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-0.5">
+                      Due {formatDistanceToNow(new Date(c.next_nudge_at!), { addSuffix: true })}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          {totalNudgePages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-3">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                disabled={nudgePage === 0}
+                onClick={() => setNudgePage((p) => p - 1)}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                {nudgePage + 1} / {totalNudgePages}
+              </span>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                disabled={nudgePage >= totalNudgePages - 1}
+                onClick={() => setNudgePage((p) => p + 1)}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </section>
       )}
 
