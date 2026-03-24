@@ -357,7 +357,7 @@ export default function ContactDetail() {
                   {event.description && <p className="text-muted-foreground text-xs">{event.description}</p>}
                 </div>
                 <span className="text-muted-foreground ml-auto text-xs shrink-0">
-                  {format(new Date(event.event_date), "MMM d, yyyy")}
+                  {format(new Date(event.event_date), "MMM d")}
                 </span>
               </div>
             ))}
