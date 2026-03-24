@@ -72,14 +72,15 @@ export default function ContactDetail() {
 
   const handleAddEvent = async (e: React.FormEvent) => {
     e.preventDefault();
+    const eventDate = `2000-${eventForm.month.padStart(2, "0")}-${eventForm.day.padStart(2, "0")}`;
     await createLifeEvent.mutateAsync({
       contact_id: contact.id,
       title: eventForm.title,
       description: eventForm.description || undefined,
-      event_date: eventForm.event_date,
+      event_date: eventDate,
       recurring: eventForm.recurring,
     });
-    setEventForm({ title: "", description: "", event_date: "", recurring: false });
+    setEventForm({ title: "", description: "", month: "", day: "", recurring: false });
     setEventType("custom");
     setEventDialogOpen(false);
   };
