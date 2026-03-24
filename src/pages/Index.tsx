@@ -14,7 +14,8 @@ export default function Index() {
   const { data: upcomingEvents = [] } = useUpcomingEvents();
   const navigate = useNavigate();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-
+  const [nudgePage, setNudgePage] = useState(0);
+  const NUDGES_PER_PAGE = 5;
   const overdueContacts = contacts
     .filter((c) => c.next_nudge_at && isPast(new Date(c.next_nudge_at)))
     .sort((a, b) => new Date(a.next_nudge_at!).getTime() - new Date(b.next_nudge_at!).getTime());
