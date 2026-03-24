@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useContacts, useUpcomingEvents } from "@/lib/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Clock, Calendar, Users } from "lucide-react";
+import { Heart, Clock, Calendar, Users, Bell, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { formatDistanceToNow, isPast, format } from "date-fns";
+import { formatDistanceToNow, isPast, isFuture, format } from "date-fns";
 import { circleLabels, circleOptions } from "@/lib/constants";
 import AddContactDialog from "@/components/AddContactDialog";
+import { Button } from "@/components/ui/button";
 
 export default function Index() {
   const { data: contacts = [], isLoading } = useContacts();
