@@ -34,7 +34,15 @@ export default function Index() {
     return groups;
   })();
 
-  if (isLoading) {
+  const upcomingNudges = useMemo(() => {
+    return contacts
+      .filter((c) => c.next_nudge_at && isFuture(new Date(c.next_nudge_at)))
+      .sort((a, b) => new Date(a.next_nudge_at!).getTime() - new Date(b.next_nudge_at!).getTime());
+  }, [contacts]);
+
+  const totalNudgePages = Math.max(1, Math.ceil(upcomingNudges.length / NUDGES_PER_PAGE));
+  const pagedNudges = upcomingNudges.slice(nudgePage * NUDGES_PER_PAGE, (nudgePage + 1) * NUDGES_PER_PAGE);
+
     return (
       <div className="p-6 max-w-2xl mx-auto space-y-4">
         {[1, 2, 3].map((i) => (
