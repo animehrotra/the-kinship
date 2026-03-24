@@ -157,9 +157,12 @@ export default function Index() {
                       <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
                         {circleLabels[c.circle]}
                       </Badge>
+                      <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                        {nudgeFrequencyLabels[c.nudge_frequency]}
+                      </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground mt-0.5">
-                      Due {formatDistanceToNow(new Date(c.next_nudge_at!), { addSuffix: true })}
+                      {format(new Date(c.next_nudge_at!), "MMM d, yyyy")}
                     </p>
                   </div>
                 </CardContent>
