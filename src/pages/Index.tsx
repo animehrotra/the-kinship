@@ -8,6 +8,8 @@ import { formatDistanceToNow, isPast, isFuture, format } from "date-fns";
 import { circleLabels, circleOptions, nudgeFrequencyLabels } from "@/lib/constants";
 import AddContactDialog from "@/components/AddContactDialog";
 import { Button } from "@/components/ui/button";
+import LogInteractionSheet from "@/components/LogInteractionSheet";
+import { MessageSquare } from "lucide-react";
 
 export default function Index() {
   const { data: contacts = [], isLoading } = useContacts();
@@ -146,11 +148,13 @@ export default function Index() {
             {pagedNudges.map((c) => (
               <Card
                 key={c.id}
-                className="border-border/50 cursor-pointer hover:shadow-md transition-shadow active:scale-[0.98]"
-                onClick={() => navigate(`/people/${c.id}`)}
+                className="border-border/50 hover:shadow-md transition-shadow"
               >
                 <CardContent className="p-4 flex items-center justify-between">
-                  <div>
+                  <div
+                    className="flex-1 cursor-pointer active:scale-[0.98]"
+                    onClick={() => navigate(`/people/${c.id}`)}
+                  >
                     <div className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
                       <span className="font-medium">{c.name}</span>
@@ -165,6 +169,16 @@ export default function Index() {
                       {format(new Date(c.next_nudge_at!), "MMM d, yyyy")}
                     </p>
                   </div>
+                  <LogInteractionSheet
+                    contactId={c.id}
+                    contactName={c.name}
+                    nudgeFrequency={c.nudge_frequency}
+                    trigger={
+                      <Button variant="ghost" size="icon" className="shrink-0" title="Log interaction">
+                        <MessageSquare className="w-4 h-4" />
+                      </Button>
+                    }
+                  />
                 </CardContent>
               </Card>
             ))}
