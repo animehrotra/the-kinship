@@ -23,6 +23,7 @@ export default function Auth() {
   const [submitting, setSubmitting] = useState(false);
   const [switchMessage, setSwitchMessage] = useState("");
   const [emailError, setEmailError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const passwordChecks = getPasswordErrors(password);
   const allPasswordChecksPassed = passwordChecks.every((c) => c.passed);
