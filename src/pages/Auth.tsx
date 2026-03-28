@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
-import { Heart } from "lucide-react";
+import { Heart, Eye, EyeOff } from "lucide-react";
 import { getPasswordErrors } from "@/lib/passwordValidation";
 import { PasswordChecklist } from "@/pages/ResetPassword";
 
@@ -23,6 +23,7 @@ export default function Auth() {
   const [submitting, setSubmitting] = useState(false);
   const [switchMessage, setSwitchMessage] = useState("");
   const [emailError, setEmailError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const passwordChecks = getPasswordErrors(password);
   const allPasswordChecksPassed = passwordChecks.every((c) => c.passed);
@@ -230,15 +231,26 @@ export default function Auth() {
                     </button>
                   )}
                 </div>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  minLength={8}
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    minLength={8}
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
                 {isSignUp && password.length > 0 && (
                   <PasswordChecklist checks={passwordChecks} />
                 )}
