@@ -8,6 +8,8 @@ import { formatDistanceToNow, isPast, isFuture, format } from "date-fns";
 import { circleLabels, circleOptions, nudgeFrequencyLabels } from "@/lib/constants";
 import AddContactDialog from "@/components/AddContactDialog";
 import { Button } from "@/components/ui/button";
+import LogInteractionSheet from "@/components/LogInteractionSheet";
+import { MessageSquare } from "lucide-react";
 
 export default function Index() {
   const { data: contacts = [], isLoading } = useContacts();
