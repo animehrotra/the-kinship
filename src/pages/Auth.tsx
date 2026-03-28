@@ -100,14 +100,7 @@ export default function Auth() {
         toast({ title: "Check your email", description: "We sent you a confirmation link. If you don't see it, check your spam or junk folder." });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) {
-          if (error.message === "Invalid login credentials") {
-            setIsSignUp(true);
-            setSwitchMessage("We couldn't find an account with that email. Create one below to get started!");
-            return;
-          }
-          throw error;
-        }
+        if (error) throw error;
       }
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
