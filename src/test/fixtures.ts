@@ -54,8 +54,12 @@ export const contacts: Contact[] = [
     name: "Bob Smith",
     circle: "friends",
     nudge_frequency: "monthly",
+    nudge_interval_value: 1,
+    nudge_interval_unit: "month",
+    nudge_start_date: null,
+    nudge_end_date: null,
     last_interaction_at: monthAgo.toISOString(),
-    next_nudge_at: inTenDays.toISOString(), // not overdue
+    next_nudge_at: inTenDays.toISOString(),
     archived: false,
     birthday: null,
     email: null,
