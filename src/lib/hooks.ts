@@ -10,14 +10,27 @@ type Interaction = Database["public"]["Tables"]["interactions"]["Row"];
 type LifeEvent = Database["public"]["Tables"]["life_events"]["Row"];
 type Tag = Database["public"]["Tables"]["tags"]["Row"];
 
-// Helper to calculate next nudge date
-export function calcNextNudge(frequency: string, from: Date = new Date()): string {
+// Helper to calculate next nudge date (supports both old enum and new interval format)
+export function calcNextNudge(
+  frequency: string,
+  from: Date = new Date(),
+  intervalValue?: number,
+  intervalUnit?: string
+): string {
   const d = new Date(from);
-  switch (frequency) {
-    case "weekly": d.setDate(d.getDate() + 7); break;
-    case "biweekly": d.setDate(d.getDate() + 14); break;
-    case "monthly": d.setMonth(d.getMonth() + 1); break;
-    case "quarterly": d.setMonth(d.getMonth() + 3); break;
+  if (intervalValue && intervalUnit) {
+    switch (intervalUnit) {
+      case "day": d.setDate(d.getDate() + intervalValue); break;
+      case "week": d.setDate(d.getDate() + intervalValue * 7); break;
+      case "month": d.setMonth(d.getMonth() + intervalValue); break;
+    }
+  } else {
+    switch (frequency) {
+      case "weekly": d.setDate(d.getDate() + 7); break;
+      case "biweekly": d.setDate(d.getDate() + 14); break;
+      case "monthly": d.setMonth(d.getMonth() + 1); break;
+      case "quarterly": d.setMonth(d.getMonth() + 3); break;
+    }
   }
   return d.toISOString();
 }
