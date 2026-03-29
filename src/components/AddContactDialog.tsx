@@ -6,10 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, X, Trash2 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Plus, Trash2, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import type { Database } from "@/integrations/supabase/types";
 import TagPicker from "@/components/TagPicker";
-import { circleOptions } from "@/lib/constants";
+import { circleOptions, intervalUnitOptions } from "@/lib/constants";
 
 type CircleTier = Database["public"]["Enums"]["circle_tier"];
 
@@ -42,13 +46,20 @@ export default function AddContactDialog({ open, onOpenChange, trigger }: AddCon
     email: "",
     notes: "",
     circle: "others" as CircleTier,
-    nudge_frequency: "monthly" as Database["public"]["Enums"]["nudge_frequency"],
+    nudge_interval_value: 1,
+    nudge_interval_unit: "month",
+    nudge_start_date: undefined as Date | undefined,
+    nudge_end_date: undefined as Date | undefined,
   });
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [lifeEvents, setLifeEvents] = useState<LifeEventEntry[]>([]);
 
   const resetForm = () => {
-    setForm({ name: "", phone: "", email: "", notes: "", circle: "others", nudge_frequency: "monthly" });
+    setForm({
+      name: "", phone: "", email: "", notes: "", circle: "others",
+      nudge_interval_value: 1, nudge_interval_unit: "month",
+      nudge_start_date: undefined, nudge_end_date: undefined,
+    });
     setSelectedTagIds([]);
     setLifeEvents([]);
   };
@@ -61,12 +72,15 @@ export default function AddContactDialog({ open, onOpenChange, trigger }: AddCon
       email: form.email || null,
       notes: form.notes || null,
       circle: form.circle,
-      nudge_frequency: form.nudge_frequency,
+      nudge_frequency: "monthly", // keep legacy field
+      nudge_interval_value: form.nudge_interval_value,
+      nudge_interval_unit: form.nudge_interval_unit,
+      nudge_start_date: form.nudge_start_date ? format(form.nudge_start_date, "yyyy-MM-dd") : null,
+      nudge_end_date: form.nudge_end_date ? format(form.nudge_end_date, "yyyy-MM-dd") : null,
     });
     for (const tagId of selectedTagIds) {
       await addContactTag.mutateAsync({ contactId: newContact.id, tagId });
     }
-    // Create life events
     for (const le of lifeEvents) {
       if (le.month && le.day) {
         const eventDate = `2000-${le.month.padStart(2, "0")}-${le.day.padStart(2, "0")}`;
@@ -110,31 +124,73 @@ export default function AddContactDialog({ open, onOpenChange, trigger }: AddCon
             <Label>Name *</Label>
             <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <Label>Circle *</Label>
-              <Select value={form.circle} onValueChange={(v) => setForm({ ...form, circle: v as CircleTier })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+          <div className="space-y-2">
+            <Label>Circle *</Label>
+            <Select value={form.circle} onValueChange={(v) => setForm({ ...form, circle: v as CircleTier })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {circleOptions.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Nudge frequency: "Every X days/weeks/months" */}
+          <div className="space-y-2">
+            <Label>Nudge every *</Label>
+            <div className="flex gap-2">
+              <Input
+                type="number"
+                min={1}
+                max={365}
+                value={form.nudge_interval_value}
+                onChange={(e) => setForm({ ...form, nudge_interval_value: Math.max(1, parseInt(e.target.value) || 1) })}
+                className="w-20"
+              />
+              <Select value={form.nudge_interval_unit} onValueChange={(v) => setForm({ ...form, nudge_interval_unit: v })}>
+                <SelectTrigger className="flex-1"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {circleOptions.map((o) => (
+                  {intervalUnitOptions.map((o) => (
                     <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          {/* Optional start / end dates */}
+          <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label>Nudge every *</Label>
-              <Select value={form.nudge_frequency} onValueChange={(v: any) => setForm({ ...form, nudge_frequency: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="weekly">Week</SelectItem>
-                  <SelectItem value="biweekly">2 Weeks</SelectItem>
-                  <SelectItem value="monthly">Month</SelectItem>
-                  <SelectItem value="quarterly">Quarter</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label>Start date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !form.nudge_start_date && "text-muted-foreground")}>
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {form.nudge_start_date ? format(form.nudge_start_date, "MMM d, yyyy") : "Optional"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={form.nudge_start_date} onSelect={(d) => setForm({ ...form, nudge_start_date: d || undefined })} initialFocus className="p-3 pointer-events-auto" />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="space-y-2">
+              <Label>End date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !form.nudge_end_date && "text-muted-foreground")}>
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {form.nudge_end_date ? format(form.nudge_end_date, "MMM d, yyyy") : "Optional"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={form.nudge_end_date} onSelect={(d) => setForm({ ...form, nudge_end_date: d || undefined })} initialFocus className="p-3 pointer-events-auto" />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
+
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label>Phone</Label>

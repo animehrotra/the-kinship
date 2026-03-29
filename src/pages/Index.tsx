@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, Clock, Calendar, Users, Bell, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow, isPast, isFuture, format } from "date-fns";
-import { circleLabels, circleOptions, nudgeFrequencyLabels } from "@/lib/constants";
+import { circleLabels, circleOptions, nudgeFrequencyLabels, formatNudgeInterval } from "@/lib/constants";
 import AddContactDialog from "@/components/AddContactDialog";
 import { Button } from "@/components/ui/button";
 import LogInteractionSheet from "@/components/LogInteractionSheet";
@@ -162,7 +162,9 @@ export default function Index() {
                         {circleLabels[c.circle]}
                       </Badge>
                       <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-                        {nudgeFrequencyLabels[c.nudge_frequency]}
+                        {c.nudge_interval_value && c.nudge_interval_unit
+                          ? formatNudgeInterval(c.nudge_interval_value, c.nudge_interval_unit)
+                          : nudgeFrequencyLabels[c.nudge_frequency]}
                       </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground mt-0.5">
@@ -173,6 +175,8 @@ export default function Index() {
                     contactId={c.id}
                     contactName={c.name}
                     nudgeFrequency={c.nudge_frequency}
+                    intervalValue={c.nudge_interval_value}
+                    intervalUnit={c.nudge_interval_unit}
                     trigger={
                       <Button variant="ghost" size="icon" className="shrink-0" title="Log interaction">
                         <MessageSquare className="w-4 h-4" />

@@ -10,14 +10,27 @@ type Interaction = Database["public"]["Tables"]["interactions"]["Row"];
 type LifeEvent = Database["public"]["Tables"]["life_events"]["Row"];
 type Tag = Database["public"]["Tables"]["tags"]["Row"];
 
-// Helper to calculate next nudge date
-export function calcNextNudge(frequency: string, from: Date = new Date()): string {
+// Helper to calculate next nudge date (supports both old enum and new interval format)
+export function calcNextNudge(
+  frequency: string,
+  from: Date = new Date(),
+  intervalValue?: number,
+  intervalUnit?: string
+): string {
   const d = new Date(from);
-  switch (frequency) {
-    case "weekly": d.setDate(d.getDate() + 7); break;
-    case "biweekly": d.setDate(d.getDate() + 14); break;
-    case "monthly": d.setMonth(d.getMonth() + 1); break;
-    case "quarterly": d.setMonth(d.getMonth() + 3); break;
+  if (intervalValue && intervalUnit) {
+    switch (intervalUnit) {
+      case "day": d.setDate(d.getDate() + intervalValue); break;
+      case "week": d.setDate(d.getDate() + intervalValue * 7); break;
+      case "month": d.setMonth(d.getMonth() + intervalValue); break;
+    }
+  } else {
+    switch (frequency) {
+      case "weekly": d.setDate(d.getDate() + 7); break;
+      case "biweekly": d.setDate(d.getDate() + 14); break;
+      case "monthly": d.setMonth(d.getMonth() + 1); break;
+      case "quarterly": d.setMonth(d.getMonth() + 3); break;
+    }
   }
   return d.toISOString();
 }
@@ -63,7 +76,14 @@ export function useCreateContact() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (data: Omit<ContactInsert, "user_id">) => {
-      const nextNudge = calcNextNudge(data.nudge_frequency || "monthly");
+      const intervalValue = (data as any).nudge_interval_value || 1;
+      const intervalUnit = (data as any).nudge_interval_unit || "month";
+      const nextNudge = calcNextNudge(
+        data.nudge_frequency || "monthly",
+        new Date(),
+        intervalValue,
+        intervalUnit
+      );
       const { data: row, error } = await supabase.from("contacts").insert({
         ...data,
         user_id: user!.id,
@@ -116,14 +136,16 @@ export function useLogInteraction() {
   const { user } = useAuth();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ contactId, type, notes, nudgeFrequency }: {
+    mutationFn: async ({ contactId, type, notes, nudgeFrequency, intervalValue, intervalUnit }: {
       contactId: string;
       type: Database["public"]["Enums"]["interaction_type"];
       notes?: string;
       nudgeFrequency: string;
+      intervalValue?: number;
+      intervalUnit?: string;
     }) => {
       const now = new Date().toISOString();
-      const nextNudge = calcNextNudge(nudgeFrequency);
+      const nextNudge = calcNextNudge(nudgeFrequency, new Date(), intervalValue, intervalUnit);
       
       const { error: intError } = await supabase.from("interactions").insert({
         contact_id: contactId,
