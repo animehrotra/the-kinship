@@ -1,28 +1,44 @@
 import { useState } from "react";
-import { useContacts } from "@/lib/hooks";
+import { useContacts, useDeleteContact } from "@/lib/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Search } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Plus, Search, Pencil, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow, isPast } from "date-fns";
 import { circleLabels, circleOptions } from "@/lib/constants";
 import AddContactDialog from "@/components/AddContactDialog";
+import EditContactDialog from "@/components/EditContactDialog";
+import type { Database } from "@/integrations/supabase/types";
+
+type Contact = Database["public"]["Tables"]["contacts"]["Row"];
 
 export default function People() {
   const { data: contacts = [], isLoading } = useContacts();
+  const deleteContact = useDeleteContact();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [circleFilter, setCircleFilter] = useState<string>("all");
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  const [editContact, setEditContact] = useState<Contact | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const filtered = contacts.filter((c) => {
     const matchName = c.name.toLowerCase().includes(search.toLowerCase());
     const matchCircle = circleFilter === "all" || c.circle === circleFilter;
     return matchName && matchCircle;
   });
+
+  const handleDelete = async () => {
+    if (deleteId) {
+      await deleteContact.mutateAsync(deleteId);
+      setDeleteId(null);
+    }
+  };
 
   return (
     <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-4">
@@ -96,12 +112,65 @@ export default function People() {
                         : "No interactions yet"}
                     </p>
                   </div>
+                  <div className="flex items-center gap-1 shrink-0 ml-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditContact(c);
+                      }}
+                      title="Edit"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive hover:text-destructive"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteId(c.id);
+                      }}
+                      title="Delete"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             );
           })}
         </div>
       )}
+
+      {/* Edit dialog */}
+      {editContact && (
+        <EditContactDialog
+          contact={editContact}
+          open={!!editContact}
+          onOpenChange={(open) => { if (!open) setEditContact(null); }}
+        />
+      )}
+
+      {/* Delete confirmation */}
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => { if (!open) setDeleteId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete contact?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete this contact and all their interactions, life events, and tags. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
