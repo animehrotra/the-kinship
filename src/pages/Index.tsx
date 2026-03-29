@@ -162,7 +162,9 @@ export default function Index() {
                         {circleLabels[c.circle]}
                       </Badge>
                       <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-                        {nudgeFrequencyLabels[c.nudge_frequency]}
+                        {c.nudge_interval_value && c.nudge_interval_unit
+                          ? formatNudgeInterval(c.nudge_interval_value, c.nudge_interval_unit)
+                          : nudgeFrequencyLabels[c.nudge_frequency]}
                       </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground mt-0.5">
