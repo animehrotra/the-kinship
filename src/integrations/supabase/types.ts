@@ -59,7 +59,11 @@ export type Database = {
           name: string
           next_nudge_at: string | null
           notes: string | null
+          nudge_end_date: string | null
           nudge_frequency: Database["public"]["Enums"]["nudge_frequency"]
+          nudge_interval_unit: string
+          nudge_interval_value: number
+          nudge_start_date: string | null
           phone: string | null
           updated_at: string
           user_id: string
@@ -75,7 +79,11 @@ export type Database = {
           name: string
           next_nudge_at?: string | null
           notes?: string | null
+          nudge_end_date?: string | null
           nudge_frequency?: Database["public"]["Enums"]["nudge_frequency"]
+          nudge_interval_unit?: string
+          nudge_interval_value?: number
+          nudge_start_date?: string | null
           phone?: string | null
           updated_at?: string
           user_id: string
@@ -91,7 +99,11 @@ export type Database = {
           name?: string
           next_nudge_at?: string | null
           notes?: string | null
+          nudge_end_date?: string | null
           nudge_frequency?: Database["public"]["Enums"]["nudge_frequency"]
+          nudge_interval_unit?: string
+          nudge_interval_value?: number
+          nudge_start_date?: string | null
           phone?: string | null
           updated_at?: string
           user_id?: string
