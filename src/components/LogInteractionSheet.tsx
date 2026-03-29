@@ -18,10 +18,12 @@ interface LogInteractionSheetProps {
   contactId: string;
   contactName: string;
   nudgeFrequency: string;
+  intervalValue?: number;
+  intervalUnit?: string;
   trigger: React.ReactNode;
 }
 
-export default function LogInteractionSheet({ contactId, contactName, nudgeFrequency, trigger }: LogInteractionSheetProps) {
+export default function LogInteractionSheet({ contactId, contactName, nudgeFrequency, intervalValue, intervalUnit, trigger }: LogInteractionSheetProps) {
   const [logType, setLogType] = useState<InteractionType>("texted");
   const [open, setOpen] = useState(false);
   const logInteraction = useLogInteraction();
