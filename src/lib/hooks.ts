@@ -78,9 +78,12 @@ export function useCreateContact() {
     mutationFn: async (data: Omit<ContactInsert, "user_id">) => {
       const intervalValue = (data as any).nudge_interval_value || 1;
       const intervalUnit = (data as any).nudge_interval_unit || "month";
+      const startDate = (data as any).nudge_start_date
+        ? new Date((data as any).nudge_start_date + "T00:00:00")
+        : new Date();
       const nextNudge = calcNextNudge(
         data.nudge_frequency || "monthly",
-        new Date(),
+        startDate,
         intervalValue,
         intervalUnit
       );
