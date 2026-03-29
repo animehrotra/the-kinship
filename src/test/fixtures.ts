@@ -74,8 +74,12 @@ export const contacts: Contact[] = [
     name: "Carol Davis",
     circle: "others",
     nudge_frequency: "quarterly",
-    last_interaction_at: null, // never interacted
-    next_nudge_at: null, // no nudge set
+    nudge_interval_value: 3,
+    nudge_interval_unit: "month",
+    nudge_start_date: null,
+    nudge_end_date: null,
+    last_interaction_at: null,
+    next_nudge_at: null,
     archived: false,
     birthday: null,
     email: null,
