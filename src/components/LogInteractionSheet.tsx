@@ -33,6 +33,8 @@ export default function LogInteractionSheet({ contactId, contactName, nudgeFrequ
       contactId,
       type: logType,
       nudgeFrequency,
+      intervalValue,
+      intervalUnit,
     });
     setOpen(false);
     setLogType("texted");

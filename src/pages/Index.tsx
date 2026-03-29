@@ -175,6 +175,8 @@ export default function Index() {
                     contactId={c.id}
                     contactName={c.name}
                     nudgeFrequency={c.nudge_frequency}
+                    intervalValue={c.nudge_interval_value}
+                    intervalUnit={c.nudge_interval_unit}
                     trigger={
                       <Button variant="ghost" size="icon" className="shrink-0" title="Log interaction">
                         <MessageSquare className="w-4 h-4" />

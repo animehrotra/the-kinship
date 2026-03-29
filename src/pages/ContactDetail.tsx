@@ -66,6 +66,8 @@ export default function ContactDetail() {
       contactId: contact.id,
       type: logType,
       nudgeFrequency: contact.nudge_frequency,
+      intervalValue: contact.nudge_interval_value,
+      intervalUnit: contact.nudge_interval_unit,
     });
     setLogSheetOpen(false);
   };

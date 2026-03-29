@@ -129,14 +129,16 @@ export function useLogInteraction() {
   const { user } = useAuth();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ contactId, type, notes, nudgeFrequency }: {
+    mutationFn: async ({ contactId, type, notes, nudgeFrequency, intervalValue, intervalUnit }: {
       contactId: string;
       type: Database["public"]["Enums"]["interaction_type"];
       notes?: string;
       nudgeFrequency: string;
+      intervalValue?: number;
+      intervalUnit?: string;
     }) => {
       const now = new Date().toISOString();
-      const nextNudge = calcNextNudge(nudgeFrequency);
+      const nextNudge = calcNextNudge(nudgeFrequency, new Date(), intervalValue, intervalUnit);
       
       const { error: intError } = await supabase.from("interactions").insert({
         contact_id: contactId,
