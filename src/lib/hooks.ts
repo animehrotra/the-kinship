@@ -76,7 +76,14 @@ export function useCreateContact() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (data: Omit<ContactInsert, "user_id">) => {
-      const nextNudge = calcNextNudge(data.nudge_frequency || "monthly");
+      const intervalValue = (data as any).nudge_interval_value || 1;
+      const intervalUnit = (data as any).nudge_interval_unit || "month";
+      const nextNudge = calcNextNudge(
+        data.nudge_frequency || "monthly",
+        new Date(),
+        intervalValue,
+        intervalUnit
+      );
       const { data: row, error } = await supabase.from("contacts").insert({
         ...data,
         user_id: user!.id,
