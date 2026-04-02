@@ -2,10 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 
-// The VAPID public key must be available client-side for subscription
-// This is a publishable key - safe to embed in client code
-const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY;
-
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
@@ -17,12 +13,32 @@ function urlBase64ToUint8Array(base64String: string) {
 
 type PushState = "unsupported" | "denied" | "prompt" | "subscribed" | "loading";
 
+let vapidKeyCache: string | null = null;
+
+async function getVapidKey(): Promise<string | null> {
+  if (vapidKeyCache) return vapidKeyCache;
+  try {
+    const { data, error } = await supabase.functions.invoke("get-vapid-key");
+    if (error || !data?.publicKey) return null;
+    vapidKeyCache = data.publicKey;
+    return vapidKeyCache;
+  } catch {
+    return null;
+  }
+}
+
 export function usePushNotifications() {
   const { user } = useAuth();
   const [state, setState] = useState<PushState>("loading");
 
   const checkState = useCallback(async () => {
-    if (!("serviceWorker" in navigator) || !("PushManager" in window) || !VAPID_PUBLIC_KEY) {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+      setState("unsupported");
+      return;
+    }
+
+    const key = await getVapidKey();
+    if (!key) {
       setState("unsupported");
       return;
     }
@@ -38,7 +54,6 @@ export function usePushNotifications() {
       return;
     }
 
-    // Check if we already have a subscription stored
     try {
       const reg = await navigator.serviceWorker.getRegistration("/sw.js");
       if (reg) {
@@ -52,7 +67,7 @@ export function usePushNotifications() {
       // fall through
     }
 
-    setState(permission === "granted" ? "prompt" : "prompt");
+    setState("prompt");
   }, [user]);
 
   useEffect(() => {
@@ -60,12 +75,11 @@ export function usePushNotifications() {
   }, [checkState]);
 
   const subscribe = useCallback(async () => {
-    if (!user || !VAPID_PUBLIC_KEY) return false;
+    if (!user) return false;
 
     try {
       setState("loading");
 
-      // Register service worker (only in production / non-iframe contexts)
       const isInIframe = (() => {
         try { return window.self !== window.top; } catch { return true; }
       })();
@@ -79,18 +93,23 @@ export function usePushNotifications() {
         return false;
       }
 
+      const vapidKey = await getVapidKey();
+      if (!vapidKey) {
+        setState("unsupported");
+        return false;
+      }
+
       const registration = await navigator.serviceWorker.register("/sw.js");
       await navigator.serviceWorker.ready;
 
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+        applicationServerKey: urlBase64ToUint8Array(vapidKey),
       });
 
       const json = subscription.toJSON();
 
-      // Store in database
-      const { error } = await supabase.from("push_subscriptions").upsert(
+      const { error } = await supabase.from("push_subscriptions" as any).upsert(
         {
           user_id: user.id,
           endpoint: json.endpoint!,
@@ -120,7 +139,7 @@ export function usePushNotifications() {
         if (sub) await sub.unsubscribe();
       }
       await supabase
-        .from("push_subscriptions")
+        .from("push_subscriptions" as any)
         .delete()
         .eq("user_id", user.id);
       setState("prompt");
