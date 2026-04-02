@@ -1,4 +1,5 @@
 import { Heart, Users, Archive, LogOut } from "lucide-react";
+import { NotificationToggle } from "@/components/NotificationToggle";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
@@ -62,6 +63,11 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="p-2">
+        {!collapsed && (
+          <div className="px-2 mb-2">
+            <NotificationToggle />
+          </div>
+        )}
         {!collapsed && user && (
           <p className="text-xs text-muted-foreground px-2 truncate mb-1">{user.email}</p>
         )}
