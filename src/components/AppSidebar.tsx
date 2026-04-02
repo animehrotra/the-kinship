@@ -1,4 +1,5 @@
 import { Heart, Users, Archive, LogOut } from "lucide-react";
+import { NotificationToggle } from "@/components/NotificationToggle";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
