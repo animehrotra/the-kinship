@@ -1,5 +1,10 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
 
 // Web Push utilities using the Web Crypto API (no npm:web-push needed in Deno)
 const base64UrlToUint8Array = (base64url: string): Uint8Array => {
