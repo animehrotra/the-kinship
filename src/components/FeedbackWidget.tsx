@@ -61,11 +61,10 @@ export function FeedbackWidget() {
       <Button
         onClick={() => setOpen(true)}
         size="icon"
-        variant="outline"
-        className="fixed bottom-20 right-4 z-50 h-12 w-12 rounded-full shadow-lg md:bottom-6"
+        className="fixed bottom-20 right-4 z-50 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-xl hover:bg-primary/90 md:bottom-6"
         aria-label="Send feedback"
       >
-        <MessageSquarePlus className="h-5 w-5" />
+        <Megaphone className="h-6 w-6" />
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
