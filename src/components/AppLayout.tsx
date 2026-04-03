@@ -32,6 +32,7 @@ export function AppLayout() {
             <Outlet />
           </main>
           <MobileNav />
+          <FeedbackWidget />
         </div>
       </div>
     </SidebarProvider>
