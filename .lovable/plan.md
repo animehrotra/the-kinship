@@ -34,12 +34,15 @@ Kinship is a personal CRM that helps individuals maintain meaningful relationshi
 | **Tags** | Create, assign, and remove color-coded tags on contacts. Tag picker with inline creation on contact detail page. Tags assigned during contact creation. |
 | **Search & Filter** | Search contacts by name and filter by circle on the People page. |
 | **Archive** | Soft-delete contacts to archive; restore from dedicated Archive page. |
+| **Push Notifications** | Web push notification infrastructure: VAPID key pair, service worker, browser subscription management, `push_subscriptions` table, `get-vapid-key` / `send-push` / `check-nudges` edge functions, and daily cron job (8 AM UTC). NotificationToggle component in sidebar. |
 
 ### Planned
 
 | Feature | Description |
 |---|---|
 | **Clear birthday field** | Allow resetting birthday to empty in edit forms. |
+| **Test push notifications end-to-end** | Publish the app, enable notifications on a real device, verify subscription is saved in the database, and confirm the daily cron delivers push reminders for due nudges. |
+| **Publish project** | Publish the app to a live `.lovable.app` URL so it can be used, tested, and shared. |
 
 ## 5. User Flows
 
@@ -82,8 +85,9 @@ Contact Detail -> "Add" life event -> Select type (Birthday/Anniversary/Custom)
 
 | Priority | Feature | Description |
 |---|---|---|
-| **P0** | Push/email notifications | Deliver nudges outside the app so users don't need to open it proactively. |
+| **P0** | Email notifications | Deliver nudge reminders via email so users don't need to open the app. (Push notifications are done.) |
 | **P0** | Mobile PWA / native feel | Install prompt, offline support, and app-like experience. |
+| **P1** | Customer feedback | In-app feedback form or widget allowing users to submit suggestions, report issues, and request features. |
 | **P1** | Notes on interactions | Allow adding freeform notes when logging an interaction (partially supported, not surfaced in UI). |
 | **P1** | Bulk actions | Multi-select contacts for bulk archive, tag, or circle reassignment. |
 | **P1** | Import contacts | CSV or Google Contacts import to reduce onboarding friction. |
