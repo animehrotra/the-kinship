@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MessageSquarePlus } from "lucide-react";
+import { Megaphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
