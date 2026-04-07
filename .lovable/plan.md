@@ -1,24 +1,13 @@
 
+# Kinship — Plan
 
-# Update README.md and Create NOTES.md
+## Completed
+- Core app (contacts, circles, nudges, interactions, life events, tags, feedback)
+- Authentication with email verification and password validation
+- Push notification infrastructure (VAPID, service worker, edge functions)
+- README.md and NOTES.md documentation
+- **Security hardening** — added WITH CHECK to contacts UPDATE RLS policy
 
-## What we're doing
-Two quick file updates to give the project proper documentation and a scratchpad for temporary notes.
-
-## Changes
-
-### 1. Rewrite `README.md`
-Replace the placeholder with a proper project description:
-- App name, tagline, and purpose
-- Key features list (circles, nudges, interaction logging, life events, tags, push notifications, feedback widget)
-- Tech stack (React, TypeScript, Vite, Tailwind CSS, Lovable Cloud)
-- Getting started / development instructions
-
-### 2. Create `NOTES.md`
-A personal scratchpad file with sections for:
-- Quick notes / ideas
-- To-do items (informal, separate from plan.md)
-- Questions / decisions to revisit
-
-Both files are documentation-only — no code or functionality changes.
-
+## Pending
+- Enable Leaked Password Protection (HIBP) via Cloud UI
+- Publish to live URL
