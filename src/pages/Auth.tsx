@@ -112,7 +112,23 @@ export default function Auth() {
     }
   };
 
-  // Forgot password view
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        toast({ title: "Error", description: String(result.error), variant: "destructive" });
+      }
+      if (result.redirected) return;
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
   if (isForgotPassword) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
