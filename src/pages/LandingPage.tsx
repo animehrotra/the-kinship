@@ -48,11 +48,11 @@ export default function LandingPage() {
     <div className="min-h-screen bg-background text-foreground">
       {/* Hero */}
       <section className="flex flex-col items-center justify-center px-6 pt-20 pb-16 text-center max-w-3xl mx-auto">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 mb-6">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#e9ede9] mb-6">
           <Heart className="w-7 h-7 text-primary" />
         </div>
-        <h2 className="text-2xl font-serif tracking-tight text-foreground mb-2">Kinship</h2>
-        <h1 className="text-4xl md:text-5xl font-serif tracking-tight mb-4">
+        <h2 className="font-serif tracking-tight mb-2 text-4xl text-[#55916b] font-thin">Kinship</h2>
+        <h1 className="md:text-5xl font-serif tracking-tight mb-4 text-3xl">
           Nurture the relationships&nbsp;that&nbsp;matter
         </h1>
         <p className="text-lg text-muted-foreground max-w-lg mb-8">
