@@ -52,7 +52,7 @@ export default function LandingPage() {
           <Heart className="w-7 h-7 text-primary" />
         </div>
         <h2 className="font-serif tracking-tight mb-2 text-4xl text-[#55916b] font-thin">Kinship</h2>
-        <h1 className="md:text-5xl font-serif tracking-tight mb-4 text-3xl">
+        <h1 className="font-serif tracking-tight mb-4 text-3xl md:text-3xl">
           Nurture the relationships&nbsp;that&nbsp;matter
         </h1>
         <p className="text-lg text-muted-foreground max-w-lg mb-8">
