@@ -51,7 +51,6 @@ export default function LandingPage() {
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 mb-6">
           <Heart className="w-7 h-7 text-primary" />
         </div>
-        <h2 className="text-2xl font-serif tracking-tight text-foreground mb-2">Kinship</h2>
         <h1 className="text-4xl md:text-5xl font-serif tracking-tight mb-4">
           Nurture the relationships&nbsp;that&nbsp;matter
         </h1>
