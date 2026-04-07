@@ -12,6 +12,7 @@ import { toast } from "@/hooks/use-toast";
 import { Heart, Eye, EyeOff } from "lucide-react";
 import { getPasswordErrors } from "@/lib/passwordValidation";
 import { PasswordChecklist } from "@/pages/ResetPassword";
+import { lovable } from "@/integrations/lovable/index";
 
 export default function Auth() {
   const { session, loading } = useAuth();
