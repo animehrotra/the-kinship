@@ -53,16 +53,16 @@ export default function LandingPage() {
         </div>
         <h2 className="font-serif tracking-tight mb-2 text-4xl text-[#55916b] font-thin">Kinship</h2>
         <h1 className="font-serif tracking-tight mb-4 text-3xl md:text-3xl">
-          Nurture the relationships&nbsp;that&nbsp;matter
+          Never lose touch with the people you love
         </h1>
         <p className="text-lg text-muted-foreground max-w-lg mb-8">
-          Life gets busy, friendships fade. Kinship is a personal CRM that helps you stay close to the people you care about — with gentle reminders, not guilt.
+          Life gets busy. People drift. Kinship quietly reminds you to show up — before the distance becomes too hard to close.
         </p>
         <button
           onClick={() => navigate("/auth")}
           className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors text-base"
         >
-          Get started <ArrowRight className="w-4 h-4" />
+          Start reconnecting <ArrowRight className="w-4 h-4" />
         </button>
       </section>
 
@@ -84,10 +84,39 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer CTA */}
+      {/* Why Kinship */}
+      <section className="px-6 pb-20 max-w-3xl mx-auto">
+        <h2 className="text-sm font-medium uppercase tracking-widest text-muted-foreground text-center mb-10">
+          Why Kinship
+        </h2>
+        <blockquote className="text-center">
+          <p className="font-serif italic text-xl md:text-2xl text-foreground leading-relaxed mb-4">
+            "The people we mean to call. The birthdays we almost forgot. The friends we keep saying we'll catch up with."
+          </p>
+          <footer className="text-muted-foreground">Kinship is for all of them.</footer>
+        </blockquote>
+      </section>
+
+      {/* Privacy */}
+      <section className="px-6 pb-20 max-w-3xl mx-auto text-center">
+        <h2 className="text-sm font-medium uppercase tracking-widest text-muted-foreground mb-6">
+          Your data. Your relationships.
+        </h2>
+        <p className="text-muted-foreground mb-8 leading-relaxed">
+          Private by design. Kinship will never sell your data, show you ads, or share your contacts with anyone.
+        </p>
+        <button
+          onClick={() => navigate("/auth")}
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors text-base"
+        >
+          Start reconnecting <ArrowRight className="w-4 h-4" />
+        </button>
+      </section>
+
+      {/* Footer */}
       <section className="border-t border-border px-6 py-12 text-center">
-        <p className="text-muted-foreground text-sm">
-          Free &amp; private. Your data stays yours.
+        <p className="text-muted-foreground text-sm italic">
+          Your relationships are private. So is your data.
         </p>
       </section>
     </div>
