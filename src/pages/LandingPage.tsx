@@ -68,7 +68,7 @@ export default function LandingPage() {
 
       {/* How it works */}
       <section className="px-6 pb-20 max-w-4xl mx-auto">
-        <h2 className="text-sm font-medium uppercase tracking-widest text-muted-foreground text-center mb-10">
+        <h2 className="uppercase tracking-widest text-muted-foreground text-center mb-10 font-sans text-xl font-bold">
           How it works
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
@@ -86,11 +86,11 @@ export default function LandingPage() {
 
       {/* Why Kinship */}
       <section className="px-6 pb-20 max-w-3xl mx-auto">
-        <h2 className="text-sm font-medium uppercase tracking-widest text-muted-foreground text-center mb-10">
+        <h2 className="uppercase tracking-widest text-muted-foreground text-center mb-10 font-sans text-xl font-bold">
           Why Kinship
         </h2>
         <blockquote className="text-center">
-          <p className="font-serif italic text-xl md:text-2xl text-foreground leading-relaxed mb-4">
+          <p className="font-serif italic text-xl text-foreground leading-relaxed mb-4 opacity-90 font-medium md:text-xl">
             "The people we mean to call. The birthdays we almost forgot. The friends we keep saying we'll catch up with."
           </p>
           <footer className="text-muted-foreground">Kinship is for all of them.</footer>
