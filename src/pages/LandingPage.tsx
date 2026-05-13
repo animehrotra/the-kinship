@@ -45,9 +45,24 @@ export default function LandingPage() {
   if (session) return <Navigate to="/dashboard" replace />;
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div
+      className="min-h-screen text-foreground relative"
+      style={{
+        backgroundImage:
+          "linear-gradient(to bottom, hsl(30 25% 97.5%) 0%, hsl(30 30% 95.5%) 100%)",
+      }}
+    >
+      {/* Subtle paper-grain texture overlay */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 opacity-[0.045] mix-blend-multiply"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.2  0 0 0 0 0.18  0 0 0 0 0.14  0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+        }}
+      />
       {/* Hero */}
-      <section className="flex flex-col items-center justify-center px-6 pt-20 pb-16 text-center max-w-3xl mx-auto">
+      <section className="flex flex-col items-center justify-center px-6 pt-20 pb-16 text-center max-w-3xl mx-auto relative">
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#e9ede9] mb-6">
           <Heart className="w-7 h-7 text-primary" />
         </div>
@@ -84,21 +99,26 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Why Kinship */}
-      <section className="px-6 pb-20 max-w-3xl mx-auto">
-        <h2 className="uppercase tracking-widest text-muted-foreground text-center mb-10 font-sans text-xl font-bold">
-          Why Kinship
-        </h2>
-        <blockquote className="text-center">
-          <p className="font-serif italic text-xl text-foreground leading-relaxed mb-4 opacity-90 font-medium md:text-xl">
-            "The people we mean to call. The birthdays we almost forgot. The friends we keep saying we'll catch up with."
-          </p>
-          <footer className="text-muted-foreground">Kinship is for all of them.</footer>
-        </blockquote>
+      {/* Why Kinship — full-bleed sage band for section differentiation */}
+      <section
+        className="px-6 py-20 relative"
+        style={{ backgroundColor: "hsl(140 18% 94%)" }}
+      >
+        <div className="max-w-3xl mx-auto">
+          <h2 className="uppercase tracking-widest text-muted-foreground text-center mb-10 font-sans text-xl font-bold">
+            Why Kinship
+          </h2>
+          <blockquote className="text-center">
+            <p className="font-serif italic text-xl text-foreground leading-relaxed mb-4 opacity-90 font-medium md:text-xl">
+              "The people we mean to call. The birthdays we almost forgot. The friends we keep saying we'll catch up with."
+            </p>
+            <footer className="text-muted-foreground">Kinship is for all of them.</footer>
+          </blockquote>
+        </div>
       </section>
 
       {/* Privacy */}
-      <section className="px-6 pb-20 max-w-3xl mx-auto text-center">
+      <section className="px-6 pt-20 pb-20 max-w-3xl mx-auto text-center">
         <h2 className="text-sm font-medium uppercase tracking-widest text-muted-foreground mb-6">
           Your data. Your relationships.
         </h2>
