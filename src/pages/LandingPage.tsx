@@ -118,13 +118,13 @@ export default function LandingPage() {
       </section>
 
       {/* Privacy */}
-      <section className="px-6 pt-10 pb-20 max-w-3xl mx-auto text-center">
-        <p className="font-serif text-2xl md:text-3xl text-foreground mb-3 leading-snug">
-          Private by design. Kinship will never sell your data, show you ads, or share your contacts with anyone.
-        </p>
-        <h2 className="text-sm font-medium uppercase tracking-widest text-muted-foreground mb-8">
+      <section className="px-6 pt-20 pb-20 max-w-3xl mx-auto text-center">
+        <h2 className="text-sm font-medium uppercase tracking-widest text-muted-foreground mb-6">
           Your data. Your relationships.
         </h2>
+        <p className="text-muted-foreground mb-8 leading-relaxed">
+          Private by design. Kinship will never sell your data, show you ads, or share your contacts with anyone.
+        </p>
         <button
           onClick={() => navigate("/auth")}
           className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors text-base"
@@ -135,6 +135,9 @@ export default function LandingPage() {
 
       {/* Footer */}
       <section className="border-t border-border px-6 py-12 text-center">
+        <p className="text-muted-foreground text-sm italic">
+          Your relationships are private. So is your data.
+        </p>
       </section>
     </div>
   );
