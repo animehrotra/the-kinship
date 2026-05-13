@@ -1,4 +1,4 @@
-# Kinship — Notes & Scratchpad
+M# Kinship — Notes & Scratchpad
 
 Personal notes, quick ideas, and informal to-dos. For the official product plan, see [plan.md](.lovable/plan.md).
 
@@ -9,7 +9,6 @@ Personal notes, quick ideas, and informal to-dos. For the official product plan,
 ## ✅ To-Do (Informal)
 
 - ** High **
-  App name change
   Landing Page copywrite refinement
   Add Someone - Circle dropdown values, Tag to Relationship Tag, Removal of methodology of reachout from V1
   Mobile app store compatibility so is ready to publish there
@@ -19,3 +18,5 @@ Personal notes, quick ideas, and informal to-dos. For the official product plan,
   - Feedback icon look and feel validate
 
 ## ❓ Questions / Decisions to Revisit
+
+- Making edits on github and see if the same reflects on lovable
