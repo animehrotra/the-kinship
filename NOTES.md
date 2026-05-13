@@ -20,3 +20,4 @@ Personal notes, quick ideas, and informal to-dos. For the official product plan,
 ## ❓ Questions / Decisions to Revisit
 
 - Making edits on github and see if the same reflects on lovable
+- to use branches to experiment w/o affecting main branch
