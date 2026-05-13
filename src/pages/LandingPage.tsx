@@ -118,7 +118,7 @@ export default function LandingPage() {
       </section>
 
       {/* Privacy */}
-      <section className="px-6 pb-20 max-w-3xl mx-auto text-center">
+      <section className="px-6 pt-20 pb-20 max-w-3xl mx-auto text-center">
         <h2 className="text-sm font-medium uppercase tracking-widest text-muted-foreground mb-6">
           Your data. Your relationships.
         </h2>
