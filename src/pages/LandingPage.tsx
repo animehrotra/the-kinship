@@ -135,9 +135,9 @@ export default function LandingPage() {
 
       {/* Footer */}
       <section className="border-t border-border px-6 py-12 text-center">
-        <p className="text-muted-foreground text-sm italic">
-          Your relationships are private. So is your data.
-        </p>
+        <h2 className="text-sm font-medium uppercase tracking-widest text-muted-foreground mb-6">
+          Your data. Your relationships.
+        </h2>
       </section>
     </div>
   );
