@@ -117,14 +117,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Privacy */}
-      <section className="px-6 pt-20 pb-20 max-w-3xl mx-auto text-center">
-        <h2 className="text-sm font-medium uppercase tracking-widest text-muted-foreground mb-6">
-          ​Your data. Your relationships.
-        </h2>
-        <p className="text-muted-foreground mb-8 leading-relaxed">
-          Private by design. Kinship will never sell your data, show you ads, or share your contacts with anyone.
-        </p>
+      {/* CTA */}
+      <section className="px-6 py-16 max-w-3xl mx-auto text-center">
         <button
           onClick={() => navigate("/auth")}
           className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors text-base"
