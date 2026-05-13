@@ -8,7 +8,7 @@ const features = [
     icon: Users,
     title: "Organize your circles",
     description:
-      "Group the people who matter into Inner Circle, Friends, Family, Acquaintances, and more — so you know where to focus.",
+      "Group the people who matter into Inner Circle, Friends, Family, Acquaintances, and more — so your energy always goes to the right people.",
   },
   {
     icon: Bell,
@@ -20,7 +20,7 @@ const features = [
     icon: ArchiveRestore,
     title: "Track every touchpoint",
     description:
-      "Log calls, texts, meetups, and video chats. See your relationship history at a glance.",
+      "Log calls, texts, meetups, and video chats. Every conversation remembered, so no one ever feels forgotten.",
   },
 ];
 
