@@ -99,17 +99,22 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Why Kinship */}
-      <section className="px-6 pb-20 max-w-3xl mx-auto">
-        <h2 className="uppercase tracking-widest text-muted-foreground text-center mb-10 font-sans text-xl font-bold">
-          Why Kinship
-        </h2>
-        <blockquote className="text-center">
-          <p className="font-serif italic text-xl text-foreground leading-relaxed mb-4 opacity-90 font-medium md:text-xl">
-            "The people we mean to call. The birthdays we almost forgot. The friends we keep saying we'll catch up with."
-          </p>
-          <footer className="text-muted-foreground">Kinship is for all of them.</footer>
-        </blockquote>
+      {/* Why Kinship — full-bleed sage band for section differentiation */}
+      <section
+        className="px-6 py-20 relative"
+        style={{ backgroundColor: "hsl(140 18% 94%)" }}
+      >
+        <div className="max-w-3xl mx-auto">
+          <h2 className="uppercase tracking-widest text-muted-foreground text-center mb-10 font-sans text-xl font-bold">
+            Why Kinship
+          </h2>
+          <blockquote className="text-center">
+            <p className="font-serif italic text-xl text-foreground leading-relaxed mb-4 opacity-90 font-medium md:text-xl">
+              "The people we mean to call. The birthdays we almost forgot. The friends we keep saying we'll catch up with."
+            </p>
+            <footer className="text-muted-foreground">Kinship is for all of them.</footer>
+          </blockquote>
+        </div>
       </section>
 
       {/* Privacy */}
