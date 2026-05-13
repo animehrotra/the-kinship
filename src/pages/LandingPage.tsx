@@ -120,7 +120,7 @@ export default function LandingPage() {
       {/* Privacy */}
       <section className="px-6 pt-20 pb-20 max-w-3xl mx-auto text-center">
         <h2 className="text-sm font-medium uppercase tracking-widest text-muted-foreground mb-6">
-          Your data. Your relationships.
+          ​Your data. Your relationships.
         </h2>
         <p className="text-muted-foreground mb-8 leading-relaxed">
           Private by design. Kinship will never sell your data, show you ads, or share your contacts with anyone.
