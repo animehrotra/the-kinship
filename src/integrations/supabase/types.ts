@@ -324,7 +324,7 @@ export type Database = {
         | "acquaintances"
         | "family"
         | "others"
-      interaction_type: "texted" | "called" | "met_up" | "video_call"
+      interaction_type: "texted" | "called" | "met_up" | "video_call" | "whatsapp"
       nudge_frequency: "weekly" | "biweekly" | "monthly" | "quarterly"
     }
     CompositeTypes: {
@@ -461,7 +461,7 @@ export const Constants = {
         "family",
         "others",
       ],
-      interaction_type: ["texted", "called", "met_up", "video_call"],
+      interaction_type: ["texted", "called", "met_up", "video_call", "whatsapp"],
       nudge_frequency: ["weekly", "biweekly", "monthly", "quarterly"],
     },
   },
