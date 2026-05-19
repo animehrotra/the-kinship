@@ -9,7 +9,6 @@ Personal notes, quick ideas, and informal to-dos. For the official product plan,
 ## ✅ To-Do (Informal)
 
 - ** High **
-  Landing Page copywrite refinement
   Add Someone - Circle dropdown values, Tag to Relationship Tag, Removal of methodology of reachout from V1
   Mobile app store compatibility so is ready to publish there
 - ** Medium **
