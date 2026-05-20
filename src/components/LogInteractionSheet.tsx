@@ -59,7 +59,7 @@ export default function LogInteractionSheet({ contactId, contactName, nudgeFrequ
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="max-w-md p-5">
         <DialogHeader>
-          <DialogTitle className="text-base">Log interaction with {contactName}</DialogTitle>
+          <DialogTitle className="text-base">Log connection with {contactName}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 mt-2">
