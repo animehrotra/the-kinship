@@ -63,52 +63,68 @@ export default function LogInteractionSheet({ contactId, contactName, nudgeFrequ
   };
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>{trigger}</SheetTrigger>
-      <SheetContent side="bottom" className="rounded-t-2xl">
-        <SheetHeader>
-          <SheetTitle>Log interaction with {contactName}</SheetTitle>
-        </SheetHeader>
-        <div className="grid grid-cols-3 gap-3 mt-4">
-          {(Object.entries(interactionMeta) as [InteractionType, typeof interactionMeta[string]][]).map(
-            ([type, { icon: Icon, label }]) => (
-              <button
-                key={type}
-                onClick={() => setLogType(type)}
-                className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
-                  logType === type
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:border-primary/30"
-                }`}
-              >
-                <Icon className="w-5 h-5" />
-                <span className="text-sm font-medium">{label}</span>
-              </button>
-            )
-          )}
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent className="max-w-md p-5">
+        <DialogHeader>
+          <DialogTitle className="text-base">Log interaction with {contactName}</DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-4 mt-2">
+          <div>
+            <Label className="text-xs text-muted-foreground mb-2 block">How did you connect?</Label>
+            <div className="grid grid-cols-5 gap-2">
+              {(Object.entries(interactionMeta) as [InteractionType, typeof interactionMeta[string]][]).map(
+                ([type, { icon: Icon, label }]) => (
+                  <button
+                    key={type}
+                    onClick={() => setLogType(type)}
+                    className={`px-1 py-2.5 rounded-lg border transition-all flex flex-col items-center gap-1 ${
+                      logType === type
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/30"
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="text-[11px] font-medium leading-tight">{label}</span>
+                  </button>
+                )
+              )}
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="interaction-notes" className="text-xs text-muted-foreground mb-1.5 block">Note (optional)</Label>
+            <Textarea
+              id="interaction-notes"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="e.g. wished happy birthday"
+              className="resize-none min-h-0"
+              rows={2}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="interaction-date" className="text-xs text-muted-foreground mb-1.5 block">When did this happen?</Label>
+            <Input
+              id="interaction-date"
+              type="date"
+              value={date}
+              max={todayISO()}
+              onChange={(e) => setDate(e.target.value)}
+            />
+          </div>
+
+          <Button
+            onClick={handleLog}
+            className="w-full"
+            disabled={logInteraction.isPending}
+          >
+            {logInteraction.isPending ? "Saving..." : "Save"}
+          </Button>
         </div>
-        <Textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder="Add a note… e.g. wished happy birthday"
-          className="mt-4 resize-none"
-          rows={2}
-        />
-        <Input
-          type="date"
-          value={date}
-          max={todayISO()}
-          onChange={(e) => setDate(e.target.value)}
-          className="mt-3"
-        />
-        <Button
-          onClick={handleLog}
-          className="w-full mt-4"
-          disabled={logInteraction.isPending}
-        >
-          {logInteraction.isPending ? "Saving..." : "Save"}
-        </Button>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 }
