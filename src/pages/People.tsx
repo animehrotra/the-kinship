@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useContacts, useDeleteContact } from "@/lib/hooks";
+import { useContacts, useDeleteContact, getContactStatus } from "@/lib/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Plus, Search, Pencil, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { formatDistanceToNow, isPast } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import { circleLabels, circleOptions } from "@/lib/constants";
 import AddContactDialog from "@/components/AddContactDialog";
 import EditContactDialog from "@/components/EditContactDialog";
@@ -90,7 +90,8 @@ export default function People() {
       ) : (
         <div className="space-y-2">
           {filtered.map((c) => {
-            const overdue = c.next_nudge_at && isPast(new Date(c.next_nudge_at));
+            const status = getContactStatus(c);
+            const dotColor = { "on-track": "bg-emerald", "overdue": "bg-amber", "drifting": "bg-red-500" }[status];
             return (
               <Card
                 key={c.id}
@@ -100,7 +101,7 @@ export default function People() {
                 <CardContent className="p-4 flex items-center justify-between">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full shrink-0 ${overdue ? "bg-amber" : "bg-emerald"}`} />
+                      <span className={`w-2 h-2 rounded-full shrink-0 ${dotColor}`} />
                       <span className="font-medium truncate">{c.name}</span>
                       <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">
                         {circleLabels[c.circle]}

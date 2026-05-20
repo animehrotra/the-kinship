@@ -35,6 +35,19 @@ export function calcNextNudge(
   return d.toISOString();
 }
 
+export function getContactStatus(c: Contact): "on-track" | "overdue" | "drifting" {
+  if (!c.next_nudge_at || new Date(c.next_nudge_at) > new Date()) return "on-track";
+  let intervalMs: number;
+  if (c.nudge_interval_value && c.nudge_interval_unit) {
+    const daysMap: Record<string, number> = { day: 1, week: 7, month: 30 };
+    intervalMs = c.nudge_interval_value * (daysMap[c.nudge_interval_unit] || 30) * 86400000;
+  } else {
+    const daysMap: Record<string, number> = { weekly: 7, biweekly: 14, monthly: 30, quarterly: 90 };
+    intervalMs = (daysMap[c.nudge_frequency] || 30) * 86400000;
+  }
+  return Date.now() - new Date(c.next_nudge_at).getTime() > intervalMs ? "drifting" : "overdue";
+}
+
 export function useContacts(archived = false) {
   const { user } = useAuth();
   return useQuery({
@@ -267,11 +280,33 @@ export function useUpcomingEvents() {
         .from("life_events")
         .select("*, contacts(name, id)")
         .eq("user_id", user!.id)
-        .gte("event_date", new Date().toISOString().split("T")[0])
-        .lte("event_date", new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0])
         .order("event_date");
       if (error) throw error;
-      return data;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const in30 = new Date(today.getTime() + 30 * 86400000);
+
+      return (data ?? [])
+        .map((event) => {
+          const d = new Date(event.event_date + "T00:00:00");
+          let displayDate: string;
+          if (event.recurring) {
+            const thisYear = new Date(today.getFullYear(), d.getMonth(), d.getDate());
+            displayDate = thisYear >= today
+              ? thisYear.toISOString().split("T")[0]
+              : new Date(today.getFullYear() + 1, d.getMonth(), d.getDate()).toISOString().split("T")[0];
+          } else {
+            displayDate = event.event_date;
+          }
+          const displayDateObj = new Date(displayDate + "T00:00:00");
+          if (displayDateObj >= today && displayDateObj <= in30) {
+            return { ...event, display_date: displayDate };
+          }
+          return null;
+        })
+        .filter((e): e is NonNullable<typeof e> => e !== null)
+        .sort((a, b) => a.display_date.localeCompare(b.display_date));
     },
     enabled: !!user,
   });
