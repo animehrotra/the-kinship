@@ -174,7 +174,7 @@ export default function ContactDetail() {
           trigger={
             <Button className="flex-1 gap-2">
               <MessageSquare className="w-4 h-4" />
-              Log interaction
+              Log connection
             </Button>
           }
         />
