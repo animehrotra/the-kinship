@@ -109,7 +109,7 @@ export default function People() {
                     <p className="text-sm text-muted-foreground mt-0.5 ml-4">
                       {c.last_interaction_at
                         ? formatDistanceToNow(new Date(c.last_interaction_at), { addSuffix: true })
-                        : "No interactions yet"}
+                        : "No connections yet"}
                     </p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0 ml-2">
@@ -160,7 +160,7 @@ export default function People() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete contact?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete this contact and all their interactions, life events, and tags. This action cannot be undone.
+              This will permanently delete this contact and all their connections, life events, and tags. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

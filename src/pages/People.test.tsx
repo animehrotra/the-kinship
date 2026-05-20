@@ -88,6 +88,6 @@ describe("People Page", () => {
   it("shows 'No interactions yet' for contacts without last_interaction_at", () => {
     renderPeople();
     // Carol Davis has null last_interaction_at
-    expect(screen.getByText(/no interactions yet/i)).toBeInTheDocument();
+    expect(screen.getByText(/no connections yet/i)).toBeInTheDocument();
   });
 });

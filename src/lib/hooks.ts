@@ -185,7 +185,7 @@ export function useLogInteraction() {
       qc.invalidateQueries({ queryKey: ["contacts"] });
       qc.invalidateQueries({ queryKey: ["contact", vars.contactId] });
       qc.invalidateQueries({ queryKey: ["interactions", vars.contactId] });
-      toast({ title: "Interaction logged" });
+      toast({ title: "Connection logged" });
     },
     onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),
   });
