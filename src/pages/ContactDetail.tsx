@@ -176,44 +176,19 @@ export default function ContactDetail() {
 
       {/* Actions */}
       <div className="flex gap-2">
-        <Sheet open={logSheetOpen} onOpenChange={setLogSheetOpen}>
-          <SheetTrigger asChild>
+        <LogInteractionSheet
+          contactId={contact.id}
+          contactName={contact.name}
+          nudgeFrequency={contact.nudge_frequency}
+          intervalValue={contact.nudge_interval_value}
+          intervalUnit={contact.nudge_interval_unit}
+          trigger={
             <Button className="flex-1 gap-2">
               <MessageSquare className="w-4 h-4" />
               Log interaction
             </Button>
-          </SheetTrigger>
-          <SheetContent side="bottom" className="rounded-t-2xl">
-            <SheetHeader>
-              <SheetTitle>Log interaction with {contact.name}</SheetTitle>
-            </SheetHeader>
-            <div className="grid grid-cols-2 gap-3 mt-4">
-              {(Object.entries(interactionMeta) as [InteractionType, typeof interactionMeta[string]][]).map(
-                ([type, { icon: Icon, label }]) => (
-                  <button
-                    key={type}
-                    onClick={() => setLogType(type)}
-                    className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
-                      logType === type
-                        ? "border-primary bg-primary/5"
-                        : "border-border hover:border-primary/30"
-                    }`}
-                  >
-                    <Icon className="w-5 h-5" />
-                    <span className="text-sm font-medium">{label}</span>
-                  </button>
-                )
-              )}
-            </div>
-            <Button
-              onClick={handleLog}
-              className="w-full mt-4"
-              disabled={logInteraction.isPending}
-            >
-              {logInteraction.isPending ? "Saving..." : "Save"}
-            </Button>
-          </SheetContent>
-        </Sheet>
+          }
+        />
 
         <Button variant="outline" size="icon" onClick={handleArchive} title={contact.archived ? "Unarchive" : "Archive"}>
           <Archive className="w-4 h-4" />
