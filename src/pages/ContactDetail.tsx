@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ArrowLeft, MessageSquare, Phone, Video, Users, Calendar, Archive, Plus } from "lucide-react";
 import { formatDistanceToNow, format, isPast, differenceInDays } from "date-fns";
-import type { Database } from "@/integrations/supabase/types";
 import TagPicker from "@/components/TagPicker";
 import LogInteractionSheet from "@/components/LogInteractionSheet";
 import { circleLabels } from "@/lib/constants";
@@ -30,8 +29,6 @@ const interactionMeta: Record<string, { icon: ComponentType<{ className?: string
   video_call: { icon: Video, label: "Video call" },
   whatsapp: { icon: WhatsAppIcon, label: "WhatsApp" },
 };
-
-type InteractionType = Database["public"]["Enums"]["interaction_type"];
 
 export default function ContactDetail() {
   const { id } = useParams<{ id: string }>();
