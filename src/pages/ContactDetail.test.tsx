@@ -8,17 +8,27 @@ import { contacts, interactions, lifeEvents } from "@/test/fixtures";
 const mockUseContact = vi.fn();
 const mockUseInteractions = vi.fn();
 const mockUseLifeEvents = vi.fn();
+const mockUseContactTags = vi.fn();
+const mockUseTags = vi.fn();
 const mockLogInteraction = { mutateAsync: vi.fn(), isPending: false };
 const mockCreateLifeEvent = { mutateAsync: vi.fn(), isPending: false };
 const mockUpdateContact = { mutateAsync: vi.fn(), isPending: false };
+const mockAddContactTag = { mutateAsync: vi.fn(), isPending: false };
+const mockRemoveContactTag = { mutateAsync: vi.fn(), isPending: false };
+const mockCreateTag = { mutateAsync: vi.fn(), isPending: false };
 
 vi.mock("@/lib/hooks", () => ({
   useContact: (id: string) => mockUseContact(id),
   useInteractions: (id: string) => mockUseInteractions(id),
   useLifeEvents: (id: string) => mockUseLifeEvents(id),
+  useContactTags: (id: string) => mockUseContactTags(id),
+  useTags: () => mockUseTags(),
   useLogInteraction: () => mockLogInteraction,
   useCreateLifeEvent: () => mockCreateLifeEvent,
   useUpdateContact: () => mockUpdateContact,
+  useAddContactTag: () => mockAddContactTag,
+  useRemoveContactTag: () => mockRemoveContactTag,
+  useCreateTag: () => mockCreateTag,
 }));
 
 vi.mock("@/lib/auth", () => ({
@@ -44,6 +54,8 @@ describe("ContactDetail Page", () => {
     mockUseContact.mockReturnValue({ data: contacts[0], isLoading: false });
     mockUseInteractions.mockReturnValue({ data: interactions });
     mockUseLifeEvents.mockReturnValue({ data: lifeEvents });
+    mockUseContactTags.mockReturnValue({ data: [] });
+    mockUseTags.mockReturnValue({ data: [] });
   });
 
   // Happy path: renders contact info
