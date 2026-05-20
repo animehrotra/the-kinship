@@ -16,11 +16,11 @@ test.describe("Log an Interaction", () => {
     await page.getByText("Interaction Test").click();
     await expect(page.locator("h1")).toContainText("Interaction Test");
 
-    // Click "Log interaction"
-    await page.getByRole("button", { name: "Log interaction" }).click();
+    // Click "Log connection"
+    await page.getByRole("button", { name: "Log connection" }).click();
 
     // Select "Texted" (default) and save
-    await expect(page.getByText("Log interaction with Interaction Test")).toBeVisible();
+    await expect(page.getByText("Log connection with Interaction Test")).toBeVisible();
     await page.getByRole("button", { name: "Save" }).click();
 
     // Verify interaction appears in History

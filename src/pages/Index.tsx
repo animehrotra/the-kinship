@@ -127,7 +127,7 @@ export default function Index() {
                     <p className="text-sm text-muted-foreground mt-0.5">
                       {c.last_interaction_at
                         ? `Last seen ${formatDistanceToNow(new Date(c.last_interaction_at), { addSuffix: true })}`
-                        : "No interactions yet"}
+                        : "No connections yet"}
                     </p>
                   </div>
                 </CardContent>
@@ -178,7 +178,7 @@ export default function Index() {
                     intervalValue={c.nudge_interval_value}
                     intervalUnit={c.nudge_interval_unit}
                     trigger={
-                      <Button variant="ghost" size="icon" className="shrink-0" title="Log interaction">
+                      <Button variant="ghost" size="icon" className="shrink-0" title="Log connection">
                         <MessageSquare className="w-4 h-4" />
                       </Button>
                     }

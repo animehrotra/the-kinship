@@ -79,7 +79,7 @@ describe("Index (Dashboard)", () => {
     }];
     mockUseContacts.mockReturnValue({ data: overdueNoInteraction, isLoading: false });
     renderIndex();
-    expect(screen.getByText(/no interactions yet/i)).toBeInTheDocument();
+    expect(screen.getByText(/no connections yet/i)).toBeInTheDocument();
   });
 
   // Negative: contacts with null next_nudge_at don't appear in overdue

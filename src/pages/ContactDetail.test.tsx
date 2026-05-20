@@ -73,9 +73,9 @@ describe("ContactDetail Page", () => {
   });
 
   // Happy path: log interaction button
-  it("renders Log interaction button", () => {
+  it("renders Log connection button", () => {
     renderDetail();
-    expect(screen.getByText(/log interaction/i)).toBeInTheDocument();
+    expect(screen.getByText(/log connection/i)).toBeInTheDocument();
   });
 
   // Happy path: interaction history
