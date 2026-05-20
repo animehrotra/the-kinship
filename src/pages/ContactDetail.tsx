@@ -40,7 +40,6 @@ export default function ContactDetail() {
   const { data: interactions = [] } = useInteractions(id!);
   const { data: lifeEvents = [] } = useLifeEvents(id!);
   const { data: contactTagsData = [] } = useContactTags(id!);
-  const logInteraction = useLogInteraction();
   const createLifeEvent = useCreateLifeEvent();
   const updateContact = useUpdateContact();
   const addContactTag = useAddContactTag();
@@ -48,9 +47,6 @@ export default function ContactDetail() {
 
   const contactTagIds = contactTagsData.map((ct: any) => ct.tag_id);
   const contactTags = contactTagsData.map((ct: any) => ct.tags).filter(Boolean);
-
-  const [logType, setLogType] = useState<InteractionType>("texted");
-  const [logSheetOpen, setLogSheetOpen] = useState(false);
 
   const [eventForm, setEventForm] = useState({ title: "", description: "", month: "", day: "", recurring: false });
   const [eventType, setEventType] = useState<"birthday" | "anniversary" | "custom">("custom");
@@ -69,17 +65,6 @@ export default function ContactDetail() {
   const daysUntilNudge = contact.next_nudge_at
     ? differenceInDays(new Date(contact.next_nudge_at), new Date())
     : null;
-
-  const handleLog = async () => {
-    await logInteraction.mutateAsync({
-      contactId: contact.id,
-      type: logType,
-      nudgeFrequency: contact.nudge_frequency,
-      intervalValue: contact.nudge_interval_value,
-      intervalUnit: contact.nudge_interval_unit,
-    });
-    setLogSheetOpen(false);
-  };
 
   const handleAddEvent = async (e: React.FormEvent) => {
     e.preventDefault();
