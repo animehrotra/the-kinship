@@ -91,7 +91,7 @@ export default function LogInteractionSheet({ contactId, contactName, nudgeFrequ
               id="interaction-notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="e.g. wished happy birthday"
+              placeholder={'e.g. "Wished happy birthday" or "Caught up over coffee"'}
               className="resize-none min-h-0"
               rows={2}
             />
