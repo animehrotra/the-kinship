@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useContacts, useUpcomingEvents } from "@/lib/hooks";
+import { useContacts, useUpcomingEvents, getContactStatus } from "@/lib/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Heart, Clock, Calendar, Users, Bell, ChevronLeft, ChevronRight } from "lucide-react";
@@ -101,6 +101,19 @@ export default function Index() {
         })}
       </div>
 
+      {/* Status legend */}
+      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+        <span className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-emerald shrink-0" />On track
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-amber shrink-0" />Overdue
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" />Drifting
+        </span>
+      </div>
+
       {/* Overdue */}
       {overdueContacts.length > 0 && (
         <section>
@@ -109,7 +122,9 @@ export default function Index() {
             <h2 className="font-medium">It's been a while</h2>
           </div>
           <div className="space-y-2">
-            {overdueContacts.map((c) => (
+            {overdueContacts.map((c) => {
+              const dotColor = getContactStatus(c) === "drifting" ? "bg-red-500" : "bg-amber";
+              return (
               <Card
                 key={c.id}
                 className="border-border/50 cursor-pointer hover:shadow-md transition-shadow active:scale-[0.98]"
@@ -118,7 +133,7 @@ export default function Index() {
                 <CardContent className="p-4 flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-amber shrink-0" />
+                      <span className={`w-2 h-2 rounded-full shrink-0 ${dotColor}`} />
                       <span className="font-medium">{c.name}</span>
                       <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
                         {circleLabels[c.circle]}
@@ -132,7 +147,8 @@ export default function Index() {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+            );
+            })}
           </div>
         </section>
       )}
@@ -233,7 +249,7 @@ export default function Index() {
                   <div>
                     <span className="font-medium">{event.title}</span>
                     <p className="text-sm text-muted-foreground">
-                      {event.contacts?.name} · {format(new Date(event.event_date), "MMM d")}
+                      {event.contacts?.name} · {format(new Date((event.display_date ?? event.event_date) + "T00:00:00"), "MMM d")}
                     </p>
                   </div>
                 </CardContent>
