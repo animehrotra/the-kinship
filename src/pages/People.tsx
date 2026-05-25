@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Plus, Search, Pencil, Trash2 } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
-import { circleLabels, circleOptions } from "@/lib/constants";
+import { circleLabels, circleOptions, formatNudgeInterval, nudgeFrequencyLabels } from "@/lib/constants";
 import AddContactDialog from "@/components/AddContactDialog";
 import EditContactDialog from "@/components/EditContactDialog";
 import type { Database } from "@/integrations/supabase/types";
@@ -107,6 +107,14 @@ export default function People() {
                         {circleLabels[c.circle]}
                       </Badge>
                     </div>
+                    <p className="flex items-center gap-1 text-xs text-muted-foreground/80 mt-0.5 ml-4">
+                      <Clock className="w-3 h-3 shrink-0" />
+                      <span className="truncate">
+                        {c.nudge_interval_value && c.nudge_interval_unit
+                          ? formatNudgeInterval(c.nudge_interval_value, c.nudge_interval_unit)
+                          : nudgeFrequencyLabels[c.nudge_frequency] || c.nudge_frequency}
+                      </span>
+                    </p>
                     <p className="text-sm text-muted-foreground mt-0.5 ml-4">
                       {c.last_interaction_at
                         ? formatDistanceToNow(new Date(c.last_interaction_at), { addSuffix: true })

@@ -1,6 +1,6 @@
 import { useState, type ComponentType } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useContact, useInteractions, useLifeEvents, useCreateLifeEvent, useUpdateContact, useContactTags, useAddContactTag, useRemoveContactTag } from "@/lib/hooks";
+import { useContact, useInteractions, useLifeEvents, useCreateLifeEvent, useUpdateLifeEvent, useDeleteLifeEvent, useUpdateContact, useContactTags, useAddContactTag, useRemoveContactTag } from "@/lib/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowLeft, MessageSquare, Phone, Video, Users, Calendar, Archive, Plus, Share2 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { ArrowLeft, MessageSquare, Phone, Video, Users, Calendar, Archive, Plus, Share2, Pencil, Trash2 } from "lucide-react";
 import { formatDistanceToNow, format, isPast, differenceInDays } from "date-fns";
 import TagPicker from "@/components/TagPicker";
 import LogInteractionSheet from "@/components/LogInteractionSheet";
@@ -30,6 +31,8 @@ export default function ContactDetail() {
   const { data: lifeEvents = [] } = useLifeEvents(id!);
   const { data: contactTagsData = [] } = useContactTags(id!);
   const createLifeEvent = useCreateLifeEvent();
+  const updateLifeEvent = useUpdateLifeEvent();
+  const deleteLifeEvent = useDeleteLifeEvent();
   const updateContact = useUpdateContact();
   const addContactTag = useAddContactTag();
   const removeContactTag = useRemoveContactTag();
@@ -40,6 +43,37 @@ export default function ContactDetail() {
   const [eventForm, setEventForm] = useState({ title: "", description: "", month: "", day: "", recurring: false });
   const [eventType, setEventType] = useState<"birthday" | "anniversary" | "custom">("custom");
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
+  const [editingEventId, setEditingEventId] = useState<string | null>(null);
+  const [deleteEventId, setDeleteEventId] = useState<string | null>(null);
+  const [eventError, setEventError] = useState<string | null>(null);
+
+  const hasBirthdayEvent = lifeEvents.some(
+    (e) => e.title === "Birthday" && e.id !== editingEventId
+  );
+
+  const resetEventForm = () => {
+    setEventForm({ title: "", description: "", month: "", day: "", recurring: false });
+    setEventType("custom");
+    setEditingEventId(null);
+    setEventError(null);
+  };
+
+  const openEditDialog = (event: typeof lifeEvents[number]) => {
+    const date = new Date(event.event_date + "T00:00:00");
+    const type: "birthday" | "anniversary" | "custom" =
+      event.title === "Birthday" ? "birthday" : event.title === "Anniversary" ? "anniversary" : "custom";
+    setEventType(type);
+    setEventForm({
+      title: event.title,
+      description: event.description || "",
+      month: String(date.getMonth() + 1),
+      day: String(date.getDate()),
+      recurring: !!event.recurring,
+    });
+    setEditingEventId(event.id);
+    setEventError(null);
+    setEventDialogOpen(true);
+  };
 
   if (isLoading || !contact) {
     return (
@@ -57,17 +91,38 @@ export default function ContactDetail() {
 
   const handleAddEvent = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (eventType === "birthday" && hasBirthdayEvent) {
+      setEventError("A birthday has already been added for this contact");
+      return;
+    }
     const eventDate = `2000-${eventForm.month.padStart(2, "0")}-${eventForm.day.padStart(2, "0")}`;
-    await createLifeEvent.mutateAsync({
-      contact_id: contact.id,
-      title: eventForm.title,
-      description: eventForm.description || undefined,
-      event_date: eventDate,
-      recurring: eventForm.recurring,
-    });
-    setEventForm({ title: "", description: "", month: "", day: "", recurring: false });
-    setEventType("custom");
+    if (editingEventId) {
+      await updateLifeEvent.mutateAsync({
+        id: editingEventId,
+        contact_id: contact.id,
+        title: eventForm.title,
+        description: eventForm.description || null,
+        event_date: eventDate,
+        recurring: eventForm.recurring,
+      });
+    } else {
+      await createLifeEvent.mutateAsync({
+        contact_id: contact.id,
+        title: eventForm.title,
+        description: eventForm.description || undefined,
+        event_date: eventDate,
+        recurring: eventForm.recurring,
+      });
+    }
+    resetEventForm();
     setEventDialogOpen(false);
+  };
+
+  const handleDeleteEvent = async () => {
+    if (deleteEventId) {
+      await deleteLifeEvent.mutateAsync({ id: deleteEventId, contact_id: contact.id });
+      setDeleteEventId(null);
+    }
   };
 
   const handleArchive = async () => {
@@ -210,7 +265,13 @@ export default function ContactDetail() {
       <section>
         <div className="flex items-center justify-between mb-3">
           <h2 className="font-medium">Life events</h2>
-          <Dialog open={eventDialogOpen} onOpenChange={setEventDialogOpen}>
+          <Dialog
+            open={eventDialogOpen}
+            onOpenChange={(open) => {
+              setEventDialogOpen(open);
+              if (!open) resetEventForm();
+            }}
+          >
             <DialogTrigger asChild>
               <Button variant="ghost" size="sm" className="gap-1">
                 <Plus className="w-3.5 h-3.5" />
@@ -219,7 +280,7 @@ export default function ContactDetail() {
             </DialogTrigger>
             <DialogContent className="max-w-sm">
               <DialogHeader>
-                <DialogTitle>Add life event</DialogTitle>
+                <DialogTitle>{editingEventId ? "Edit life event" : "Add life event"}</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleAddEvent} className="space-y-3">
                 <div className="space-y-2">
@@ -235,6 +296,7 @@ export default function ContactDetail() {
                         type="button"
                         onClick={() => {
                           setEventType(key);
+                          setEventError(null);
                           if (key === "birthday") {
                             setEventForm({ ...eventForm, title: "Birthday", recurring: true });
                           } else if (key === "anniversary") {
@@ -253,6 +315,12 @@ export default function ContactDetail() {
                       </button>
                     ))}
                   </div>
+                  {eventType === "birthday" && hasBirthdayEvent && !eventError && (
+                    <p className="text-xs text-destructive">A birthday has already been added for this contact</p>
+                  )}
+                  {eventError && (
+                    <p className="text-xs text-destructive" role="alert">{eventError}</p>
+                  )}
                 </div>
                 {eventType === "custom" && (
                   <div className="space-y-2">
@@ -298,8 +366,20 @@ export default function ContactDetail() {
                     <Label htmlFor="recurring" className="text-sm">Recurring yearly</Label>
                   </div>
                 )}
-                <Button type="submit" className="w-full" disabled={createLifeEvent.isPending}>
-                  {createLifeEvent.isPending ? "Saving..." : "Add event"}
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={
+                    createLifeEvent.isPending ||
+                    updateLifeEvent.isPending ||
+                    (eventType === "birthday" && hasBirthdayEvent)
+                  }
+                >
+                  {createLifeEvent.isPending || updateLifeEvent.isPending
+                    ? "Saving..."
+                    : editingEventId
+                      ? "Save changes"
+                      : "Add event"}
                 </Button>
               </form>
             </DialogContent>
@@ -310,20 +390,59 @@ export default function ContactDetail() {
         ) : (
           <div className="space-y-2">
             {lifeEvents.map((event) => (
-              <div key={event.id} className="flex items-start gap-3 text-sm py-1.5">
+              <div key={event.id} className="flex items-start gap-3 text-sm py-1.5 group">
                 <Calendar className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                <div>
+                <div className="min-w-0 flex-1">
                   <span className="font-medium">{event.title}</span>
                   {event.description && <p className="text-muted-foreground text-xs">{event.description}</p>}
                 </div>
-                <span className="text-muted-foreground ml-auto text-xs shrink-0">
+                <span className="text-muted-foreground text-xs shrink-0 self-center">
                   {format(new Date(event.event_date), "MMM d")}
                 </span>
+                <div className="flex items-center gap-0.5 shrink-0">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={() => openEditDialog(event)}
+                    title="Edit event"
+                    aria-label={`Edit ${event.title}`}
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-destructive hover:text-destructive"
+                    onClick={() => setDeleteEventId(event.id)}
+                    title="Delete event"
+                    aria-label={`Delete ${event.title}`}
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
         )}
       </section>
+
+      <AlertDialog open={!!deleteEventId} onOpenChange={(open) => { if (!open) setDeleteEventId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete this event?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This life event will be permanently removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteEvent} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

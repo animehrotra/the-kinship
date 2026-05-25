@@ -239,6 +239,36 @@ export function useCreateLifeEvent() {
   });
 }
 
+export function useUpdateLifeEvent() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, contact_id: _contactId, ...data }: { id: string; contact_id: string; title?: string; description?: string | null; event_date?: string; recurring?: boolean }) => {
+      const { error } = await supabase.from("life_events").update(data).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: (_, vars) => {
+      qc.invalidateQueries({ queryKey: ["life_events", vars.contact_id] });
+      toast({ title: "Life event updated" });
+    },
+    onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),
+  });
+}
+
+export function useDeleteLifeEvent() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, contact_id: _contactId }: { id: string; contact_id: string }) => {
+      const { error } = await supabase.from("life_events").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: (_, vars) => {
+      qc.invalidateQueries({ queryKey: ["life_events", vars.contact_id] });
+      toast({ title: "Life event deleted" });
+    },
+    onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),
+  });
+}
+
 export function useTags() {
   const { user } = useAuth();
   return useQuery({
