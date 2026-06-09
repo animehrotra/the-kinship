@@ -1,12 +1,14 @@
-import { Heart, Users, Archive, LogOut } from "lucide-react";
+import { Heart, Users, Archive, LogOut, MessageSquare } from "lucide-react";
 import { NotificationToggle } from "@/components/NotificationToggle";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
+  SidebarGroupLabel,
   SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
@@ -19,6 +21,10 @@ const items = [
   { title: "Nudges", url: "/dashboard", icon: Heart },
   { title: "People", url: "/people", icon: Users },
   { title: "Archive", url: "/archive", icon: Archive },
+];
+
+const adminItems = [
+  { title: "Feedback", url: "/admin/feedback", icon: MessageSquare },
 ];
 
 export function AppSidebar() {

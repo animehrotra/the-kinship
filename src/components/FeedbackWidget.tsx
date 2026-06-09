@@ -42,6 +42,10 @@ export function FeedbackWidget() {
       user_id: user.id,
       category,
       message: message.trim(),
+      page_url: window.location.pathname + window.location.search,
+      user_agent: navigator.userAgent,
+      viewport: `${window.innerWidth}x${window.innerHeight}`,
+      app_version: __APP_VERSION__,
     });
     setSubmitting(false);
 
