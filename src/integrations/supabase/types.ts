@@ -112,25 +112,37 @@ export type Database = {
       }
       feedback: {
         Row: {
+          app_version: string | null
           category: string
           created_at: string
           id: string
           message: string
+          page_url: string | null
+          user_agent: string | null
           user_id: string
+          viewport: string | null
         }
         Insert: {
+          app_version?: string | null
           category?: string
           created_at?: string
           id?: string
           message: string
+          page_url?: string | null
+          user_agent?: string | null
           user_id: string
+          viewport?: string | null
         }
         Update: {
+          app_version?: string | null
           category?: string
           created_at?: string
           id?: string
           message?: string
+          page_url?: string | null
+          user_agent?: string | null
           user_id?: string
+          viewport?: string | null
         }
         Relationships: []
       }

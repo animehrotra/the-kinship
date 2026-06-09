@@ -13,6 +13,7 @@ import ArchivePage from "./pages/ArchivePage";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
+import AdminFeedback from "./pages/AdminFeedback";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
               <Route path="/people" element={<People />} />
               <Route path="/people/:id" element={<ContactDetail />} />
               <Route path="/archive" element={<ArchivePage />} />
+              <Route path="/admin/feedback" element={<AdminFeedback />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

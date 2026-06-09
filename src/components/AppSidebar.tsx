@@ -1,12 +1,14 @@
-import { Heart, Users, Archive, LogOut } from "lucide-react";
+import { Heart, Users, Archive, LogOut, MessageSquare } from "lucide-react";
 import { NotificationToggle } from "@/components/NotificationToggle";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
+  SidebarGroupLabel,
   SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
@@ -21,11 +23,16 @@ const items = [
   { title: "Archive", url: "/archive", icon: Archive },
 ];
 
+const adminItems = [
+  { title: "Feedback", url: "/admin/feedback", icon: MessageSquare },
+];
+
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
   const { signOut, user } = useAuth();
+  const { isAdmin } = useIsAdmin();
 
   return (
     <Sidebar collapsible="icon">
@@ -60,6 +67,30 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {isAdmin && (
+          <SidebarGroup>
+            {!collapsed && <SidebarGroupLabel>Admin</SidebarGroupLabel>}
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {adminItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <NavLink
+                        to={item.url}
+                        className="hover:bg-sidebar-accent/50"
+                        activeClassName="bg-sidebar-accent text-primary font-medium"
+                      >
+                        <item.icon className="mr-2 h-4 w-4" />
+                        {!collapsed && <span>{item.title}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       <SidebarFooter className="p-2">
