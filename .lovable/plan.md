@@ -1,55 +1,29 @@
-## Add email reminders alongside push
+## Move email reminders to backlog
 
-Today, nudges already act as reminders: a daily cron at 08:00 UTC runs `check-nudges`, which finds contacts whose `next_nudge_at` is today or earlier and sends a **web push** notification to opted-in devices. We'll keep that and add an **email channel** on top, with a user-picked send hour and a "once on due date, then weekly catch-up" cadence.
+You don't want to buy a domain right now, so we'll pull the half-built email reminder system out of the MVP and restore the simple push-only behavior that was working before. Nudges will continue to act as reminders via push notifications (and the visual "overdue" indicators on the dashboard).
 
-### What you'll see in the app
+### What changes in the app
 
-- A new **Reminders** card in the sidebar (or a small Settings panel) with:
-  - Toggle: **Email reminders** on/off
-  - Sub toggle - daily / weekly
-  - If daily, Dropdown: **Preferred hour** (e.g. 7 AM, 8 AM, 9 AM … in your local timezone)
-  - If weekly, drop-down to select day of the week
-  - Existing push toggle stays as-is
-- A daily email titled "Kinship: You have N people to reach out" listing due contacts, with one-click links into each contact.
-- After the due date, no daily nag — only one **weekly catch-up email** (every Monday at your chosen hour) listing anything still overdue.
+- **Reminders settings page** (`/settings/reminders`) — removed. The sidebar "Reminders" link goes away.
+- **Push notification toggle** — moves back to wherever it lived before (sidebar footer), unchanged in behavior.
+- **Push reminders** — keep working exactly as before: daily check at 08:00 UTC, browser push for due/overdue contacts.
+- **No email sending, no preferred-hour picker, no weekly digest.** Nothing user-visible related to email.
 
-### How it works under the hood
+### What changes under the hood
 
-1. **Email infrastructure** — set up Lovable Emails (verified subdomain + queue + send log) so reminders use the same reliable delivery as the rest of the app.
-2. **New `notification_preferences` table** (one row per user):
-  - `email_enabled` (bool, default true)
-  - `preferred_hour` (int 0–23, default 8)
-  - `timezone` (IANA string, auto-detected from browser on first save)
-  - `last_weekly_digest_at` (timestamp — used to throttle weekly catch-ups)
-  - RLS: each user reads/writes only their own row.
-3. **Two email templates** (React Email, brand-styled):
-  - `nudge-due-today` — fired on the day a contact becomes due.
-  - `nudge-weekly-overdue` — fired weekly for anything still overdue.
-4. **Rewritten `check-nudges` Edge Function**, now runs **hourly** (not daily):
-  - For each user, check if the current UTC hour matches their `preferred_hour` in their timezone. If not, skip.
-  - **Daily pass:** find contacts with `next_nudge_at` falling on *today* in their timezone → send `nudge-due-today` (one email, listing all of them) + push (existing behavior).
-  - **Weekly pass:** if today is Monday in their timezone AND `last_weekly_digest_at` is >6 days ago, find still-overdue contacts → send `nudge-weekly-overdue` + update `last_weekly_digest_at`.
-  - Idempotency keys (`nudge-daily-<user>-<YYYY-MM-DD>`, `nudge-weekly-<user>-<YYYY-WW>`) prevent duplicates if the cron retries.
-5. **Cron job** updated from `0 8 * * *` to `0 * * * *` (hourly). Per-user hour gating happens inside the function.
-6. **Reminders settings UI** — new `/settings/reminders` page (and a link in the sidebar footer next to the push toggle) for the toggle + hour dropdown.
+1. **Revert `check-nudges` Edge Function** to its previous daily, push-only version (remove timezone logic, email branch, preference lookups).
+2. **Cron** — unschedule `hourly-nudge-check`, re-schedule `daily-nudge-check` at `0 8 * * *`.
+3. **Drop the `notification_preferences` table** and the `reminder_frequency` enum via a new migration. Also remove the `handle_new_user` trigger row-insert for it (keep the trigger if it does other work; otherwise drop the email-prefs piece only).
+4. **Delete `src/pages/ReminderSettings.tsx`** and its route in `src/App.tsx`.
+5. **Revert `src/components/AppSidebar.tsx`** — remove the "Reminders" nav item; keep `NotificationToggle` in the footer.
+6. **Update `.lovable/plan.md`** — move the email-reminder spec into a "Backlog" section so we don't lose the design work for later.
 
-### Behavior summary
+### What stays
 
+- Push notifications (`send-push`, `get-vapid-key`, `usePushNotifications`, service worker) — untouched.
+- All nudge calculation logic and dashboard UI — untouched.
+- No domain setup needed. No DNS. No email infra.
 
-| Event                              | Push (existing) | Email (new)                        |
-| ---------------------------------- | --------------- | ---------------------------------- |
-| Contact due today                  | ✅ at 08:00 UTC  | ✅ at user's preferred hour (local) |
-| Still overdue, day 2–6             | ✅ daily         | ❌ silent                           |
-| Still overdue, weekly              | ✅ daily         | ✅ Monday catch-up                  |
-| User unsubscribes via email footer | unaffected      | suppressed automatically           |
+### When you're ready to revisit
 
-
-### Non-goals (kept out of this round)
-
-- SMS / WhatsApp reminders.
-- Per-contact reminder overrides (e.g. mute one person's emails).
-- Editing reminder copy in-app.
-
-### Prerequisites that will be set up automatically
-
-- Lovable email domain + email infrastructure (one-time DNS step you'll be guided through if not already done).
+The full design (preferred hour, daily/weekly cadence, timezone handling, idempotency keys) is preserved in the backlog section of `.lovable/plan.md`. Bringing it back later is "buy a domain + re-apply this plan."
