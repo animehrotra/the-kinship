@@ -14,7 +14,7 @@ import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 import AdminFeedback from "./pages/AdminFeedback";
-import ReminderSettings from "./pages/ReminderSettings";
+
 
 const queryClient = new QueryClient();
 
@@ -35,7 +35,7 @@ const App = () => (
               <Route path="/people/:id" element={<ContactDetail />} />
               <Route path="/archive" element={<ArchivePage />} />
               <Route path="/admin/feedback" element={<AdminFeedback />} />
-              <Route path="/settings/reminders" element={<ReminderSettings />} />
+              
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
