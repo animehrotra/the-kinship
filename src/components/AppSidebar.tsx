@@ -1,4 +1,4 @@
-import { Heart, Users, Archive, LogOut, MessageSquare, Bell } from "lucide-react";
+import { Heart, Users, Archive, LogOut, MessageSquare } from "lucide-react";
 import { NotificationToggle } from "@/components/NotificationToggle";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -94,20 +94,6 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="p-2">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <NavLink
-                to="/settings/reminders"
-                className="hover:bg-sidebar-accent/50"
-                activeClassName="bg-sidebar-accent text-primary font-medium"
-              >
-                <Bell className="mr-2 h-4 w-4" />
-                {!collapsed && <span>Reminders</span>}
-              </NavLink>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
         {!collapsed && (
           <div className="px-2 my-2">
             <NotificationToggle />
