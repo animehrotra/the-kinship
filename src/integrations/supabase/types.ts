@@ -222,6 +222,45 @@ export type Database = {
           },
         ]
       }
+      notification_preferences: {
+        Row: {
+          created_at: string
+          email_enabled: boolean
+          frequency: Database["public"]["Enums"]["reminder_frequency"]
+          last_daily_sent_on: string | null
+          last_weekly_sent_on: string | null
+          preferred_hour: number
+          preferred_weekday: number
+          timezone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_enabled?: boolean
+          frequency?: Database["public"]["Enums"]["reminder_frequency"]
+          last_daily_sent_on?: string | null
+          last_weekly_sent_on?: string | null
+          preferred_hour?: number
+          preferred_weekday?: number
+          timezone?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_enabled?: boolean
+          frequency?: Database["public"]["Enums"]["reminder_frequency"]
+          last_daily_sent_on?: string | null
+          last_weekly_sent_on?: string | null
+          preferred_hour?: number
+          preferred_weekday?: number
+          timezone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -338,6 +377,7 @@ export type Database = {
         | "others"
       interaction_type: "texted" | "called" | "met_up" | "video_call" | "social"
       nudge_frequency: "weekly" | "biweekly" | "monthly" | "quarterly"
+      reminder_frequency: "daily" | "weekly"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -475,6 +515,7 @@ export const Constants = {
       ],
       interaction_type: ["texted", "called", "met_up", "video_call", "social"],
       nudge_frequency: ["weekly", "biweekly", "monthly", "quarterly"],
+      reminder_frequency: ["daily", "weekly"],
     },
   },
 } as const
