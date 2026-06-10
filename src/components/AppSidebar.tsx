@@ -1,5 +1,7 @@
-import { Heart, Users, Archive, LogOut, MessageSquare } from "lucide-react";
+import { useState } from "react";
+import { Heart, Users, Archive, LogOut, MessageSquare, Megaphone } from "lucide-react";
 import { NotificationToggle } from "@/components/NotificationToggle";
+import { FeedbackDialog } from "@/components/FeedbackWidget";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
@@ -33,6 +35,7 @@ export function AppSidebar() {
   const location = useLocation();
   const { signOut, user } = useAuth();
   const { isAdmin } = useIsAdmin();
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   return (
     <Sidebar collapsible="icon">
@@ -104,6 +107,15 @@ export function AppSidebar() {
         )}
         <SidebarMenu>
           <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={() => setFeedbackOpen(true)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <Megaphone className="mr-2 h-4 w-4" />
+              {!collapsed && <span>Share feedback</span>}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
             <SidebarMenuButton onClick={signOut} className="text-muted-foreground hover:text-destructive">
               <LogOut className="mr-2 h-4 w-4" />
               {!collapsed && <span>Sign out</span>}
@@ -111,6 +123,7 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
+      <FeedbackDialog open={feedbackOpen} onOpenChange={setFeedbackOpen} />
     </Sidebar>
   );
 }
