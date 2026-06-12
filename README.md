@@ -1,8 +1,8 @@
-# Kinship — Personal CRM
+# Kinship — Personal Relationships App
 
 > Never lose touch with the people who matter most.
 
-Kinship is a personal CRM that helps you maintain meaningful relationships with friends, family, and acquaintances through structured nudges, interaction tracking, and life event awareness.
+Kinship is a personal relationships app that helps you maintain meaningful connections with friends, family, and acquaintances through structured nudges, interaction tracking, and life event awareness.
 
 ## Key Features
 
