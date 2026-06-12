@@ -1,28 +1,35 @@
-# Contact detail page — Archive & Delete buttons
 
-Update the action row on `/people/:id` (`src/pages/ContactDetail.tsx`) so the three actions sit side by side, each with an icon + label.
+# Add "Invite a friend" share action
 
-## Changes
+Give users a one-tap way to share the Kinship app link so the OG preview we just set up actually gets seen.
 
-1. **Log connection** — unchanged (primary sage button, flex-1).
-2. **Archive button** — currently icon-only. Convert to an outline button with the Archive icon + label:
-   - Label: `Archive` (or `Unarchive` when `contact.archived` is true).
-   - Same outline variant, no longer `size="icon"`.
-3. **Delete button** — new outline button, destructive styling (red text/border on hover), with `Trash2` icon + label `Delete`.
-   - Opens an `AlertDialog` confirmation ("Delete [name]? This permanently removes the contact and all their interactions and life events. This cannot be undone.").
-   - On confirm: call existing `useDeleteContact` hook, then `navigate("/people")`.
+## Where it lives
 
-## Layout
+1. **Desktop sidebar footer** — new "Invite a friend" button placed just above "Share feedback" in `AppSidebar.tsx`. Uses a `Share2` (or `Gift`) icon to differentiate from the feedback megaphone.
+2. **Mobile** — add the same item to the mobile sidebar/menu in the same position. No new floating button (keeps the Megaphone FAB uncluttered).
 
-To keep things tidy on mobile (narrow widths), stack as:
-- Row 1: full-width `Log connection` (primary).
-- Row 2: `Archive` and `Delete` side by side, each `flex-1`, outline variant.
+## Behavior
 
-This avoids cramming three buttons with labels into one row on small screens while keeping the primary action prominent.
+When tapped:
+- **If `navigator.share` is available** (most mobile browsers, Safari, modern Chrome): open the native share sheet pre-filled with:
+  - title: `Kinship`
+  - text: `Never lose touch with the people you love`
+  - url: `https://the-kinship.lovable.app`
+  This is the best path because it surfaces WhatsApp, Messages, LinkedIn, etc. directly and renders the OG image inline.
+- **Fallback** (desktop browsers without Web Share): copy the URL to clipboard and show a toast "Link copied — paste it anywhere to share".
 
-## Technical notes
+A single handler decides at runtime; no UI branching needed.
 
-- Reuse existing `useDeleteContact` from `src/lib/hooks.ts` (already imported pattern exists).
-- Reuse the existing `AlertDialog` component already imported in the file (used for life-event deletion) — add a second instance keyed off a new `deleteContactOpen` state.
-- No backend changes; RLS already covers contact deletes.
-- No new dependencies.
+## Out of scope
+
+- No per-user referral tracking / unique invite links.
+- No "share to specific platform" buttons (X, LinkedIn, WhatsApp deep links). Native share sheet covers these.
+- No changes to the OG image or meta tags — those are already in place.
+
+## Technical details
+
+- New file: `src/components/InviteFriendButton.tsx` — small presentational button + handler, takes `variant` prop to match the sidebar item styling already used by "Share feedback".
+- Edit: `src/components/AppSidebar.tsx` — insert the new item in the footer section above the feedback row, for both desktop and mobile renderings.
+- Use existing `useToast` for the clipboard fallback confirmation.
+- Constants (`SHARE_URL`, `SHARE_TITLE`, `SHARE_TEXT`) live at the top of `InviteFriendButton.tsx` so they're easy to tweak.
+- No backend, no new dependencies.

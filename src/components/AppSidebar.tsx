@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Heart, Users, Archive, LogOut, MessageSquare, Megaphone } from "lucide-react";
 import { NotificationToggle } from "@/components/NotificationToggle";
+import { InviteFriendButton } from "@/components/InviteFriendButton";
 import { FeedbackDialog } from "@/components/FeedbackWidget";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -106,6 +107,9 @@ export function AppSidebar() {
           <p className="text-xs text-muted-foreground px-2 truncate mb-1">{user.email}</p>
         )}
         <SidebarMenu>
+          <SidebarMenuItem>
+            <InviteFriendButton collapsed={collapsed} />
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
               onClick={() => setFeedbackOpen(true)}
