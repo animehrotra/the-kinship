@@ -8,9 +8,10 @@ const SHARE_TEXT = "Never lose touch with the people you love";
 
 interface InviteFriendButtonProps {
   collapsed?: boolean;
+  variant?: "sidebar" | "mobile";
 }
 
-export function InviteFriendButton({ collapsed }: InviteFriendButtonProps) {
+export function InviteFriendButton({ collapsed, variant = "sidebar" }: InviteFriendButtonProps) {
   const { toast } = useToast();
 
   const handleShare = async () => {
@@ -38,6 +39,20 @@ export function InviteFriendButton({ collapsed }: InviteFriendButtonProps) {
       });
     }
   };
+
+  if (variant === "mobile") {
+    return (
+      <button
+        type="button"
+        onClick={handleShare}
+        className="flex flex-col items-center gap-0.5 px-3 py-1.5 text-muted-foreground transition-colors hover:text-primary"
+        aria-label="Invite a friend"
+      >
+        <Share2 className="h-5 w-5" />
+        <span className="text-[10px] font-medium">Invite</span>
+      </button>
+    );
+  }
 
   return (
     <SidebarMenuButton
