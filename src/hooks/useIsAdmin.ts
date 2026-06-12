@@ -16,7 +16,7 @@ export function useIsAdmin() {
     }
     let cancelled = false;
     supabase
-      .rpc("has_role", { _user_id: user.id, _role: "admin" })
+      .rpc("has_role", { _role: "admin" })
       .then(({ data, error }) => {
         if (cancelled) return;
         setIsAdmin(!error && data === true);
