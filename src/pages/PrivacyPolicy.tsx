@@ -46,7 +46,9 @@ export default function PrivacyPolicy() {
             <p>
               All data is stored in our secure backend database. Access is protected by
               authentication, and your contact and interaction data is isolated so only you can
-              read or modify it. We use industry-standard encryption for data in transit.
+              read or modify it. We use industry-standard encryption for data in transit.&nbsp;
+              Your data is stored via Supabase, a secure and trusted cloud database provider
+              that meets industry-standard security and compliance requirements
             </p>
           </section>
 
@@ -73,7 +75,10 @@ export default function PrivacyPolicy() {
             <p>
               You can delete your account and all associated data at any time by deleting
               contacts individually or contacting us. If you have questions about this policy,
-              reach out through the feedback link inside the app.
+              reach out through the feedback link inside the app.&nbsp;To delete your account
+              and all associated data completely, including your email address and profile,
+              please contact us directly and we will permanently remove your data from our
+              systems within 7 days.
             </p>
           </section>
 
