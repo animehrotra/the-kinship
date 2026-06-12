@@ -46,6 +46,7 @@ export default function ContactDetail() {
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [deleteEventId, setDeleteEventId] = useState<string | null>(null);
+  const [deleteContactOpen, setDeleteContactOpen] = useState(false);
   const [eventError, setEventError] = useState<string | null>(null);
 
   const hasBirthdayEvent = lifeEvents.some(
