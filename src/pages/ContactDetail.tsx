@@ -34,6 +34,7 @@ export default function ContactDetail() {
   const updateLifeEvent = useUpdateLifeEvent();
   const deleteLifeEvent = useDeleteLifeEvent();
   const updateContact = useUpdateContact();
+  const deleteContact = useDeleteContact();
   const addContactTag = useAddContactTag();
   const removeContactTag = useRemoveContactTag();
 
