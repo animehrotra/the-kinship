@@ -1,14 +1,28 @@
-## Publish + Live Smoke Test
+# Contact detail page — Archive & Delete buttons
 
-### Goal
-Publish the Kinship app to its public Lovable URL and run a quick live smoke test.
+Update the action row on `/people/:id` (`src/pages/ContactDetail.tsx`) so the three actions sit side by side, each with an icon + label.
 
-### Steps
-1. **Security scan** — Run a fresh security scan to verify no critical findings block the publish.
-2. **Publish** — Trigger `preview_ui--publish` with the current auto-generated Lovable URL (no custom slug set now; user will rename later via Project Settings → Domains).
-3. **Smoke test** — Once live, verify the landing page loads, auth flow works, and core dashboard routes are reachable.
+## Changes
 
-### Notes
-- OG image, meta tags, Twitter card, and push notification icon fixes are already in place from the previous session.
-- RLS hardening is complete.
-- Visibility will follow the workspace default (can be changed later in Project Settings).
+1. **Log connection** — unchanged (primary sage button, flex-1).
+2. **Archive button** — currently icon-only. Convert to an outline button with the Archive icon + label:
+   - Label: `Archive` (or `Unarchive` when `contact.archived` is true).
+   - Same outline variant, no longer `size="icon"`.
+3. **Delete button** — new outline button, destructive styling (red text/border on hover), with `Trash2` icon + label `Delete`.
+   - Opens an `AlertDialog` confirmation ("Delete [name]? This permanently removes the contact and all their interactions and life events. This cannot be undone.").
+   - On confirm: call existing `useDeleteContact` hook, then `navigate("/people")`.
+
+## Layout
+
+To keep things tidy on mobile (narrow widths), stack as:
+- Row 1: full-width `Log connection` (primary).
+- Row 2: `Archive` and `Delete` side by side, each `flex-1`, outline variant.
+
+This avoids cramming three buttons with labels into one row on small screens while keeping the primary action prominent.
+
+## Technical notes
+
+- Reuse existing `useDeleteContact` from `src/lib/hooks.ts` (already imported pattern exists).
+- Reuse the existing `AlertDialog` component already imported in the file (used for life-event deletion) — add a second instance keyed off a new `deleteContactOpen` state.
+- No backend changes; RLS already covers contact deletes.
+- No new dependencies.
