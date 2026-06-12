@@ -1,4 +1,5 @@
 import { Heart, Users, Archive } from "lucide-react";
+import { InviteFriendButton } from "@/components/InviteFriendButton";
 import { NavLink } from "@/components/NavLink";
 
 const items = [
@@ -23,6 +24,7 @@ export function MobileNav() {
             <span className="text-[10px] font-medium">{item.title}</span>
           </NavLink>
         ))}
+        <InviteFriendButton variant="mobile" />
       </div>
     </nav>
   );
