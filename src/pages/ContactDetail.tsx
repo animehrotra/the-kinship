@@ -1,6 +1,6 @@
 import { useState, type ComponentType } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useContact, useInteractions, useLifeEvents, useCreateLifeEvent, useUpdateLifeEvent, useDeleteLifeEvent, useUpdateContact, useContactTags, useAddContactTag, useRemoveContactTag } from "@/lib/hooks";
+import { useContact, useInteractions, useLifeEvents, useCreateLifeEvent, useUpdateLifeEvent, useDeleteLifeEvent, useUpdateContact, useDeleteContact, useContactTags, useAddContactTag, useRemoveContactTag } from "@/lib/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
