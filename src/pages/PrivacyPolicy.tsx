@@ -20,7 +20,6 @@ export default function PrivacyPolicy() {
             Back to Kinship
           </Link>
         </div>
-2>
 
         <div className="flex items-center gap-2 mb-6">
           <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
