@@ -14,6 +14,7 @@ import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 import AdminFeedback from "./pages/AdminFeedback";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/" element={<LandingPage />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route element={<AppLayout />}>
               <Route path="/dashboard" element={<Index />} />
               <Route path="/people" element={<People />} />

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Heart, Users, Bell, ArchiveRestore, ArrowRight } from "lucide-react";
-import { useNavigate, Navigate } from "react-router-dom";
+import { useNavigate, Navigate, Link } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 
 const features = [
@@ -128,10 +128,13 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <section className="border-t border-border px-6 py-12 text-center">
+      <section className="border-t border-border px-6 py-12 text-center space-y-3">
         <p className="text-muted-foreground text-sm italic">
           Your relationships are private. So is your data.
         </p>
+        <Link to="/privacy" className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors">
+          Privacy Policy
+        </Link>
       </section>
     </div>
   );
