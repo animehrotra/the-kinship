@@ -128,10 +128,13 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <section className="border-t border-border px-6 py-12 text-center">
+      <section className="border-t border-border px-6 py-12 text-center space-y-3">
         <p className="text-muted-foreground text-sm italic">
           Your relationships are private. So is your data.
         </p>
+        <Link to="/privacy" className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors">
+          Privacy Policy
+        </Link>
       </section>
     </div>
   );
