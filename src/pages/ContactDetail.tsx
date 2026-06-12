@@ -1,6 +1,6 @@
 import { useState, type ComponentType } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useContact, useInteractions, useLifeEvents, useCreateLifeEvent, useUpdateLifeEvent, useDeleteLifeEvent, useUpdateContact, useContactTags, useAddContactTag, useRemoveContactTag } from "@/lib/hooks";
+import { useContact, useInteractions, useLifeEvents, useCreateLifeEvent, useUpdateLifeEvent, useDeleteLifeEvent, useUpdateContact, useDeleteContact, useContactTags, useAddContactTag, useRemoveContactTag } from "@/lib/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,7 @@ export default function ContactDetail() {
   const updateLifeEvent = useUpdateLifeEvent();
   const deleteLifeEvent = useDeleteLifeEvent();
   const updateContact = useUpdateContact();
+  const deleteContact = useDeleteContact();
   const addContactTag = useAddContactTag();
   const removeContactTag = useRemoveContactTag();
 
@@ -45,6 +46,7 @@ export default function ContactDetail() {
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [deleteEventId, setDeleteEventId] = useState<string | null>(null);
+  const [deleteContactOpen, setDeleteContactOpen] = useState(false);
   const [eventError, setEventError] = useState<string | null>(null);
 
   const hasBirthdayEvent = lifeEvents.some(
@@ -219,7 +221,7 @@ export default function ContactDetail() {
       )}
 
       {/* Actions */}
-      <div className="flex gap-2">
+      <div className="space-y-2">
         <LogInteractionSheet
           contactId={contact.id}
           contactName={contact.name}
@@ -227,17 +229,52 @@ export default function ContactDetail() {
           intervalValue={contact.nudge_interval_value}
           intervalUnit={contact.nudge_interval_unit}
           trigger={
-            <Button className="flex-1 gap-2">
+            <Button className="w-full gap-2">
               <MessageSquare className="w-4 h-4" />
               Log connection
             </Button>
           }
         />
-
-        <Button variant="outline" size="icon" onClick={handleArchive} title={contact.archived ? "Unarchive" : "Archive"}>
-          <Archive className="w-4 h-4" />
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" className="flex-1 gap-2" onClick={handleArchive}>
+            <Archive className="w-4 h-4" />
+            {contact.archived ? "Unarchive" : "Archive"}
+          </Button>
+          <Button
+            variant="outline"
+            className="flex-1 gap-2 text-destructive hover:text-destructive hover:bg-destructive/10 hover:border-destructive/30"
+            onClick={() => setDeleteContactOpen(true)}
+          >
+            <Trash2 className="w-4 h-4" />
+            Delete
+          </Button>
+        </div>
       </div>
+
+      <AlertDialog open={deleteContactOpen} onOpenChange={setDeleteContactOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete {contact.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This permanently removes {contact.name} along with all their interactions and life events. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                await deleteContact.mutateAsync(contact.id);
+                setDeleteContactOpen(false);
+                navigate("/people");
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
 
       {/* Interaction history */}
       {interactions.length > 0 && (
