@@ -221,7 +221,7 @@ export default function ContactDetail() {
       )}
 
       {/* Actions */}
-      <div className="flex gap-2">
+      <div className="space-y-2">
         <LogInteractionSheet
           contactId={contact.id}
           contactName={contact.name}
@@ -229,17 +229,52 @@ export default function ContactDetail() {
           intervalValue={contact.nudge_interval_value}
           intervalUnit={contact.nudge_interval_unit}
           trigger={
-            <Button className="flex-1 gap-2">
+            <Button className="w-full gap-2">
               <MessageSquare className="w-4 h-4" />
               Log connection
             </Button>
           }
         />
-
-        <Button variant="outline" size="icon" onClick={handleArchive} title={contact.archived ? "Unarchive" : "Archive"}>
-          <Archive className="w-4 h-4" />
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" className="flex-1 gap-2" onClick={handleArchive}>
+            <Archive className="w-4 h-4" />
+            {contact.archived ? "Unarchive" : "Archive"}
+          </Button>
+          <Button
+            variant="outline"
+            className="flex-1 gap-2 text-destructive hover:text-destructive hover:bg-destructive/10 hover:border-destructive/30"
+            onClick={() => setDeleteContactOpen(true)}
+          >
+            <Trash2 className="w-4 h-4" />
+            Delete
+          </Button>
+        </div>
       </div>
+
+      <AlertDialog open={deleteContactOpen} onOpenChange={setDeleteContactOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete {contact.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This permanently removes {contact.name} along with all their interactions and life events. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                await deleteContact.mutateAsync(contact.id);
+                setDeleteContactOpen(false);
+                navigate("/people");
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
 
       {/* Interaction history */}
       {interactions.length > 0 && (
