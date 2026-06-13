@@ -27,6 +27,7 @@ export function MobileNav() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   const handleShare = async () => {
     if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
