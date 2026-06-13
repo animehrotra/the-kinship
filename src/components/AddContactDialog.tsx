@@ -175,12 +175,12 @@ export default function AddContactDialog({ open, onOpenChange, trigger }: AddCon
           {/* Optional start / end dates */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label>Start date</Label>
+              <Label>First nudge date</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !form.nudge_start_date && "text-muted-foreground")}>
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {form.nudge_start_date ? format(form.nudge_start_date, "MMM d, yyyy") : "Optional"}
+                    {form.nudge_start_date ? format(form.nudge_start_date, "MMM d, yyyy") : "Defaults to interval from today"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
