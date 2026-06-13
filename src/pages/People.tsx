@@ -6,12 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Plus, Search, Pencil, Trash2, Clock } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Clock, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { circleLabels, circleOptions, formatNudgeInterval, nudgeFrequencyLabels } from "@/lib/constants";
 import AddContactDialog from "@/components/AddContactDialog";
 import EditContactDialog from "@/components/EditContactDialog";
+import LogInteractionSheet from "@/components/LogInteractionSheet";
 import type { Database } from "@/integrations/supabase/types";
 
 type Contact = Database["public"]["Tables"]["contacts"]["Row"];
@@ -122,6 +123,24 @@ export default function People() {
                     </p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0 ml-2">
+                    <LogInteractionSheet
+                      contactId={c.id}
+                      contactName={c.name}
+                      nudgeFrequency={c.nudge_frequency}
+                      intervalValue={c.nudge_interval_value}
+                      intervalUnit={c.nudge_interval_unit}
+                      trigger={
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={(e) => e.stopPropagation()}
+                          title="Log connection"
+                        >
+                          <MessageSquare className="w-3.5 h-3.5" />
+                        </Button>
+                      }
+                    />
                     <Button
                       variant="ghost"
                       size="icon"
