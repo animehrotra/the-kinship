@@ -7,6 +7,8 @@ import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useUnreadFeedback } from "@/hooks/useUnreadFeedback";
+import { Badge } from "@/components/ui/badge";
 import {
   Sidebar,
   SidebarContent,
