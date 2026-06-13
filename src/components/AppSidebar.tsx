@@ -38,6 +38,7 @@ export function AppSidebar() {
   const location = useLocation();
   const { signOut, user } = useAuth();
   const { isAdmin } = useIsAdmin();
+  const { count: unreadFeedback } = useUnreadFeedback();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   return (
