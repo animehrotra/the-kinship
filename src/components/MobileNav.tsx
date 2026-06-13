@@ -99,6 +99,17 @@ export function MobileNav() {
               {user && (
                 <p className="text-sm text-muted-foreground truncate pb-2">{user.email}</p>
               )}
+              <button
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setFeedbackOpen(true);
+                }}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-muted"
+              >
+                <Megaphone className="h-5 w-5" />
+                <span className="text-sm font-medium text-left">Send feedback</span>
+              </button>
               {isAdmin && (
                 <button
                   type="button"
