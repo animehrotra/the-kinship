@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Heart, Users, Archive, Share2, LogOut, UserCircle, MessageSquare } from "lucide-react";
+import { Heart, Users, Archive, Share2, LogOut, UserCircle, MessageSquare, Megaphone } from "lucide-react";
+import { FeedbackDialog } from "@/components/FeedbackWidget";
 import { NavLink } from "@/components/NavLink";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
