@@ -131,7 +131,7 @@ export default function EditContactDialog({ contact, open, onOpenChange }: EditC
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label>Start date</Label>
+              <Label>Nudge Start Date</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !form.nudge_start_date && "text-muted-foreground")}>

@@ -48,7 +48,7 @@ export default function AddContactDialog({ open, onOpenChange, trigger }: AddCon
     circle: "others" as CircleTier,
     nudge_interval_value: 1,
     nudge_interval_unit: "month",
-    nudge_start_date: undefined as Date | undefined,
+    nudge_start_date: new Date(),
     nudge_end_date: undefined as Date | undefined,
   });
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
@@ -58,7 +58,7 @@ export default function AddContactDialog({ open, onOpenChange, trigger }: AddCon
     setForm({
       name: "", phone: "", email: "", notes: "", circle: "others",
       nudge_interval_value: 1, nudge_interval_unit: "month",
-      nudge_start_date: undefined, nudge_end_date: undefined,
+      nudge_start_date: new Date(), nudge_end_date: undefined,
     });
     setSelectedTagIds([]);
     setLifeEvents([]);
@@ -175,16 +175,16 @@ export default function AddContactDialog({ open, onOpenChange, trigger }: AddCon
           {/* Optional start / end dates */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label>First nudge date</Label>
+              <Label>Nudge Start Date *</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !form.nudge_start_date && "text-muted-foreground")}>
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {form.nudge_start_date ? format(form.nudge_start_date, "MMM d, yyyy") : "Defaults to interval from today"}
+                    {form.nudge_start_date ? format(form.nudge_start_date, "MMM d, yyyy") : "Select a date"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={form.nudge_start_date} onSelect={(d) => setForm({ ...form, nudge_start_date: d || undefined })} initialFocus className="p-3 pointer-events-auto" />
+                  <Calendar mode="single" selected={form.nudge_start_date} onSelect={(d) => setForm({ ...form, nudge_start_date: d || new Date() })} initialFocus className="p-3 pointer-events-auto" />
                 </PopoverContent>
               </Popover>
             </div>
