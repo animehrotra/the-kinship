@@ -13,6 +13,7 @@ import { ArrowLeft, MessageSquare, Phone, Video, Users, Calendar, Archive, Plus,
 import { formatDistanceToNow, format, isPast, differenceInDays } from "date-fns";
 import TagPicker from "@/components/TagPicker";
 import LogInteractionSheet from "@/components/LogInteractionSheet";
+import EditContactDialog from "@/components/EditContactDialog";
 import { circleLabels } from "@/lib/constants";
 
 const interactionMeta: Record<string, { icon: ComponentType<{ className?: string }>; label: string }> = {
