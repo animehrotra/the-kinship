@@ -48,6 +48,7 @@ export default function ContactDetail() {
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [deleteEventId, setDeleteEventId] = useState<string | null>(null);
   const [deleteContactOpen, setDeleteContactOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const [eventError, setEventError] = useState<string | null>(null);
 
   const hasBirthdayEvent = lifeEvents.some(
@@ -223,19 +224,25 @@ export default function ContactDetail() {
 
       {/* Actions */}
       <div className="space-y-2">
-        <LogInteractionSheet
-          contactId={contact.id}
-          contactName={contact.name}
-          nudgeFrequency={contact.nudge_frequency}
-          intervalValue={contact.nudge_interval_value}
-          intervalUnit={contact.nudge_interval_unit}
-          trigger={
-            <Button className="w-full gap-2">
-              <MessageSquare className="w-4 h-4" />
-              Log connection
-            </Button>
-          }
-        />
+        <div className="flex gap-2">
+          <LogInteractionSheet
+            contactId={contact.id}
+            contactName={contact.name}
+            nudgeFrequency={contact.nudge_frequency}
+            intervalValue={contact.nudge_interval_value}
+            intervalUnit={contact.nudge_interval_unit}
+            trigger={
+              <Button className="flex-1 gap-2">
+                <MessageSquare className="w-4 h-4" />
+                Log connection
+              </Button>
+            }
+          />
+          <Button variant="outline" className="flex-1 gap-2" onClick={() => setEditOpen(true)}>
+            <Pencil className="w-4 h-4" />
+            Edit
+          </Button>
+        </div>
         <div className="flex gap-2">
           <Button variant="outline" className="flex-1 gap-2" onClick={handleArchive}>
             <Archive className="w-4 h-4" />
@@ -251,6 +258,8 @@ export default function ContactDetail() {
           </Button>
         </div>
       </div>
+
+      <EditContactDialog contact={contact} open={editOpen} onOpenChange={setEditOpen} />
 
       <AlertDialog open={deleteContactOpen} onOpenChange={setDeleteContactOpen}>
         <AlertDialogContent>
