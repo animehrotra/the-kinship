@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Navigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useUnreadFeedback } from "@/hooks/useUnreadFeedback";
 import {
   Table,
   TableBody,
@@ -58,6 +59,7 @@ function shortUA(ua: string | null) {
 
 export default function AdminFeedback() {
   const { isAdmin, loading: roleLoading } = useIsAdmin();
+  const { markAllRead } = useUnreadFeedback();
   const [rows, setRows] = useState<FeedbackRow[]>([]);
   const [profiles, setProfiles] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
@@ -86,8 +88,9 @@ export default function AdminFeedback() {
         setProfiles(map);
       }
       setLoading(false);
+      markAllRead();
     })();
-  }, [isAdmin]);
+  }, [isAdmin, markAllRead]);
 
   const filtered = useMemo(
     () => (filter === "all" ? rows : rows.filter((r) => r.category === filter)),

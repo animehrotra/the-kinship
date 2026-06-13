@@ -7,6 +7,8 @@ import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useUnreadFeedback } from "@/hooks/useUnreadFeedback";
+import { Badge } from "@/components/ui/badge";
 import {
   Sidebar,
   SidebarContent,
@@ -36,6 +38,7 @@ export function AppSidebar() {
   const location = useLocation();
   const { signOut, user } = useAuth();
   const { isAdmin } = useIsAdmin();
+  const { count: unreadFeedback } = useUnreadFeedback();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   return (
@@ -86,7 +89,15 @@ export function AppSidebar() {
                         activeClassName="bg-sidebar-accent text-primary font-medium"
                       >
                         <item.icon className="mr-2 h-4 w-4" />
-                        {!collapsed && <span>{item.title}</span>}
+                        {!collapsed && <span className="flex-1">{item.title}</span>}
+                        {item.title === "Feedback" && unreadFeedback > 0 && (
+                          <Badge
+                            variant="destructive"
+                            className={collapsed ? "absolute top-1 right-1 h-4 min-w-4 px-1 text-[10px]" : "ml-auto h-5 min-w-5 px-1.5 text-xs"}
+                          >
+                            {unreadFeedback > 99 ? "99+" : unreadFeedback}
+                          </Badge>
+                        )}
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
