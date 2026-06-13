@@ -3,7 +3,6 @@ import { useAuth } from "@/lib/auth";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { MobileNav } from "@/components/MobileNav";
-import { FeedbackWidget } from "@/components/FeedbackWidget";
 
 export function AppLayout() {
   const { session, loading } = useAuth();
@@ -32,7 +31,6 @@ export function AppLayout() {
             <Outlet />
           </main>
           <MobileNav />
-          <FeedbackWidget />
         </div>
       </div>
     </SidebarProvider>

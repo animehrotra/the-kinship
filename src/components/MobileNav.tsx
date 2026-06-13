@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Heart, Users, Archive, Share2, LogOut, UserCircle, MessageSquare } from "lucide-react";
+import { Heart, Users, Archive, Share2, LogOut, UserCircle, MessageSquare, Megaphone } from "lucide-react";
+import { FeedbackDialog } from "@/components/FeedbackWidget";
 import { NavLink } from "@/components/NavLink";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
@@ -26,6 +27,7 @@ export function MobileNav() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   const handleShare = async () => {
     if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
@@ -45,7 +47,8 @@ export function MobileNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/95 backdrop-blur-sm md:hidden">
+    <>
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/95 backdrop-blur-sm md:hidden">
       <div className="flex items-center justify-around h-14">
         {navItems.map((item) => (
           <NavLink
@@ -97,6 +100,17 @@ export function MobileNav() {
               {user && (
                 <p className="text-sm text-muted-foreground truncate pb-2">{user.email}</p>
               )}
+              <button
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setFeedbackOpen(true);
+                }}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-muted"
+              >
+                <Megaphone className="h-5 w-5" />
+                <span className="text-sm font-medium text-left">Send feedback</span>
+              </button>
               {isAdmin && (
                 <button
                   type="button"
@@ -131,5 +145,7 @@ export function MobileNav() {
         </Sheet>
       </div>
     </nav>
+      <FeedbackDialog open={feedbackOpen} onOpenChange={setFeedbackOpen} />
+    </>
   );
 }
