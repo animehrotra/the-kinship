@@ -88,8 +88,9 @@ export default function AdminFeedback() {
         setProfiles(map);
       }
       setLoading(false);
+      markAllRead();
     })();
-  }, [isAdmin]);
+  }, [isAdmin, markAllRead]);
 
   const filtered = useMemo(
     () => (filter === "all" ? rows : rows.filter((r) => r.category === filter)),
