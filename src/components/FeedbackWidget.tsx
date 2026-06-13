@@ -117,19 +117,5 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
 }
 
 export function FeedbackWidget() {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <>
-      <Button
-        onClick={() => setOpen(true)}
-        size="icon"
-        className="fixed bottom-20 right-4 z-50 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-xl hover:bg-primary/90 md:hidden"
-        aria-label="Send feedback"
-      >
-        <Megaphone className="h-6 w-6" />
-      </Button>
-      <FeedbackDialog open={open} onOpenChange={setOpen} />
-    </>
-  );
+  return null;
 }

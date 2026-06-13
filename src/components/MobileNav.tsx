@@ -144,5 +144,6 @@ export function MobileNav() {
         </Sheet>
       </div>
     </nav>
+    <FeedbackDialog open={feedbackOpen} onOpenChange={setFeedbackOpen} />
   );
 }
