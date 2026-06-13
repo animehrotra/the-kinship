@@ -67,29 +67,46 @@ export default function AdminFeedback() {
 
   useEffect(() => {
     if (!isAdmin) return;
+    let cancelled = false;
     (async () => {
-      const { data } = await supabase
-        .from("feedback")
-        .select("*")
-        .order("created_at", { ascending: false });
-      const list = (data as FeedbackRow[]) || [];
-      setRows(list);
-
-      const userIds = [...new Set(list.map((r) => r.user_id))];
-      if (userIds.length) {
-        const { data: profs } = await supabase
-          .from("profiles")
-          .select("id, display_name")
-          .in("id", userIds);
-        const map: Record<string, string> = {};
-        (profs as Profile[] | null)?.forEach((p) => {
-          map[p.id] = p.display_name || "Unknown";
-        });
-        setProfiles(map);
+      try {
+        const { data, error } = await supabase
+          .from("feedback")
+          .select("*")
+          .order("created_at", { ascending: false });
+        if (cancelled) return;
+        if (error) {
+          console.error("Failed to load feedback:", error);
+          setRows([]);
+        } else {
+          const list = (data as FeedbackRow[]) || [];
+          setRows(list);
+          const userIds = [...new Set(list.map((r) => r.user_id))];
+          if (userIds.length) {
+            const { data: profs } = await supabase
+              .from("profiles")
+              .select("id, display_name")
+              .in("id", userIds);
+            if (cancelled) return;
+            const map: Record<string, string> = {};
+            (profs as Profile[] | null)?.forEach((p) => {
+              map[p.id] = p.display_name || "Unknown";
+            });
+            setProfiles(map);
+          }
+        }
+      } catch (e) {
+        console.error("AdminFeedback load error:", e);
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+          markAllRead();
+        }
       }
-      setLoading(false);
-      markAllRead();
     })();
+    return () => {
+      cancelled = true;
+    };
   }, [isAdmin, markAllRead]);
 
   const filtered = useMemo(
