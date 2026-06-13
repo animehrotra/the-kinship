@@ -59,6 +59,7 @@ function shortUA(ua: string | null) {
 
 export default function AdminFeedback() {
   const { isAdmin, loading: roleLoading } = useIsAdmin();
+  const { markAllRead } = useUnreadFeedback();
   const [rows, setRows] = useState<FeedbackRow[]>([]);
   const [profiles, setProfiles] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
