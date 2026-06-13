@@ -142,10 +142,23 @@ export default function AddContactDialog({ open, onOpenChange, trigger }: AddCon
             <div className="flex gap-2">
               <Input
                 type="number"
+                inputMode="numeric"
                 min={1}
                 max={365}
-                value={form.nudge_interval_value}
-                onChange={(e) => setForm({ ...form, nudge_interval_value: Math.max(1, parseInt(e.target.value) || 1) })}
+                value={Number.isFinite(form.nudge_interval_value) ? form.nudge_interval_value : ""}
+                onChange={(e) => {
+                  const raw = e.target.value;
+                  if (raw === "") {
+                    setForm({ ...form, nudge_interval_value: NaN as unknown as number });
+                  } else {
+                    const n = parseInt(raw, 10);
+                    setForm({ ...form, nudge_interval_value: Number.isNaN(n) ? (NaN as unknown as number) : n });
+                  }
+                }}
+                onBlur={(e) => {
+                  const n = parseInt(e.target.value, 10);
+                  setForm({ ...form, nudge_interval_value: Number.isNaN(n) ? 1 : Math.min(365, Math.max(1, n)) });
+                }}
                 className="w-20"
               />
               <Select value={form.nudge_interval_unit} onValueChange={(v) => setForm({ ...form, nudge_interval_unit: v })}>
