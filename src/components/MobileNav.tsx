@@ -1,7 +1,11 @@
 import { useState } from "react";
-import { Heart, Users, Archive, Share2, LogOut, UserCircle } from "lucide-react";
+import { Heart, Users, Archive, Share2, LogOut, UserCircle, MessageSquare } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useUnreadFeedback } from "@/hooks/useUnreadFeedback";
+import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,7 +21,10 @@ const SHARE_TEXT = "Never lose touch with the people you love";
 
 export function MobileNav() {
   const { signOut, user } = useAuth();
+  const { isAdmin } = useIsAdmin();
+  const { count: unreadFeedback } = useUnreadFeedback();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleShare = async () => {
@@ -67,20 +74,46 @@ export function MobileNav() {
           <SheetTrigger asChild>
             <button
               type="button"
-              className="flex flex-col items-center gap-0.5 px-3 py-1.5 text-muted-foreground transition-colors hover:text-primary"
+              className="relative flex flex-col items-center gap-0.5 px-3 py-1.5 text-muted-foreground transition-colors hover:text-primary"
               aria-label="More options"
             >
               <UserCircle className="h-5 w-5" />
               <span className="text-[10px] font-medium">More</span>
+              {isAdmin && unreadFeedback > 0 && (
+                <Badge
+                  variant="destructive"
+                  className="absolute top-0 right-1 h-4 min-w-4 px-1 text-[10px]"
+                >
+                  {unreadFeedback > 99 ? "99+" : unreadFeedback}
+                </Badge>
+              )}
             </button>
           </SheetTrigger>
           <SheetContent side="bottom" className="rounded-t-2xl">
             <SheetHeader>
               <SheetTitle className="text-left">Account</SheetTitle>
             </SheetHeader>
-            <div className="mt-4 space-y-4">
+            <div className="mt-4 space-y-2">
               {user && (
-                <p className="text-sm text-muted-foreground truncate">{user.email}</p>
+                <p className="text-sm text-muted-foreground truncate pb-2">{user.email}</p>
+              )}
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    navigate("/admin/feedback");
+                  }}
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-muted"
+                >
+                  <MessageSquare className="h-5 w-5" />
+                  <span className="text-sm font-medium flex-1 text-left">Feedback</span>
+                  {unreadFeedback > 0 && (
+                    <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-xs">
+                      {unreadFeedback > 99 ? "99+" : unreadFeedback}
+                    </Badge>
+                  )}
+                </button>
               )}
               <button
                 type="button"
