@@ -91,15 +91,17 @@ export function useCreateContact() {
     mutationFn: async (data: Omit<ContactInsert, "user_id">) => {
       const intervalValue = (data as any).nudge_interval_value || 1;
       const intervalUnit = (data as any).nudge_interval_unit || "month";
-      const startDate = (data as any).nudge_start_date
-        ? new Date((data as any).nudge_start_date + "T00:00:00")
-        : new Date();
-      const nextNudge = calcNextNudge(
-        data.nudge_frequency || "monthly",
-        startDate,
-        intervalValue,
-        intervalUnit
-      );
+      const rawStart = (data as any).nudge_start_date;
+      // If user picked a start date, the first nudge IS that date.
+      // Otherwise, schedule the first nudge one interval from today.
+      const nextNudge = rawStart
+        ? new Date(rawStart + "T09:00:00").toISOString()
+        : calcNextNudge(
+            data.nudge_frequency || "monthly",
+            new Date(),
+            intervalValue,
+            intervalUnit
+          );
       const { data: row, error } = await supabase.from("contacts").insert({
         ...data,
         user_id: user!.id,
