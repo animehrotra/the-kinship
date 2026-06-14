@@ -147,17 +147,17 @@ export default function AdminFeedback() {
 
   const renderTable = (list: FeedbackRow[], isClosed: boolean) => (
     <div className="rounded-lg border bg-card overflow-x-auto">
-      <Table>
+      <Table className="min-w-[700px]">
         <TableHeader>
           <TableRow>
-            <TableHead>Date</TableHead>
-            <TableHead>From</TableHead>
-            <TableHead>Category</TableHead>
-            <TableHead>Message</TableHead>
-            <TableHead>Page</TableHead>
-            <TableHead>Device</TableHead>
-            <TableHead>Version</TableHead>
-            <TableHead className="text-right">Action</TableHead>
+            <TableHead className="w-[140px]">Date</TableHead>
+            <TableHead className="w-[100px]">From</TableHead>
+            <TableHead className="w-[110px]">Category</TableHead>
+            <TableHead className="min-w-[280px]">Message</TableHead>
+            <TableHead className="hidden lg:table-cell w-[120px]">Page</TableHead>
+            <TableHead className="hidden lg:table-cell w-[120px]">Device</TableHead>
+            <TableHead className="hidden lg:table-cell w-[80px]">Version</TableHead>
+            <TableHead className="text-right w-[110px]">Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -166,16 +166,16 @@ export default function AdminFeedback() {
               <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
                 {new Date(r.created_at).toLocaleString()}
               </TableCell>
-              <TableCell className="text-sm">
+              <TableCell className="whitespace-nowrap text-sm">
                 {profiles[r.user_id] || r.user_id.slice(0, 8)}
               </TableCell>
               <TableCell>
                 <Badge variant="secondary">{r.category}</Badge>
               </TableCell>
-              <TableCell className="max-w-md whitespace-pre-wrap text-sm">
+              <TableCell className="min-w-[280px] whitespace-pre-wrap text-sm">
                 {r.message}
               </TableCell>
-              <TableCell className="text-xs">
+              <TableCell className="hidden lg:table-cell text-xs">
                 {r.page_url ? (
                   <Link to={r.page_url} className="text-primary underline underline-offset-2">
                     {r.page_url}
@@ -184,11 +184,11 @@ export default function AdminFeedback() {
                   "—"
                 )}
               </TableCell>
-              <TableCell className="text-xs text-muted-foreground" title={r.user_agent || ""}>
+              <TableCell className="hidden lg:table-cell text-xs text-muted-foreground" title={r.user_agent || ""}>
                 {shortUA(r.user_agent)}
                 {r.viewport && ` · ${r.viewport}`}
               </TableCell>
-              <TableCell className="text-xs font-mono text-muted-foreground">
+              <TableCell className="hidden lg:table-cell text-xs font-mono text-muted-foreground">
                 {r.app_version || "—"}
               </TableCell>
               <TableCell className="text-right">
