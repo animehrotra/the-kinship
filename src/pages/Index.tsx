@@ -81,7 +81,7 @@ export default function Index() {
       <h1 className="text-2xl font-serif">Nudges</h1>
 
       {/* Circle Summary */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {circleOptions.map(({ value: circle }) => {
           const stats = circleSummary[circle] || { total: 0, reached: 0 };
           return (
