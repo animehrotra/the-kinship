@@ -114,6 +114,7 @@ export type Database = {
         Row: {
           app_version: string | null
           category: string
+          closed_at: string | null
           created_at: string
           id: string
           message: string
@@ -125,6 +126,7 @@ export type Database = {
         Insert: {
           app_version?: string | null
           category?: string
+          closed_at?: string | null
           created_at?: string
           id?: string
           message: string
@@ -136,6 +138,7 @@ export type Database = {
         Update: {
           app_version?: string | null
           category?: string
+          closed_at?: string | null
           created_at?: string
           id?: string
           message?: string
@@ -320,6 +323,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_closed_feedback: { Args: never; Returns: undefined }
       has_role: {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
         Returns: boolean
