@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.cleanup_closed_feedback() FROM PUBLIC, anon, authenticated;
