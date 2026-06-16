@@ -5,6 +5,31 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Returns { hour, date } in IANA tz for "now". Falls back to UTC on bad tz.
+function localNow(timezone: string): { hour: number; date: string } {
+  try {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: timezone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      hour12: false,
+    }).formatToParts(new Date());
+    const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+    const date = `${get("year")}-${get("month")}-${get("day")}`;
+    const hourStr = get("hour");
+    const hour = parseInt(hourStr === "24" ? "0" : hourStr, 10);
+    return { hour, date };
+  } catch {
+    const d = new Date();
+    return {
+      hour: d.getUTCHours(),
+      date: d.toISOString().slice(0, 10),
+    };
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -13,39 +38,70 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    const todayUtc = new Date().toISOString().slice(0, 10);
-    const { data: dueContacts, error } = await supabase
-      .from("contacts")
-      .select("id, name, user_id, next_nudge_at")
-      .eq("archived", false)
-      .not("next_nudge_at", "is", null)
-      .lte("next_nudge_at", `${todayUtc}T23:59:59.999Z`);
-    if (error) throw error;
+    // Pull all users with notification prefs. Push subs join filters to opted-in only.
+    const { data: profiles, error: profErr } = await supabase
+      .from("profiles")
+      .select("id, notify_hour, notify_timezone, last_nudge_notified_on");
+    if (profErr) throw profErr;
 
-    const byUser: Record<string, { id: string; name: string }[]> = {};
-    for (const c of dueContacts ?? []) {
-      (byUser[c.user_id] ||= []).push({ id: c.id, name: c.name });
-    }
-
+    let usersConsidered = 0;
+    let usersDue = 0;
     let pushSent = 0;
-    for (const [userId, contacts] of Object.entries(byUser)) {
-      const count = contacts.length;
-      const names = contacts.slice(0, 3).map((c) => c.name);
+
+    for (const p of profiles ?? []) {
+      const tz = p.notify_timezone || "UTC";
+      const { hour, date } = localNow(tz);
+
+      // Only fire at the user's preferred local hour.
+      if (hour !== (p.notify_hour ?? 9)) continue;
+      usersConsidered++;
+
+      // Dedupe — already notified today (in their local tz)?
+      if (p.last_nudge_notified_on === date) continue;
+
+      // Fetch contacts due today or earlier.
+      const { data: dueContacts, error: contactsErr } = await supabase
+        .from("contacts")
+        .select("id, name, next_nudge_at")
+        .eq("user_id", p.id)
+        .eq("archived", false)
+        .not("next_nudge_at", "is", null)
+        .lte("next_nudge_at", `${date}T23:59:59.999Z`);
+      if (contactsErr) {
+        console.error(`contacts query failed for ${p.id}:`, contactsErr);
+        continue;
+      }
+      if (!dueContacts || dueContacts.length === 0) continue;
+
+      usersDue++;
+      const count = dueContacts.length;
+      const names = dueContacts.slice(0, 3).map((c) => c.name);
       const title = `Kinship: ${count} nudge${count > 1 ? "s" : ""} due today`;
       const body =
         count <= 3
           ? `Time to reach out to ${names.join(", ")}`
           : `Time to reach out to ${names.join(", ")} and ${count - 3} more`;
+
       const resp = await fetch(`${supabaseUrl}/functions/v1/send-push`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceRoleKey}` },
-        body: JSON.stringify({ user_id: userId, title, body, url: "/dashboard" }),
+        body: JSON.stringify({ user_id: p.id, title, body, url: "/dashboard" }),
       });
-      if (resp.ok) pushSent += (await resp.json()).sent || 0;
+
+      if (resp.ok) {
+        const json = await resp.json();
+        const sent = json.sent || 0;
+        pushSent += sent;
+        // Stamp dedupe regardless of subscription count — we don't want to retry next hour.
+        await supabase
+          .from("profiles")
+          .update({ last_nudge_notified_on: date })
+          .eq("id", p.id);
+      }
     }
 
     return new Response(
-      JSON.stringify({ processed: dueContacts?.length ?? 0, pushSent }),
+      JSON.stringify({ usersConsidered, usersDue, pushSent }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (err) {
