@@ -231,6 +231,9 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          last_nudge_notified_on: string | null
+          notify_hour: number
+          notify_timezone: string
           updated_at: string
         }
         Insert: {
@@ -238,6 +241,9 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id: string
+          last_nudge_notified_on?: string | null
+          notify_hour?: number
+          notify_timezone?: string
           updated_at?: string
         }
         Update: {
@@ -245,6 +251,9 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          last_nudge_notified_on?: string | null
+          notify_hour?: number
+          notify_timezone?: string
           updated_at?: string
         }
         Relationships: []
