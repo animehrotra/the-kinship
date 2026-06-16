@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Heart, Users, Archive, LogOut, MessageSquare, Megaphone } from "lucide-react";
-import { NotificationToggle } from "@/components/NotificationToggle";
+import { NotificationSettings } from "@/components/NotificationSettings";
 import { InviteFriendButton } from "@/components/InviteFriendButton";
 import { FeedbackDialog } from "@/components/FeedbackWidget";
 import { NavLink } from "@/components/NavLink";
@@ -111,7 +111,7 @@ export function AppSidebar() {
       <SidebarFooter className="p-2">
         {!collapsed && (
           <div className="px-2 my-2">
-            <NotificationToggle />
+            <NotificationSettings />
           </div>
         )}
         {!collapsed && user && (
