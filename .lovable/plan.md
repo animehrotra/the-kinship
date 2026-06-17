@@ -1,54 +1,28 @@
-# Activate Daily Nudge Notifications
+## Goal
 
-Goal: make installed-PWA users actually receive a daily push when contacts are due — reliably, at a sensible local time, without duplicates.
+Replace the static "UTC" timezone in the daily nudge settings with the user's actual local timezone
 
-## What we'll build
+Move the ability to letting them change it to a backlog / roadmap item in [Notes.md](http://Notes.md) or a right place as applicable as low priority item.
 
-### 1. Per-user notification preferences
-Add columns to `profiles` so each user controls when they get pinged:
-- `notify_hour` (int, 0–23, default `9`) — preferred local send hour
-- `notify_timezone` (text, default `'UTC'`) — IANA tz like `Europe/London`; auto-filled on first push opt-in from the browser (`Intl.DateTimeFormat().resolvedOptions().timeZone`)
-- `last_nudge_notified_on` (date, nullable) — the local date we last pushed them; the dedupe guard
+## Changes (single file: `src/components/NotificationSettings.tsx`)
 
-### 2. Smarter `check-nudges` edge function
-Rewrite the query so it runs **hourly** instead of daily:
-- Join `profiles` and pick only users whose current local hour (derived from `notify_timezone`) equals their `notify_hour`
-- Skip any user whose `last_nudge_notified_on` already equals today in their local tz (dedupe)
-- For remaining users, find contacts where `next_nudge_at <= end-of-their-local-today`
-- After a successful `send-push`, stamp `last_nudge_notified_on = <their local today>`
-- Keep the existing "N nudges due — reach out to A, B, C" summary copy
+1. **Auto-default to local timezone on load**
+  - When loading the profile, if `notify_timezone` is missing or still `"UTC"` (the migration default) AND the browser reports a different IANA zone, immediately persist the detected zone to `profiles.notify_timezone` and reflect it in state.
+  - This silently migrates every existing user away from UTC the first time they open the panel.
+    &nbsp;
 
-### 3. Hourly scheduler
-Enable `pg_cron` + `pg_net` and schedule `check-nudges` to run every hour at minute 0. (Created via the insert tool, not migrations, since the URL/anon key are project-specific.)
+**Deferred Changes for future:** 
 
-### 4. UI: notification settings
-Small settings surface — added to the existing sidebar area next to `NotificationToggle`:
-- Time-of-day picker (hour select, shows user's detected timezone as a hint)
-- "Send a test notification" button → calls `send-push` for the current user with a sample payload, so users can confirm delivery on their device
-- iOS PWA hint: a one-line note shown only on iOS Safari when not in standalone mode — "Add Kinship to your Home Screen first to enable notifications"
-- When a user first toggles notifications on, auto-capture their browser timezone into `profiles.notify_timezone`
+1. **Make timezone user-editable**
+  - Replace the read-only `Timezone: {tz}` line with a searchable timezone picker:
+    - A shadcn `Popover` + `Command` combobox listing all IANA zones from `Intl.supportedValuesOf('timeZone')` (fallback to a curated ~50-zone list for browsers that don't support it, e.g. older Safari).
+    - Current value shown on the trigger button; typing filters the list.
+    - A small "Use my current timezone" link/button that resets to `Intl.DateTimeFormat().resolvedOptions().timeZone`.
+  - Selecting a zone calls the same save path used for `notify_hour` (one `update` to `profiles` with `{ notify_hour, notify_timezone }`) and shows the existing "Saved" toast referencing the new zone.
+2. **Keep behavior on first opt-in**
+  - The existing `handleToggle` already writes the detected zone on subscribe — leave it, but it becomes a no-op for users who already have a non-UTC zone saved.
 
-### 5. Docs / copy
-Brief inline help text on the settings card explaining: notifications only work in the published app, must be installed to Home Screen on iOS, and arrive once per day around their chosen hour.
+## Out of scope
 
-## Technical notes
-
-- Timezone math in `check-nudges` uses `toLocaleString('en-US', { timeZone, hour12: false })` parsing in Deno — no extra deps.
-- The `last_nudge_notified_on` guard is per-user, not per-contact, so a user gets at most one push per local day even if cron retries.
-- New `send-test-push` is not a separate function — we reuse `send-push` directly from the client (it already accepts `{ user_id, title, body, url }` and validates subs server-side).
-- No changes to `send-push`, `get-vapid-key`, `sw.js`, or the VAPID/encryption layer — those already work end-to-end.
-- RLS: users can `SELECT`/`UPDATE` their own `profiles` row (existing policy covers the new columns automatically).
-
-## Out of scope (call out, don't build)
-- Quiet hours / multi-window schedules
-- Per-contact "notify me X days before" overrides
-- Email fallback when push fails
-- Android/iOS native push via Capacitor
-
-## Files touched
-- Migration: add 3 columns to `profiles`
-- Cron setup via `supabase--insert` (pg_cron + pg_net + schedule)
-- `supabase/functions/check-nudges/index.ts` — rewrite for hourly + tz + dedupe
-- `src/hooks/usePushNotifications.ts` — capture tz on subscribe
-- New `src/components/NotificationSettings.tsx` — hour picker, test button, iOS hint
-- Wire `NotificationSettings` into the sidebar (replacing or augmenting the bare `NotificationToggle`)
+- No backend changes. `check-nudges` already reads `notify_timezone` per user, so once the column is correct the function does the right thing.
+- No new dependencies; `Popover` and `Command` are already in the shadcn setup.
