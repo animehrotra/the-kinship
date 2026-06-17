@@ -64,7 +64,18 @@ export function NotificationSettings() {
         .maybeSingle();
       if (data) {
         setHour(data.notify_hour ?? 9);
-        setTz(data.notify_timezone || detectTimezone());
+        const stored = data.notify_timezone;
+        const detected = detectTimezone();
+        // Auto-migrate users still on the default "UTC" (or missing) to their browser tz
+        if ((!stored || stored === "UTC") && detected && detected !== "UTC") {
+          await supabase
+            .from("profiles")
+            .update({ notify_timezone: detected })
+            .eq("id", user.id);
+          setTz(detected);
+        } else {
+          setTz(stored || detected);
+        }
       }
     })();
   }, [user]);
