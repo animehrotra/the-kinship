@@ -44,7 +44,7 @@ Deno.serve(async (req) => {
     // Pull all users with notification prefs. Push subs join filters to opted-in only.
     const { data: profiles, error: profErr } = await supabase
       .from("profiles")
-      .select("id, notify_hour, notify_timezone, last_nudge_notified_on");
+      .select("id, notify_hour, notify_minute, notify_timezone, last_nudge_notified_on");
     if (profErr) throw profErr;
 
     let usersConsidered = 0;
@@ -53,10 +53,14 @@ Deno.serve(async (req) => {
 
     for (const p of profiles ?? []) {
       const tz = p.notify_timezone || "UTC";
-      const { hour, date } = localNow(tz);
+      const { hour, minute, date } = localNow(tz);
 
-      // Only fire at the user's preferred local hour.
-      if (hour !== (p.notify_hour ?? 9)) continue;
+      // Only fire within a 30-minute window of the user's preferred local time.
+      // Cron runs every 30 min on the :00 / :30 — bucket "now" to the matching slot.
+      const targetHour = p.notify_hour ?? 8;
+      const targetMinute = (p.notify_minute ?? 30) >= 30 ? 30 : 0;
+      const slotMinute = minute >= 30 ? 30 : 0;
+      if (hour !== targetHour || slotMinute !== targetMinute) continue;
       usersConsidered++;
 
       // Dedupe — already notified today (in their local tz)?
