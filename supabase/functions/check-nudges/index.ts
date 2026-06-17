@@ -5,8 +5,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Returns { hour, date } in IANA tz for "now". Falls back to UTC on bad tz.
-function localNow(timezone: string): { hour: number; date: string } {
+// Returns { hour, minute, date } in IANA tz for "now". Falls back to UTC on bad tz.
+function localNow(timezone: string): { hour: number; minute: number; date: string } {
   try {
     const parts = new Intl.DateTimeFormat("en-CA", {
       timeZone: timezone,
@@ -14,17 +14,20 @@ function localNow(timezone: string): { hour: number; date: string } {
       month: "2-digit",
       day: "2-digit",
       hour: "2-digit",
+      minute: "2-digit",
       hour12: false,
     }).formatToParts(new Date());
     const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
     const date = `${get("year")}-${get("month")}-${get("day")}`;
     const hourStr = get("hour");
     const hour = parseInt(hourStr === "24" ? "0" : hourStr, 10);
-    return { hour, date };
+    const minute = parseInt(get("minute") || "0", 10);
+    return { hour, minute, date };
   } catch {
     const d = new Date();
     return {
       hour: d.getUTCHours(),
+      minute: d.getUTCMinutes(),
       date: d.toISOString().slice(0, 10),
     };
   }
