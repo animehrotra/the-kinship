@@ -30,7 +30,6 @@ function isIosSafari(): boolean {
 
 function isStandalone(): boolean {
   if (typeof window === "undefined") return false;
-  // iOS uses navigator.standalone; others use display-mode media query
   return (
     (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) ||
     // @ts-expect-error iOS-only
@@ -38,35 +37,43 @@ function isStandalone(): boolean {
   );
 }
 
-const HOURS = Array.from({ length: 24 }, (_, i) => i);
-const formatHour = (h: number) => {
+// Half-hour slots: 0:00, 0:30, 1:00, ... 23:30
+const SLOTS: { hour: number; minute: number }[] = [];
+for (let h = 0; h < 24; h++) {
+  SLOTS.push({ hour: h, minute: 0 });
+  SLOTS.push({ hour: h, minute: 30 });
+}
+
+const formatSlot = (h: number, m: number) => {
   const period = h < 12 ? "AM" : "PM";
   const h12 = h % 12 === 0 ? 12 : h % 12;
-  return `${h12}:00 ${period}`;
+  return `${h12}:${m.toString().padStart(2, "0")} ${period}`;
 };
+
+const slotValue = (h: number, m: number) => `${h}:${m}`;
 
 export function NotificationSettings() {
   const { user } = useAuth();
   const { state, subscribe, unsubscribe } = usePushNotifications();
-  const [hour, setHour] = useState<number>(9);
+  const [hour, setHour] = useState<number>(8);
+  const [minute, setMinute] = useState<number>(30);
   const [tz, setTz] = useState<string>("UTC");
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
 
-  // Load prefs
   useEffect(() => {
     if (!user) return;
     (async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("notify_hour, notify_timezone")
+        .select("notify_hour, notify_minute, notify_timezone")
         .eq("id", user.id)
         .maybeSingle();
       if (data) {
-        setHour(data.notify_hour ?? 9);
+        setHour(data.notify_hour ?? 8);
+        setMinute((data.notify_minute ?? 30) >= 30 ? 30 : 0);
         const stored = data.notify_timezone;
         const detected = detectTimezone();
-        // Auto-migrate users still on the default "UTC" (or missing) to their browser tz
         if ((!stored || stored === "UTC") && detected && detected !== "UTC") {
           await supabase
             .from("profiles")
@@ -88,7 +95,6 @@ export function NotificationSettings() {
     }
     const ok = await subscribe();
     if (ok) {
-      // Capture browser tz on first opt-in
       const detected = detectTimezone();
       if (user) {
         await supabase
@@ -107,19 +113,27 @@ export function NotificationSettings() {
     }
   };
 
-  const saveHour = async (newHour: number) => {
+  const saveSlot = async (value: string) => {
+    const [hStr, mStr] = value.split(":");
+    const newHour = parseInt(hStr, 10);
+    const newMinute = parseInt(mStr, 10);
     setHour(newHour);
+    setMinute(newMinute);
     if (!user) return;
     setSaving(true);
     const { error } = await supabase
       .from("profiles")
-      .update({ notify_hour: newHour, notify_timezone: tz || detectTimezone() })
+      .update({
+        notify_hour: newHour,
+        notify_minute: newMinute,
+        notify_timezone: tz || detectTimezone(),
+      })
       .eq("id", user.id);
     setSaving(false);
     if (error) {
       toast({ title: "Couldn't save", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Saved", description: `You'll be nudged around ${formatHour(newHour)} (${tz}).` });
+      toast({ title: "Saved", description: `You'll be nudged around ${formatSlot(newHour, newMinute)} (${tz}).` });
     }
   };
 
@@ -184,14 +198,14 @@ export function NotificationSettings() {
 
       <div className="space-y-1.5">
         <Label className="text-xs text-muted-foreground">Send time</Label>
-        <Select value={String(hour)} onValueChange={(v) => saveHour(parseInt(v, 10))} disabled={saving}>
+        <Select value={slotValue(hour, minute)} onValueChange={saveSlot} disabled={saving}>
           <SelectTrigger className="h-8 text-xs">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {HOURS.map((h) => (
-              <SelectItem key={h} value={String(h)} className="text-xs">
-                {formatHour(h)}
+            {SLOTS.map((s) => (
+              <SelectItem key={slotValue(s.hour, s.minute)} value={slotValue(s.hour, s.minute)} className="text-xs">
+                {formatSlot(s.hour, s.minute)}
               </SelectItem>
             ))}
           </SelectContent>
