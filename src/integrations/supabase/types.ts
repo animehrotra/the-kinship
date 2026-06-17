@@ -233,6 +233,7 @@ export type Database = {
           id: string
           last_nudge_notified_on: string | null
           notify_hour: number
+          notify_minute: number
           notify_timezone: string
           updated_at: string
         }
@@ -243,6 +244,7 @@ export type Database = {
           id: string
           last_nudge_notified_on?: string | null
           notify_hour?: number
+          notify_minute?: number
           notify_timezone?: string
           updated_at?: string
         }
@@ -253,6 +255,7 @@ export type Database = {
           id?: string
           last_nudge_notified_on?: string | null
           notify_hour?: number
+          notify_minute?: number
           notify_timezone?: string
           updated_at?: string
         }
