@@ -5,8 +5,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Returns { hour, date } in IANA tz for "now". Falls back to UTC on bad tz.
-function localNow(timezone: string): { hour: number; date: string } {
+// Returns { hour, minute, date } in IANA tz for "now". Falls back to UTC on bad tz.
+function localNow(timezone: string): { hour: number; minute: number; date: string } {
   try {
     const parts = new Intl.DateTimeFormat("en-CA", {
       timeZone: timezone,
@@ -14,17 +14,20 @@ function localNow(timezone: string): { hour: number; date: string } {
       month: "2-digit",
       day: "2-digit",
       hour: "2-digit",
+      minute: "2-digit",
       hour12: false,
     }).formatToParts(new Date());
     const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
     const date = `${get("year")}-${get("month")}-${get("day")}`;
     const hourStr = get("hour");
     const hour = parseInt(hourStr === "24" ? "0" : hourStr, 10);
-    return { hour, date };
+    const minute = parseInt(get("minute") || "0", 10);
+    return { hour, minute, date };
   } catch {
     const d = new Date();
     return {
       hour: d.getUTCHours(),
+      minute: d.getUTCMinutes(),
       date: d.toISOString().slice(0, 10),
     };
   }
@@ -41,7 +44,7 @@ Deno.serve(async (req) => {
     // Pull all users with notification prefs. Push subs join filters to opted-in only.
     const { data: profiles, error: profErr } = await supabase
       .from("profiles")
-      .select("id, notify_hour, notify_timezone, last_nudge_notified_on");
+      .select("id, notify_hour, notify_minute, notify_timezone, last_nudge_notified_on");
     if (profErr) throw profErr;
 
     let usersConsidered = 0;
@@ -50,10 +53,14 @@ Deno.serve(async (req) => {
 
     for (const p of profiles ?? []) {
       const tz = p.notify_timezone || "UTC";
-      const { hour, date } = localNow(tz);
+      const { hour, minute, date } = localNow(tz);
 
-      // Only fire at the user's preferred local hour.
-      if (hour !== (p.notify_hour ?? 9)) continue;
+      // Only fire within a 30-minute window of the user's preferred local time.
+      // Cron runs every 30 min on the :00 / :30 — bucket "now" to the matching slot.
+      const targetHour = p.notify_hour ?? 8;
+      const targetMinute = (p.notify_minute ?? 30) >= 30 ? 30 : 0;
+      const slotMinute = minute >= 30 ? 30 : 0;
+      if (hour !== targetHour || slotMinute !== targetMinute) continue;
       usersConsidered++;
 
       // Dedupe — already notified today (in their local tz)?

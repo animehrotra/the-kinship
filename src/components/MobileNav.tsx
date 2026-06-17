@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Heart, Users, Archive, Share2, LogOut, UserCircle, MessageSquare, Megaphone } from "lucide-react";
+import { NotificationSettings } from "@/components/NotificationSettings";
 import { FeedbackDialog } from "@/components/FeedbackWidget";
 import { NavLink } from "@/components/NavLink";
 import { useNavigate } from "react-router-dom";
@@ -92,13 +93,14 @@ export function MobileNav() {
               )}
             </button>
           </SheetTrigger>
-          <SheetContent side="bottom" className="rounded-t-2xl">
+          <SheetContent side="bottom" className="rounded-t-2xl max-h-[85vh] overflow-y-auto">
             <SheetHeader>
               <SheetTitle className="text-left">Account</SheetTitle>
             </SheetHeader>
-            <div className="mt-4 space-y-2">
+            <div className="mt-4 space-y-3">
+              <NotificationSettings />
               {user && (
-                <p className="text-sm text-muted-foreground truncate pb-2">{user.email}</p>
+                <p className="text-sm text-muted-foreground truncate pb-1">{user.email}</p>
               )}
               <button
                 type="button"
