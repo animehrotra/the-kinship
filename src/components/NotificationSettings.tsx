@@ -237,6 +237,7 @@ export function NotificationSettings() {
   }
 
   const showIosHint = isIosSafari() && !isStandalone();
+  const showPreviewHint = isPreviewContext();
 
   return (
     <div className="rounded-lg border border-border/60 bg-card p-3 space-y-3">
