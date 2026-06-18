@@ -289,6 +289,12 @@ export function NotificationSettings() {
         </Button>
       )}
 
+      {showPreviewHint && (
+        <p className="text-[10px] text-muted-foreground leading-snug">
+          You're in the editor preview — push only works in the published app. Open the-kinship.lovable.app on your phone.
+        </p>
+      )}
+
       {showIosHint && (
         <p className="text-[10px] text-muted-foreground leading-snug">
           On iPhone, add Kinship to your Home Screen first, then open it from there to enable notifications.
