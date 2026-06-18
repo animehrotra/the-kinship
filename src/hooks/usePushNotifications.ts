@@ -24,9 +24,12 @@ export type SubscribeFailureReason =
   | "unsupported"
   | "not-authenticated";
 
-export type SubscribeResult =
-  | { ok: true }
-  | { ok: false; reason: SubscribeFailureReason; message?: string };
+export type SubscribeResult = {
+  ok: boolean;
+  reason?: SubscribeFailureReason;
+  message?: string;
+};
+
 
 let vapidKeyCache: string | null = null;
 
