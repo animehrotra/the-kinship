@@ -94,7 +94,7 @@ export function NotificationSettings() {
       return;
     }
     const result = await subscribe();
-    if (result.ok) {
+    if (result.ok === true) {
       const detected = detectTimezone();
       if (user) {
         await supabase
@@ -106,6 +106,7 @@ export function NotificationSettings() {
       toast({ title: "Notifications enabled", description: "You'll get a daily nudge summary on this device." });
       return;
     }
+
 
     console.error("[NotificationSettings] subscribe failed", result);
 
