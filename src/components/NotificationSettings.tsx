@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { usePushNotifications, isPreviewContext } from "@/hooks/usePushNotifications";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
