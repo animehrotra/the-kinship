@@ -1,28 +1,30 @@
 ## Goal
 
-Replace the static "UTC" timezone in the daily nudge settings with the user's actual local timezone
+Replace the generic "Couldn't enable notifications" toast with specific, actionable messages so we can tell why subscription is failing in the published app (you saw this red toast on the live site, which means the cause is NOT the preview guard — it's something else like permission, VAPID key fetch, service-worker registration, or `pushManager.subscribe`).
 
-Move the ability to letting them change it to a backlog / roadmap item in [Notes.md](http://Notes.md) or a right place as applicable as low priority item.
+## Changes
 
-## Changes (single file: `src/components/NotificationSettings.tsx`)
+### 1. `src/hooks/usePushNotifications.ts`
+- Change `subscribe()` to return a discriminated result instead of `boolean`:
+  - `{ ok: true }`
+  - `{ ok: false, reason: "preview" | "permission-denied" | "permission-dismissed" | "no-vapid-key" | "sw-register-failed" | "subscribe-failed" | "db-failed" | "unsupported", message?: string }`
+- Explicitly call `Notification.requestPermission()` before subscribing and branch on `denied` / `default`.
+- Wrap each step (VAPID fetch, `serviceWorker.register`, `pushManager.subscribe`, Supabase upsert) in its own try/catch so we know which step failed, and include `err.message` in the returned reason.
+- Keep current preview/iframe guard but report it as `reason: "preview"` instead of flipping state to `"unsupported"`.
 
-1. **Auto-default to local timezone on load**
-  - When loading the profile, if `notify_timezone` is missing or still `"UTC"` (the migration default) AND the browser reports a different IANA zone, immediately persist the detected zone to `profiles.notify_timezone` and reflect it in state.
-  - This silently migrates every existing user away from UTC the first time they open the panel.
-    &nbsp;
+### 2. `src/components/NotificationSettings.tsx`
+- In `handleToggle`, branch on the new `reason` and show a tailored toast for each case:
+  - `preview` → neutral toast pointing to the published URL
+  - `permission-denied` → "Notifications are blocked in your browser settings" + how to re-enable
+  - `permission-dismissed` → "You dismissed the permission prompt — tap Enable again"
+  - `no-vapid-key` → "Server isn't configured for push yet" (destructive)
+  - `sw-register-failed` / `subscribe-failed` / `db-failed` → destructive toast that includes the underlying error message so we can diagnose
+- Also `console.error` the full reason+message so it appears in browser devtools / our logs on the next message.
+- Add a small inline hint inside the card (not a toast) when running in the editor preview, so the Enable button's behavior is obvious upfront.
 
-**Deferred Changes for future:** 
+### 3. No backend changes
+This is purely a UI/diagnostics change. The cron, edge functions, and DB schema stay as-is.
 
-1. **Make timezone user-editable**
-  - Replace the read-only `Timezone: {tz}` line with a searchable timezone picker:
-    - A shadcn `Popover` + `Command` combobox listing all IANA zones from `Intl.supportedValuesOf('timeZone')` (fallback to a curated ~50-zone list for browsers that don't support it, e.g. older Safari).
-    - Current value shown on the trigger button; typing filters the list.
-    - A small "Use my current timezone" link/button that resets to `Intl.DateTimeFormat().resolvedOptions().timeZone`.
-  - Selecting a zone calls the same save path used for `notify_hour` (one `update` to `profiles` with `{ notify_hour, notify_timezone }`) and shows the existing "Saved" toast referencing the new zone.
-2. **Keep behavior on first opt-in**
-  - The existing `handleToggle` already writes the detected zone on subscribe — leave it, but it becomes a no-op for users who already have a non-UTC zone saved.
+## How we'll diagnose your published-app failure
 
-## Out of scope
-
-- No backend changes. `check-nudges` already reads `notify_timezone` per user, so once the column is correct the function does the right thing.
-- No new dependencies; `Popover` and `Command` are already in the shadcn setup.
+After this ships, tap Enable again on the published Android PWA. The new toast will name the exact failing step (e.g. "subscribe-failed: Registration failed - push service error"). Share that and I can fix the underlying cause in a follow-up — common culprits in published PWAs are a missing/incorrect VAPID key on the edge function, the service worker not being served at `/sw.js`, or Google's FCM endpoint rejecting the subscription.

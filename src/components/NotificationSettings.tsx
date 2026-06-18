@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { usePushNotifications, isPreviewContext } from "@/hooks/usePushNotifications";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -93,8 +93,8 @@ export function NotificationSettings() {
       toast({ title: "Notifications disabled" });
       return;
     }
-    const ok = await subscribe();
-    if (ok) {
+    const result = await subscribe();
+    if (result.ok === true) {
       const detected = detectTimezone();
       if (user) {
         await supabase
@@ -104,14 +104,77 @@ export function NotificationSettings() {
         setTz(detected);
       }
       toast({ title: "Notifications enabled", description: "You'll get a daily nudge summary on this device." });
-    } else {
-      toast({
-        title: "Couldn't enable notifications",
-        description: "Allow notifications in your browser settings, and make sure you're using the published app (not the in-editor preview).",
-        variant: "destructive",
-      });
+      return;
+    }
+
+
+    console.error("[NotificationSettings] subscribe failed", result);
+
+    switch (result.reason) {
+      case "preview":
+        toast({
+          title: "Open the published app",
+          description: "Push notifications only work on the published site (the-kinship.lovable.app), not the in-editor preview.",
+        });
+        break;
+      case "permission-denied":
+        toast({
+          title: "Notifications are blocked",
+          description: "Tap the lock icon in your browser's address bar and allow notifications for this site, then try again.",
+          variant: "destructive",
+        });
+        break;
+      case "permission-dismissed":
+        toast({
+          title: "Permission not granted",
+          description: "You dismissed the prompt. Tap Enable again and choose Allow.",
+        });
+        break;
+      case "no-vapid-key":
+        toast({
+          title: "Server not configured",
+          description: "Push keys aren't set up on the server yet. Please contact support.",
+          variant: "destructive",
+        });
+        break;
+      case "sw-register-failed":
+        toast({
+          title: "Couldn't install background worker",
+          description: result.message || "Service worker registration failed.",
+          variant: "destructive",
+        });
+        break;
+      case "subscribe-failed":
+        toast({
+          title: "Push subscription failed",
+          description: result.message || "The browser's push service rejected the subscription.",
+          variant: "destructive",
+        });
+        break;
+      case "db-failed":
+        toast({
+          title: "Couldn't save subscription",
+          description: result.message || "We got the push token but failed to save it.",
+          variant: "destructive",
+        });
+        break;
+      case "not-authenticated":
+        toast({
+          title: "Sign in first",
+          description: "Log in before enabling notifications.",
+          variant: "destructive",
+        });
+        break;
+      case "unsupported":
+      default:
+        toast({
+          title: "Not supported here",
+          description: "This browser doesn't support push notifications. On iPhone, install the app to your Home Screen first.",
+          variant: "destructive",
+        });
     }
   };
+
 
   const saveSlot = async (value: string) => {
     const [hStr, mStr] = value.split(":");
@@ -174,6 +237,7 @@ export function NotificationSettings() {
   }
 
   const showIosHint = isIosSafari() && !isStandalone();
+  const showPreviewHint = isPreviewContext();
 
   return (
     <div className="rounded-lg border border-border/60 bg-card p-3 space-y-3">
@@ -223,6 +287,12 @@ export function NotificationSettings() {
         >
           <Send className="h-3.5 w-3.5" /> {testing ? "Sending…" : "Send test notification"}
         </Button>
+      )}
+
+      {showPreviewHint && (
+        <p className="text-[10px] text-muted-foreground leading-snug">
+          You're in the editor preview — push only works in the published app. Open the-kinship.lovable.app on your phone.
+        </p>
       )}
 
       {showIosHint && (

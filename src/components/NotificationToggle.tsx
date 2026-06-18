@@ -13,18 +13,21 @@ export function NotificationToggle() {
       await unsubscribe();
       toast({ title: "Notifications disabled", description: "You won't receive push reminders." });
     } else {
-      const ok = await subscribe();
-      if (ok) {
+      const result = await subscribe();
+      if (result.ok) {
         toast({ title: "Notifications enabled!", description: "You'll get nudge reminders on this device." });
       } else {
         toast({
           title: "Couldn't enable notifications",
-          description: "Please allow notifications in your browser settings.",
+          description: result.reason === "preview"
+            ? "Open the published app — push doesn't work in the editor preview."
+            : `${result.reason}${result.message ? `: ${result.message}` : ""}`,
           variant: "destructive",
         });
       }
     }
   };
+
 
   return (
     <Button
