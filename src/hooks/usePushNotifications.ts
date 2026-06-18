@@ -13,6 +13,21 @@ function urlBase64ToUint8Array(base64String: string) {
 
 type PushState = "unsupported" | "denied" | "prompt" | "subscribed" | "loading";
 
+export type SubscribeFailureReason =
+  | "preview"
+  | "permission-denied"
+  | "permission-dismissed"
+  | "no-vapid-key"
+  | "sw-register-failed"
+  | "subscribe-failed"
+  | "db-failed"
+  | "unsupported"
+  | "not-authenticated";
+
+export type SubscribeResult =
+  | { ok: true }
+  | { ok: false; reason: SubscribeFailureReason; message?: string };
+
 let vapidKeyCache: string | null = null;
 
 async function getVapidKey(): Promise<string | null> {
@@ -27,18 +42,26 @@ async function getVapidKey(): Promise<string | null> {
   }
 }
 
+export function isPreviewContext(): boolean {
+  if (typeof window === "undefined") return false;
+  const inIframe = (() => {
+    try { return window.self !== window.top; } catch { return true; }
+  })();
+  const host = window.location.hostname;
+  const isPreviewHost =
+    host.includes("id-preview--") ||
+    host.endsWith("lovableproject.com") ||
+    host.endsWith("lovableproject-dev.com") ||
+    host.endsWith("beta.lovable.dev");
+  return inIframe || isPreviewHost;
+}
+
 export function usePushNotifications() {
   const { user } = useAuth();
   const [state, setState] = useState<PushState>("loading");
 
   const checkState = useCallback(async () => {
-    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
-      setState("unsupported");
-      return;
-    }
-
-    const key = await getVapidKey();
-    if (!key) {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
       setState("unsupported");
       return;
     }
@@ -74,41 +97,75 @@ export function usePushNotifications() {
     checkState();
   }, [checkState]);
 
-  const subscribe = useCallback(async () => {
-    if (!user) return false;
+  const subscribe = useCallback(async (): Promise<SubscribeResult> => {
+    if (!user) return { ok: false, reason: "not-authenticated" };
 
+    setState("loading");
+
+    if (isPreviewContext()) {
+      console.warn("[push] blocked: running in Lovable preview/iframe");
+      setState("prompt");
+      return { ok: false, reason: "preview" };
+    }
+
+    if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+      setState("unsupported");
+      return { ok: false, reason: "unsupported" };
+    }
+
+    // Permission
+    let permission: NotificationPermission;
     try {
-      setState("loading");
+      permission = await Notification.requestPermission();
+    } catch (err) {
+      console.error("[push] requestPermission threw", err);
+      setState("prompt");
+      return { ok: false, reason: "permission-dismissed", message: (err as Error)?.message };
+    }
+    if (permission === "denied") {
+      setState("denied");
+      return { ok: false, reason: "permission-denied" };
+    }
+    if (permission !== "granted") {
+      setState("prompt");
+      return { ok: false, reason: "permission-dismissed" };
+    }
 
-      const isInIframe = (() => {
-        try { return window.self !== window.top; } catch { return true; }
-      })();
-      const isPreviewHost =
-        window.location.hostname.includes("id-preview--") ||
-        window.location.hostname.includes("lovableproject.com");
+    // VAPID key
+    const vapidKey = await getVapidKey();
+    if (!vapidKey) {
+      console.error("[push] no VAPID key from get-vapid-key function");
+      setState("prompt");
+      return { ok: false, reason: "no-vapid-key" };
+    }
 
-      if (isInIframe || isPreviewHost) {
-        console.warn("Push notifications are only available in the published app");
-        setState("unsupported");
-        return false;
-      }
-
-      const vapidKey = await getVapidKey();
-      if (!vapidKey) {
-        setState("unsupported");
-        return false;
-      }
-
-      const registration = await navigator.serviceWorker.register("/sw.js");
+    // Service worker registration
+    let registration: ServiceWorkerRegistration;
+    try {
+      registration = await navigator.serviceWorker.register("/sw.js");
       await navigator.serviceWorker.ready;
+    } catch (err) {
+      console.error("[push] serviceWorker.register failed", err);
+      setState("prompt");
+      return { ok: false, reason: "sw-register-failed", message: (err as Error)?.message };
+    }
 
-      const subscription = await registration.pushManager.subscribe({
+    // Push subscription
+    let subscription: PushSubscription;
+    try {
+      subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(vapidKey),
       });
+    } catch (err) {
+      console.error("[push] pushManager.subscribe failed", err);
+      setState("prompt");
+      return { ok: false, reason: "subscribe-failed", message: (err as Error)?.message };
+    }
 
+    // Persist
+    try {
       const json = subscription.toJSON();
-
       const { error } = await supabase.from("push_subscriptions" as any).upsert(
         {
           user_id: user.id,
@@ -118,16 +175,15 @@ export function usePushNotifications() {
         },
         { onConflict: "user_id,endpoint" }
       );
-
       if (error) throw error;
-
-      setState("subscribed");
-      return true;
     } catch (err) {
-      console.error("Push subscription failed:", err);
+      console.error("[push] saving subscription failed", err);
       setState("prompt");
-      return false;
+      return { ok: false, reason: "db-failed", message: (err as Error)?.message };
     }
+
+    setState("subscribed");
+    return { ok: true };
   }, [user]);
 
   const unsubscribe = useCallback(async () => {
