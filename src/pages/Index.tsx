@@ -127,11 +127,13 @@ export default function Index() {
               return (
               <Card
                 key={c.id}
-                className="border-border/50 cursor-pointer hover:shadow-md transition-shadow active:scale-[0.98]"
-                onClick={() => navigate(`/people/${c.id}`)}
+                className="border-border/50 hover:shadow-md transition-shadow"
               >
                 <CardContent className="p-4 flex items-center justify-between">
-                  <div>
+                  <div
+                    className="flex-1 cursor-pointer active:scale-[0.98]"
+                    onClick={() => navigate(`/people/${c.id}`)}
+                  >
                     <div className="flex items-center gap-2">
                       <span className={`w-2 h-2 rounded-full shrink-0 ${dotColor}`} />
                       <span className="font-medium">{c.name}</span>
@@ -145,6 +147,18 @@ export default function Index() {
                         : "No connections yet"}
                     </p>
                   </div>
+                  <LogInteractionSheet
+                    contactId={c.id}
+                    contactName={c.name}
+                    nudgeFrequency={c.nudge_frequency}
+                    intervalValue={c.nudge_interval_value}
+                    intervalUnit={c.nudge_interval_unit}
+                    trigger={
+                      <Button variant="ghost" size="icon" className="shrink-0" title="Log connection">
+                        <MessageSquare className="w-4 h-4" />
+                      </Button>
+                    }
+                  />
                 </CardContent>
               </Card>
             );
