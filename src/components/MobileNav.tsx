@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Heart, Users, Archive, Share2, LogOut, UserCircle, MessageSquare, Megaphone } from "lucide-react";
+import { Heart, Users, Archive, Share2, LogOut, UserCircle, MessageSquare, Megaphone, Plus } from "lucide-react";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { FeedbackDialog } from "@/components/FeedbackWidget";
 import { NavLink } from "@/components/NavLink";
+import AddContactDialog from "@/components/AddContactDialog";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
@@ -11,9 +12,12 @@ import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useToast } from "@/hooks/use-toast";
 
-const navItems = [
+const leadingNavItems = [
   { title: "Nudges", url: "/dashboard", icon: Heart },
   { title: "People", url: "/people", icon: Users },
+];
+
+const trailingNavItems = [
   { title: "Archive", url: "/archive", icon: Archive },
 ];
 
@@ -29,6 +33,7 @@ export function MobileNav() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [addContactOpen, setAddContactOpen] = useState(false);
 
   const handleShare = async () => {
     if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
@@ -51,7 +56,7 @@ export function MobileNav() {
     <>
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/95 backdrop-blur-sm md:hidden">
       <div className="flex items-center justify-around h-14">
-        {navItems.map((item) => (
+        {leadingNavItems.map((item) => (
           <NavLink
             key={item.title}
             to={item.url}
@@ -66,13 +71,24 @@ export function MobileNav() {
 
         <button
           type="button"
-          onClick={handleShare}
-          className="flex flex-col items-center gap-0.5 px-3 py-1.5 text-muted-foreground transition-colors hover:text-primary"
-          aria-label="Invite a friend"
+          onClick={() => setAddContactOpen(true)}
+          className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md transition-colors hover:bg-primary/90"
+          aria-label="Add contact"
         >
-          <Share2 className="h-5 w-5" />
-          <span className="text-[10px] font-medium">Invite</span>
+          <Plus className="h-6 w-6" />
         </button>
+
+        {trailingNavItems.map((item) => (
+          <NavLink
+            key={item.title}
+            to={item.url}
+            className="flex flex-col items-center gap-0.5 px-3 py-1.5 text-muted-foreground transition-colors"
+            activeClassName="text-primary"
+          >
+            <item.icon className="h-5 w-5" />
+            <span className="text-[10px] font-medium">{item.title}</span>
+          </NavLink>
+        ))}
 
         <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
           <SheetTrigger asChild>
@@ -102,6 +118,17 @@ export function MobileNav() {
               {user && (
                 <p className="text-sm text-muted-foreground truncate pb-1">{user.email}</p>
               )}
+              <button
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false);
+                  handleShare();
+                }}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-muted"
+              >
+                <Share2 className="h-5 w-5" />
+                <span className="text-sm font-medium text-left">Invite a friend</span>
+              </button>
               <button
                 type="button"
                 onClick={() => {
@@ -148,6 +175,7 @@ export function MobileNav() {
       </div>
     </nav>
       <FeedbackDialog open={feedbackOpen} onOpenChange={setFeedbackOpen} />
+      <AddContactDialog open={addContactOpen} onOpenChange={setAddContactOpen} />
     </>
   );
 }
