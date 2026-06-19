@@ -45,7 +45,7 @@ export default function AddContactDialog({ open, onOpenChange, trigger }: AddCon
     phone: "",
     email: "",
     notes: "",
-    circle: "others" as CircleTier,
+    circle: "" as CircleTier | "",
     nudge_interval_value: 1,
     nudge_interval_unit: "month",
     nudge_start_date: new Date(),
@@ -53,19 +53,25 @@ export default function AddContactDialog({ open, onOpenChange, trigger }: AddCon
   });
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [lifeEvents, setLifeEvents] = useState<LifeEventEntry[]>([]);
+  const [circleError, setCircleError] = useState<string | null>(null);
 
   const resetForm = () => {
     setForm({
-      name: "", phone: "", email: "", notes: "", circle: "others",
+      name: "", phone: "", email: "", notes: "", circle: "",
       nudge_interval_value: 1, nudge_interval_unit: "month",
       nudge_start_date: new Date(), nudge_end_date: undefined,
     });
     setSelectedTagIds([]);
     setLifeEvents([]);
+    setCircleError(null);
   };
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.circle) {
+      setCircleError("Please select a circle before saving.");
+      return;
+    }
     const newContact = await createContact.mutateAsync({
       name: form.name,
       phone: form.phone || null,
@@ -126,14 +132,25 @@ export default function AddContactDialog({ open, onOpenChange, trigger }: AddCon
           </div>
           <div className="space-y-2">
             <Label>Circle *</Label>
-            <Select value={form.circle} onValueChange={(v) => setForm({ ...form, circle: v as CircleTier })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+            <Select
+              value={form.circle || undefined}
+              onValueChange={(v) => {
+                setForm({ ...form, circle: v as CircleTier });
+                setCircleError(null);
+              }}
+            >
+              <SelectTrigger aria-invalid={circleError ? true : undefined}>
+                <SelectValue placeholder="Select a circle" />
+              </SelectTrigger>
               <SelectContent>
                 {circleOptions.map((o) => (
                   <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
+            {circleError && (
+              <p className="text-sm text-destructive">{circleError}</p>
+            )}
           </div>
 
           {/* Nudge frequency: "Every X days/weeks/months" */}

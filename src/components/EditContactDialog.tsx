@@ -31,7 +31,7 @@ export default function EditContactDialog({ contact, open, onOpenChange }: EditC
     phone: "",
     email: "",
     notes: "",
-    circle: "others" as CircleTier,
+    circle: "inner_circle" as CircleTier,
     nudge_interval_value: 1,
     nudge_interval_unit: "month",
     nudge_start_date: undefined as Date | undefined,

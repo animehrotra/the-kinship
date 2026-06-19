@@ -1,17 +1,15 @@
 export const circleLabels: Record<string, string> = {
   inner_circle: "Inner Circle",
-  friends: "Friends",
-  acquaintances: "Acquaintances",
-  family: "Family",
-  others: "Others",
+  close: "Close",
+  casual: "Casual",
+  reconnect: "Reconnect",
 };
 
 export const circleOptions = [
   { value: "inner_circle", label: "Inner Circle" },
-  { value: "friends", label: "Friends" },
-  { value: "acquaintances", label: "Acquaintances" },
-  { value: "family", label: "Family" },
-  { value: "others", label: "Others" },
+  { value: "close", label: "Close" },
+  { value: "casual", label: "Casual" },
+  { value: "reconnect", label: "Reconnect" },
 ] as const;
 
 export const nudgeFrequencyLabels: Record<string, string> = {

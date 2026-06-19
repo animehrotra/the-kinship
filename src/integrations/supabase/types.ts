@@ -345,10 +345,9 @@ export type Database = {
       app_role: "admin" | "user"
       circle_tier:
         | "inner_circle"
-        | "friends"
-        | "acquaintances"
-        | "family"
-        | "others"
+        | "close"
+        | "casual"
+        | "reconnect"
       interaction_type: "texted" | "called" | "met_up" | "video_call" | "social"
       nudge_frequency: "weekly" | "biweekly" | "monthly" | "quarterly"
     }
@@ -481,10 +480,9 @@ export const Constants = {
       app_role: ["admin", "user"],
       circle_tier: [
         "inner_circle",
-        "friends",
-        "acquaintances",
-        "family",
-        "others",
+        "close",
+        "casual",
+        "reconnect",
       ],
       interaction_type: ["texted", "called", "met_up", "video_call", "social"],
       nudge_frequency: ["weekly", "biweekly", "monthly", "quarterly"],
