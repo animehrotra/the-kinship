@@ -71,7 +71,7 @@ export type Database = {
         Insert: {
           archived?: boolean
           birthday?: string | null
-          circle?: Database["public"]["Enums"]["circle_tier"]
+          circle: Database["public"]["Enums"]["circle_tier"]
           created_at?: string
           email?: string | null
           id?: string
@@ -343,12 +343,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
-      circle_tier:
-        | "inner_circle"
-        | "friends"
-        | "acquaintances"
-        | "family"
-        | "others"
+      circle_tier: "inner_circle" | "close" | "casual" | "reconnect"
       interaction_type: "texted" | "called" | "met_up" | "video_call" | "social"
       nudge_frequency: "weekly" | "biweekly" | "monthly" | "quarterly"
     }
@@ -479,13 +474,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
-      circle_tier: [
-        "inner_circle",
-        "friends",
-        "acquaintances",
-        "family",
-        "others",
-      ],
+      circle_tier: ["inner_circle", "close", "casual", "reconnect"],
       interaction_type: ["texted", "called", "met_up", "video_call", "social"],
       nudge_frequency: ["weekly", "biweekly", "monthly", "quarterly"],
     },
