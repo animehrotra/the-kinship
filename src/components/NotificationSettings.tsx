@@ -202,6 +202,21 @@ export function NotificationSettings() {
     }
   };
 
+  const saveWindow = async (value: string) => {
+    const days = parseInt(value, 10);
+    setWindowDays(days);
+    if (!user) return;
+    const { error } = await supabase
+      .from("profiles")
+      .update({ upcoming_nudge_window_days: days })
+      .eq("id", user.id);
+    if (error) {
+      toast({ title: "Couldn't save", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Saved", description: `Upcoming nudges will show ${days} days ahead.` });
+    }
+  };
+
   const sendTest = async () => {
     if (!user) return;
     setTesting(true);
