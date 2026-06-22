@@ -16,10 +16,25 @@ import { MessageSquare } from "lucide-react";
 export default function Index() {
   const { data: contacts = [], isLoading } = useContacts();
   const { data: upcomingEvents = [] } = useUpcomingEvents();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [nudgePage, setNudgePage] = useState(0);
+  const [windowDays, setWindowDays] = useState<number>(7);
   const NUDGES_PER_PAGE = 5;
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("upcoming_nudge_window_days")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (data?.upcoming_nudge_window_days) setWindowDays(data.upcoming_nudge_window_days);
+    })();
+  }, [user]);
+
   const overdueContacts = contacts
     .filter((c) => c.next_nudge_at && isPast(new Date(c.next_nudge_at)))
     .sort((a, b) => new Date(a.next_nudge_at!).getTime() - new Date(b.next_nudge_at!).getTime());
