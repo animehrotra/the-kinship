@@ -294,6 +294,22 @@ export function NotificationSettings() {
         <p className="text-[10px] text-muted-foreground">Timezone: {tz}</p>
       </div>
 
+      <div className="space-y-1.5">
+        <Label className="text-xs text-muted-foreground">Show upcoming nudges within</Label>
+        <Select value={String(windowDays)} onValueChange={saveWindow}>
+          <SelectTrigger className="h-8 text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {[7, 14, 30, 60, 90].map((d) => (
+              <SelectItem key={d} value={String(d)} className="text-xs">
+                Next {d} days
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       {state === "subscribed" && (
         <Button
           variant="ghost"
