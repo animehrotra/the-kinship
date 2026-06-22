@@ -67,12 +67,13 @@ export function NotificationSettings() {
     (async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("notify_hour, notify_minute, notify_timezone")
+        .select("notify_hour, notify_minute, notify_timezone, upcoming_nudge_window_days")
         .eq("id", user.id)
         .maybeSingle();
       if (data) {
         setHour(data.notify_hour ?? 8);
         setMinute((data.notify_minute ?? 30) >= 30 ? 30 : 0);
+        setWindowDays(data.upcoming_nudge_window_days ?? 7);
         const stored = data.notify_timezone;
         const detected = detectTimezone();
         if ((!stored || stored === "UTC") && detected && detected !== "UTC") {
