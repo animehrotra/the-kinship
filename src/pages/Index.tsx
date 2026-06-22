@@ -195,6 +195,7 @@ export default function Index() {
           <div className="flex items-center gap-2 mb-3">
             <Bell className="w-4 h-4 text-primary" />
             <h2 className="font-medium">Upcoming nudges</h2>
+            <span className="text-xs text-muted-foreground ml-auto">Next {windowDays} days</span>
           </div>
           <div className="space-y-2">
             {pagedNudges.map((c) => (
