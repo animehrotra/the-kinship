@@ -58,6 +58,7 @@ export function NotificationSettings() {
   const [hour, setHour] = useState<number>(8);
   const [minute, setMinute] = useState<number>(30);
   const [tz, setTz] = useState<string>("UTC");
+  const [windowDays, setWindowDays] = useState<number>(7);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
 
