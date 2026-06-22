@@ -1,11 +1,13 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useContacts, useUpcomingEvents, getContactStatus } from "@/lib/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Heart, Clock, Calendar, Users, Bell, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { formatDistanceToNow, isPast, isFuture, format } from "date-fns";
+import { formatDistanceToNow, isPast, format } from "date-fns";
 import { circleLabels, circleOptions, nudgeFrequencyLabels, formatNudgeInterval } from "@/lib/constants";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
 import AddContactDialog from "@/components/AddContactDialog";
 import { Button } from "@/components/ui/button";
 import LogInteractionSheet from "@/components/LogInteractionSheet";
@@ -14,10 +16,25 @@ import { MessageSquare } from "lucide-react";
 export default function Index() {
   const { data: contacts = [], isLoading } = useContacts();
   const { data: upcomingEvents = [] } = useUpcomingEvents();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [nudgePage, setNudgePage] = useState(0);
+  const [windowDays, setWindowDays] = useState<number>(7);
   const NUDGES_PER_PAGE = 5;
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("upcoming_nudge_window_days")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (data?.upcoming_nudge_window_days) setWindowDays(data.upcoming_nudge_window_days);
+    })();
+  }, [user]);
+
   const overdueContacts = contacts
     .filter((c) => c.next_nudge_at && isPast(new Date(c.next_nudge_at)))
     .sort((a, b) => new Date(a.next_nudge_at!).getTime() - new Date(b.next_nudge_at!).getTime());
@@ -37,10 +54,15 @@ export default function Index() {
   })();
 
   const upcomingNudges = useMemo(() => {
+    const cutoff = Date.now() + windowDays * 86400000;
     return contacts
-      .filter((c) => c.next_nudge_at && isFuture(new Date(c.next_nudge_at)))
+      .filter((c) => {
+        if (!c.next_nudge_at) return false;
+        const t = new Date(c.next_nudge_at).getTime();
+        return t > Date.now() && t <= cutoff;
+      })
       .sort((a, b) => new Date(a.next_nudge_at!).getTime() - new Date(b.next_nudge_at!).getTime());
-  }, [contacts]);
+  }, [contacts, windowDays]);
 
   const totalNudgePages = Math.max(1, Math.ceil(upcomingNudges.length / NUDGES_PER_PAGE));
   const pagedNudges = upcomingNudges.slice(nudgePage * NUDGES_PER_PAGE, (nudgePage + 1) * NUDGES_PER_PAGE);
@@ -173,6 +195,7 @@ export default function Index() {
           <div className="flex items-center gap-2 mb-3">
             <Bell className="w-4 h-4 text-primary" />
             <h2 className="font-medium">Upcoming nudges</h2>
+            <span className="text-xs text-muted-foreground ml-auto">Next {windowDays} days</span>
           </div>
           <div className="space-y-2">
             {pagedNudges.map((c) => (

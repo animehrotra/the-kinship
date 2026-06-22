@@ -58,6 +58,7 @@ export function NotificationSettings() {
   const [hour, setHour] = useState<number>(8);
   const [minute, setMinute] = useState<number>(30);
   const [tz, setTz] = useState<string>("UTC");
+  const [windowDays, setWindowDays] = useState<number>(7);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
 
@@ -66,12 +67,13 @@ export function NotificationSettings() {
     (async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("notify_hour, notify_minute, notify_timezone")
+        .select("notify_hour, notify_minute, notify_timezone, upcoming_nudge_window_days")
         .eq("id", user.id)
         .maybeSingle();
       if (data) {
         setHour(data.notify_hour ?? 8);
         setMinute((data.notify_minute ?? 30) >= 30 ? 30 : 0);
+        setWindowDays(data.upcoming_nudge_window_days ?? 7);
         const stored = data.notify_timezone;
         const detected = detectTimezone();
         if ((!stored || stored === "UTC") && detected && detected !== "UTC") {
@@ -200,6 +202,21 @@ export function NotificationSettings() {
     }
   };
 
+  const saveWindow = async (value: string) => {
+    const days = parseInt(value, 10);
+    setWindowDays(days);
+    if (!user) return;
+    const { error } = await supabase
+      .from("profiles")
+      .update({ upcoming_nudge_window_days: days })
+      .eq("id", user.id);
+    if (error) {
+      toast({ title: "Couldn't save", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Saved", description: `Upcoming nudges will show ${days} days ahead.` });
+    }
+  };
+
   const sendTest = async () => {
     if (!user) return;
     setTesting(true);
@@ -275,6 +292,22 @@ export function NotificationSettings() {
           </SelectContent>
         </Select>
         <p className="text-[10px] text-muted-foreground">Timezone: {tz}</p>
+      </div>
+
+      <div className="space-y-1.5">
+        <Label className="text-xs text-muted-foreground">Show upcoming nudges within</Label>
+        <Select value={String(windowDays)} onValueChange={saveWindow}>
+          <SelectTrigger className="h-8 text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {[7, 14, 30, 60, 90].map((d) => (
+              <SelectItem key={d} value={String(d)} className="text-xs">
+                Next {d} days
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {state === "subscribed" && (

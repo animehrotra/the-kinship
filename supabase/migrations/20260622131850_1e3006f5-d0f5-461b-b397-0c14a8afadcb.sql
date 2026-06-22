@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS upcoming_nudge_window_days INTEGER NOT NULL DEFAULT 7;
