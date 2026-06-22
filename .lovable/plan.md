@@ -1,30 +1,23 @@
 ## Goal
-
-Replace the generic "Couldn't enable notifications" toast with specific, actionable messages so we can tell why subscription is failing in the published app (you saw this red toast on the live site, which means the cause is NOT the preview guard — it's something else like permission, VAPID key fetch, service-worker registration, or `pushManager.subscribe`).
+Limit the dashboard "Upcoming nudges" list to contacts due within a cutoff window, defaulting to 7 days and configurable per user.
 
 ## Changes
 
-### 1. `src/hooks/usePushNotifications.ts`
-- Change `subscribe()` to return a discriminated result instead of `boolean`:
-  - `{ ok: true }`
-  - `{ ok: false, reason: "preview" | "permission-denied" | "permission-dismissed" | "no-vapid-key" | "sw-register-failed" | "subscribe-failed" | "db-failed" | "unsupported", message?: string }`
-- Explicitly call `Notification.requestPermission()` before subscribing and branch on `denied` / `default`.
-- Wrap each step (VAPID fetch, `serviceWorker.register`, `pushManager.subscribe`, Supabase upsert) in its own try/catch so we know which step failed, and include `err.message` in the returned reason.
-- Keep current preview/iframe guard but report it as `reason: "preview"` instead of flipping state to `"unsupported"`.
+### 1. Database (migration)
+- Add `upcoming_nudge_window_days INTEGER NOT NULL DEFAULT 7` to `profiles`.
 
-### 2. `src/components/NotificationSettings.tsx`
-- In `handleToggle`, branch on the new `reason` and show a tailored toast for each case:
-  - `preview` → neutral toast pointing to the published URL
-  - `permission-denied` → "Notifications are blocked in your browser settings" + how to re-enable
-  - `permission-dismissed` → "You dismissed the permission prompt — tap Enable again"
-  - `no-vapid-key` → "Server isn't configured for push yet" (destructive)
-  - `sw-register-failed` / `subscribe-failed` / `db-failed` → destructive toast that includes the underlying error message so we can diagnose
-- Also `console.error` the full reason+message so it appears in browser devtools / our logs on the next message.
-- Add a small inline hint inside the card (not a toast) when running in the editor preview, so the Enable button's behavior is obvious upfront.
+### 2. Dashboard filter (`src/pages/Index.tsx`)
+- Read the user's `upcoming_nudge_window_days` from their profile (fallback 7).
+- In `upcomingNudges`, filter contacts whose `next_nudge_at` falls between now and `now + windowDays`.
+- If the resulting list is empty, show a friendly empty state ("No nudges in the next N days").
 
-### 3. No backend changes
-This is purely a UI/diagnostics change. The cron, edge functions, and DB schema stay as-is.
+### 3. Settings UI (`src/components/NotificationSettings.tsx` or nearest settings surface)
+- Add a small control (select: 7 / 14 / 30 / 60 / 90 days, plus custom input) labeled "Show upcoming nudges within".
+- Persist to `profiles.upcoming_nudge_window_days` via existing profile update pattern.
 
-## How we'll diagnose your published-app failure
+### 4. Tests
+- Update `src/pages/Index.test.tsx` to cover: contact due within window appears; contact due beyond window is hidden; empty state renders when all nudges are beyond the window.
 
-After this ships, tap Enable again on the published Android PWA. The new toast will name the exact failing step (e.g. "subscribe-failed: Registration failed - push service error"). Share that and I can fix the underlying cause in a follow-up — common culprits in published PWAs are a missing/incorrect VAPID key on the edge function, the service worker not being served at `/sw.js`, or Google's FCM endpoint rejecting the subscription.
+## Out of scope
+- No change to overdue section (always shown).
+- No change to `check-nudges` edge function — push notifications still fire on actual due date.

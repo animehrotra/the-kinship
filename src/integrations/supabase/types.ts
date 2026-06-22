@@ -235,6 +235,7 @@ export type Database = {
           notify_hour: number
           notify_minute: number
           notify_timezone: string
+          upcoming_nudge_window_days: number
           updated_at: string
         }
         Insert: {
@@ -246,6 +247,7 @@ export type Database = {
           notify_hour?: number
           notify_minute?: number
           notify_timezone?: string
+          upcoming_nudge_window_days?: number
           updated_at?: string
         }
         Update: {
@@ -257,6 +259,7 @@ export type Database = {
           notify_hour?: number
           notify_minute?: number
           notify_timezone?: string
+          upcoming_nudge_window_days?: number
           updated_at?: string
         }
         Relationships: []
