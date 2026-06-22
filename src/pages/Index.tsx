@@ -54,10 +54,15 @@ export default function Index() {
   })();
 
   const upcomingNudges = useMemo(() => {
+    const cutoff = Date.now() + windowDays * 86400000;
     return contacts
-      .filter((c) => c.next_nudge_at && isFuture(new Date(c.next_nudge_at)))
+      .filter((c) => {
+        if (!c.next_nudge_at) return false;
+        const t = new Date(c.next_nudge_at).getTime();
+        return t > Date.now() && t <= cutoff;
+      })
       .sort((a, b) => new Date(a.next_nudge_at!).getTime() - new Date(b.next_nudge_at!).getTime());
-  }, [contacts]);
+  }, [contacts, windowDays]);
 
   const totalNudgePages = Math.max(1, Math.ceil(upcomingNudges.length / NUDGES_PER_PAGE));
   const pagedNudges = upcomingNudges.slice(nudgePage * NUDGES_PER_PAGE, (nudgePage + 1) * NUDGES_PER_PAGE);
