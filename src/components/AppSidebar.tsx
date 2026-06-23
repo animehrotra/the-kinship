@@ -46,9 +46,7 @@ export function AppSidebar() {
       <SidebarContent>
         <div className={`p-4 ${collapsed ? "px-2" : ""}`}>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-              <Heart className="w-4 h-4 text-primary" />
-            </div>
+            <img src="/favicon.png" alt="Kinship logo" className="w-8 h-8 rounded-xl shrink-0" />
             {!collapsed && <span className="font-serif text-lg tracking-tight">Kinship</span>}
           </div>
         </div>

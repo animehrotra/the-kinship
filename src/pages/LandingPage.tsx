@@ -63,9 +63,7 @@ export default function LandingPage() {
       />
       {/* Hero */}
       <section className="flex flex-col items-center justify-center px-6 pt-20 pb-16 text-center max-w-3xl mx-auto relative">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#e9ede9] mb-6">
-          <Heart className="w-7 h-7 text-primary" />
-        </div>
+        <img src="/favicon.png" alt="Kinship logo" className="w-14 h-14 mb-6 rounded-2xl" />
         <h2 className="font-serif tracking-tight mb-2 text-4xl text-[#55916b] font-thin">Kinship</h2>
         <h1 className="font-serif tracking-tight mb-4 text-3xl md:text-3xl">
           Never lose touch with the people you love
