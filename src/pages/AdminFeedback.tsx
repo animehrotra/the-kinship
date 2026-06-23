@@ -66,6 +66,15 @@ function shortUA(ua: string | null) {
   return `${os} · ${browser}`;
 }
 
+const CATEGORIES: { value: string; label: string }[] = [
+  { value: "suggestion", label: "Suggestion" },
+  { value: "bug", label: "Bug Report" },
+  { value: "other", label: "Other" },
+];
+
+const categoryLabel = (value: string) =>
+  CATEGORIES.find((c) => c.value === value)?.label ?? value;
+
 export default function AdminFeedback() {
   const { isAdmin, loading: roleLoading } = useIsAdmin();
   const { markAllRead } = useUnreadFeedback();
@@ -74,6 +83,8 @@ export default function AdminFeedback() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
   const [closedOpen, setClosedOpen] = useState(false);
+  const [openCategoryState, setOpenCategoryState] = useState<Record<string, boolean>>({});
+  const [closedCategoryState, setClosedCategoryState] = useState<Record<string, boolean>>({});
 
   const load = async () => {
     const { data, error } = await supabase
