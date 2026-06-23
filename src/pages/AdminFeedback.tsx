@@ -327,7 +327,7 @@ export default function AdminFeedback() {
                   No closed feedback.
                 </div>
               ) : (
-                renderTable(closed, true)
+                renderCategoryGroups(closedByCategory, true, closedCategoryState, setClosedCategoryState, false)
               )}
             </CollapsibleContent>
           </Collapsible>
