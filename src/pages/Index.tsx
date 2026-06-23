@@ -151,12 +151,12 @@ export default function Index() {
                 key={c.id}
                 className="border-border/50 hover:shadow-md transition-shadow"
               >
-                <CardContent className="p-4 flex items-center justify-between">
+                <CardContent className="p-4 flex items-start justify-between">
                   <div
                     className="flex-1 cursor-pointer active:scale-[0.98]"
                     onClick={() => navigate(`/people/${c.id}`)}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className={`w-2 h-2 rounded-full shrink-0 ${dotColor}`} />
                       <span className="font-medium">{c.name}</span>
                       <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
@@ -203,12 +203,12 @@ export default function Index() {
                 key={c.id}
                 className="border-border/50 hover:shadow-md transition-shadow"
               >
-                <CardContent className="p-4 flex items-center justify-between">
+                <CardContent className="p-4 flex items-start justify-between">
                   <div
                     className="flex-1 cursor-pointer active:scale-[0.98]"
                     onClick={() => navigate(`/people/${c.id}`)}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
                       <span className="font-medium">{c.name}</span>
                       <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
