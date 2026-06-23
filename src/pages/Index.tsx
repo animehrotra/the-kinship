@@ -151,7 +151,7 @@ export default function Index() {
                 key={c.id}
                 className="border-border/50 hover:shadow-md transition-shadow"
               >
-                <CardContent className="p-4 flex items-center justify-between">
+                <CardContent className="p-4 flex items-start justify-between">
                   <div
                     className="flex-1 cursor-pointer active:scale-[0.98]"
                     onClick={() => navigate(`/people/${c.id}`)}
