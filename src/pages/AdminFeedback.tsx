@@ -303,7 +303,7 @@ export default function AdminFeedback() {
                 No open feedback.
               </div>
             ) : (
-              renderTable(open, false)
+              renderCategoryGroups(openByCategory, false, openCategoryState, setOpenCategoryState, true)
             )}
           </section>
 
