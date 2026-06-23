@@ -145,13 +145,67 @@ export default function AdminFeedback() {
     toast({ title: newClosedAt ? "Marked closed" : "Reopened" });
   };
 
-  const { open, closed } = useMemo(() => {
+  const { open, closed, openByCategory, closedByCategory } = useMemo(() => {
     const filtered = filter === "all" ? rows : rows.filter((r) => r.category === filter);
+    const openList = filtered.filter((r) => !r.closed_at);
+    const closedList = filtered.filter((r) => !!r.closed_at);
+    const groupBy = (list: FeedbackRow[]) => {
+      const map: Record<string, FeedbackRow[]> = {};
+      for (const r of list) {
+        (map[r.category] ||= []).push(r);
+      }
+      return map;
+    };
     return {
-      open: filtered.filter((r) => !r.closed_at),
-      closed: filtered.filter((r) => !!r.closed_at),
+      open: openList,
+      closed: closedList,
+      openByCategory: groupBy(openList),
+      closedByCategory: groupBy(closedList),
     };
   }, [rows, filter]);
+
+  const visibleCategories = filter === "all"
+    ? CATEGORIES.map((c) => c.value)
+    : [filter];
+
+  const renderCategoryGroups = (
+    byCategory: Record<string, FeedbackRow[]>,
+    isClosed: boolean,
+    state: Record<string, boolean>,
+    setState: (updater: (prev: Record<string, boolean>) => Record<string, boolean>) => void,
+    defaultOpen: boolean,
+  ) => (
+    <div className="space-y-3">
+      {visibleCategories.map((cat) => {
+        const list = byCategory[cat] || [];
+        if (list.length === 0) return null;
+        const isOpen = state[cat] ?? defaultOpen;
+        return (
+          <Collapsible
+            key={cat}
+            open={isOpen}
+            onOpenChange={(v) => setState((prev) => ({ ...prev, [cat]: v }))}
+          >
+            <CollapsibleTrigger asChild>
+              <button className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-foreground/80 transition-colors w-full">
+                {isOpen ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+                <span>{categoryLabel(cat)}</span>
+                <Badge variant="secondary" className="ml-1">{list.length}</Badge>
+              </button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pt-2">
+              {renderTable(list, isClosed)}
+            </CollapsibleContent>
+          </Collapsible>
+        );
+      })}
+    </div>
+  );
+
 
   if (roleLoading) return <div className="p-6 text-muted-foreground">Loading…</div>;
   if (!isAdmin) return <Navigate to="/dashboard" replace />;
