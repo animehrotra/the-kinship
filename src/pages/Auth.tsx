@@ -134,9 +134,7 @@ export default function Auth() {
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
         <div className="w-full max-w-sm space-y-8">
           <div className="text-center space-y-2">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10 mb-2">
-              <Heart className="w-6 h-6 text-primary" />
-            </div>
+            <img src="/favicon.png" alt="Kinship logo" className="w-12 h-12 mb-2 rounded-2xl mx-auto" />
             <h1 className="text-3xl font-serif tracking-tight text-foreground">Kinship</h1>
             <p className="text-muted-foreground text-sm">Reset your password</p>
           </div>
@@ -185,9 +183,7 @@ export default function Auth() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm space-y-8">
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10 mb-2">
-            <Heart className="w-6 h-6 text-primary" />
-          </div>
+            <img src="/favicon.png" alt="Kinship logo" className="w-12 h-12 mb-2 rounded-2xl mx-auto" />
           <h1 className="text-3xl font-serif tracking-tight text-foreground">Kinship</h1>
           <p className="text-muted-foreground text-sm">Nurture the relationships that matter</p>
         </div>
