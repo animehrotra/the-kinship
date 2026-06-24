@@ -116,6 +116,16 @@ export default function People() {
                           ? formatNudgeInterval(c.nudge_interval_value, c.nudge_interval_unit)
                           : nudgeFrequencyLabels[c.nudge_frequency] || c.nudge_frequency}
                       </span>
+                      {(tagsByContact[c.id] || []).map((tag) => (
+                        <Badge
+                          key={tag.id}
+                          variant="secondary"
+                          className="text-[10px] px-1.5 py-0"
+                          style={tag.color ? { backgroundColor: tag.color, color: "#fff" } : undefined}
+                        >
+                          {tag.name}
+                        </Badge>
+                      ))}
                     </div>
                     <p className="text-sm text-muted-foreground mt-0.5 ml-4">
                       {c.last_interaction_at
