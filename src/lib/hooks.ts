@@ -303,6 +303,28 @@ export function useContactTags(contactId: string) {
   });
 }
 
+export function useAllContactTags() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["all_contact_tags", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("contact_tags")
+        .select("contact_id, tags!inner(id, name, color, user_id)")
+        .eq("tags.user_id", user!.id);
+      if (error) throw error;
+      const map: Record<string, { id: string; name: string; color: string | null }[]> = {};
+      for (const row of (data as any[]) ?? []) {
+        const t = row.tags;
+        if (!t) continue;
+        (map[row.contact_id] ||= []).push({ id: t.id, name: t.name, color: t.color });
+      }
+      return map;
+    },
+    enabled: !!user,
+  });
+}
+
 export function useUpcomingEvents() {
   const { user } = useAuth();
   return useQuery({
