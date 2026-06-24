@@ -19,6 +19,7 @@ type Contact = Database["public"]["Tables"]["contacts"]["Row"];
 
 export default function People() {
   const { data: contacts = [], isLoading } = useContacts();
+  const { data: tagsByContact = {} } = useAllContactTags();
   const deleteContact = useDeleteContact();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
