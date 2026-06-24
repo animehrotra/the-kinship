@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useContacts, useDeleteContact, getContactStatus } from "@/lib/hooks";
+import { useContacts, useDeleteContact, getContactStatus, useAllContactTags } from "@/lib/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
