@@ -221,9 +221,11 @@ export default function Index() {
                     className="flex-1 cursor-pointer active:scale-[0.98]"
                     onClick={() => navigate(`/people/${c.id}`)}
                   >
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
-                      <span className="font-medium">{c.name}</span>
+                    <div className="flex items-start gap-2">
+                      <span className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5" />
+                      <span className="font-medium break-words">{c.name}</span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1 ml-4">
                       <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
                         {circleLabels[c.circle]}
                       </Badge>
@@ -232,8 +234,18 @@ export default function Index() {
                           ? formatNudgeInterval(c.nudge_interval_value, c.nudge_interval_unit)
                           : nudgeFrequencyLabels[c.nudge_frequency]}
                       </Badge>
+                      {(tagsByContact[c.id] || []).map((tag) => (
+                        <Badge
+                          key={tag.id}
+                          variant="secondary"
+                          className="text-[10px] px-1.5 py-0"
+                          style={tag.color ? { backgroundColor: tag.color, color: "#fff" } : undefined}
+                        >
+                          {tag.name}
+                        </Badge>
+                      ))}
                     </div>
-                    <p className="text-sm text-muted-foreground mt-0.5">
+                    <p className="text-sm text-muted-foreground mt-1 ml-4">
                       {format(new Date(c.next_nudge_at!), "MMM d, yyyy")}
                     </p>
                   </div>
