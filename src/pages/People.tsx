@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useContacts, useDeleteContact, getContactStatus } from "@/lib/hooks";
+import { useContacts, useDeleteContact, getContactStatus, useAllContactTags } from "@/lib/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ type Contact = Database["public"]["Tables"]["contacts"]["Row"];
 
 export default function People() {
   const { data: contacts = [], isLoading } = useContacts();
+  const { data: tagsByContact = {} } = useAllContactTags();
   const deleteContact = useDeleteContact();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
@@ -115,6 +116,16 @@ export default function People() {
                           ? formatNudgeInterval(c.nudge_interval_value, c.nudge_interval_unit)
                           : nudgeFrequencyLabels[c.nudge_frequency] || c.nudge_frequency}
                       </span>
+                      {(tagsByContact[c.id] || []).map((tag) => (
+                        <Badge
+                          key={tag.id}
+                          variant="secondary"
+                          className="text-[10px] px-1.5 py-0"
+                          style={tag.color ? { backgroundColor: tag.color, color: "#fff" } : undefined}
+                        >
+                          {tag.name}
+                        </Badge>
+                      ))}
                     </div>
                     <p className="text-sm text-muted-foreground mt-0.5 ml-4">
                       {c.last_interaction_at
