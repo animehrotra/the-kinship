@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { useContacts, useUpcomingEvents, getContactStatus } from "@/lib/hooks";
+import { useContacts, useUpcomingEvents, getContactStatus, useAllContactTags } from "@/lib/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Heart, Clock, Calendar, Users, Bell, ChevronLeft, ChevronRight } from "lucide-react";
