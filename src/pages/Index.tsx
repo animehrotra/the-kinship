@@ -15,6 +15,7 @@ import { MessageSquare } from "lucide-react";
 
 export default function Index() {
   const { data: contacts = [], isLoading } = useContacts();
+  const { data: tagsByContact = {} } = useAllContactTags();
   const { data: upcomingEvents = [] } = useUpcomingEvents();
   const { user } = useAuth();
   const navigate = useNavigate();
