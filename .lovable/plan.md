@@ -1,23 +1,15 @@
-## Goal
-Limit the dashboard "Upcoming nudges" list to contacts due within a cutoff window, defaulting to 7 days and configurable per user.
+Update the contact card layout in `src/pages/People.tsx` so the contact name sits on its own dedicated line rather than sharing a flex row with the status dot and circle badge.
 
-## Changes
+Current layout (lines 104–110):
 
-### 1. Database (migration)
-- Add `upcoming_nudge_window_days INTEGER NOT NULL DEFAULT 7` to `profiles`.
+- Status dot, name (`truncate`), and circle badge all live in one `flex items-center gap-2` row.
+- Long names get clipped with `…` because the badge and buttons compete for width.
 
-### 2. Dashboard filter (`src/pages/Index.tsx`)
-- Read the user's `upcoming_nudge_window_days` from their profile (fallback 7).
-- In `upcomingNudges`, filter contacts whose `next_nudge_at` falls between now and `now + windowDays`.
-- If the resulting list is empty, show a friendly empty state ("No nudges in the next N days").
+Proposed change:
 
-### 3. Settings UI (`src/components/NotificationSettings.tsx` or nearest settings surface)
-- Add a small control (select: 7 / 14 / 30 / 60 / 90 days, plus custom input) labeled "Show upcoming nudges within".
-- Persist to `profiles.upcoming_nudge_window_days` via existing profile update pattern.
+1. Move the status dot and the contact name onto a full-width row. Remove `truncate` from the name and let it wrap naturally (`break-words`).
+2. Move the circle badge onto a second row, grouped with the nudge frequency and last-interaction text and tag (if any) , so the name has the entire card width available.
+3. Keep the action buttons (Log, Edit, Delete) aligned to the right of the card as they are today.
+4. Verify on mobile that the name no longer ellipses and the card remains readable.
 
-### 4. Tests
-- Update `src/pages/Index.test.tsx` to cover: contact due within window appears; contact due beyond window is hidden; empty state renders when all nudges are beyond the window.
-
-## Out of scope
-- No change to overdue section (always shown).
-- No change to `check-nudges` edge function — push notifications still fire on actual due date.
+No backend or data changes required.

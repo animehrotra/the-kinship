@@ -99,23 +99,23 @@ export default function People() {
                 className="border-border/50 cursor-pointer hover:shadow-md transition-all active:scale-[0.98]"
                 onClick={() => navigate(`/people/${c.id}`)}
               >
-                <CardContent className="p-4 flex items-center justify-between">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full shrink-0 ${dotColor}`} />
-                      <span className="font-medium truncate">{c.name}</span>
-                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">
+                <CardContent className="p-4 flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start gap-2">
+                      <span className={`w-2 h-2 rounded-full shrink-0 mt-1.5 ${dotColor}`} />
+                      <span className="font-medium break-words">{c.name}</span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1 ml-4">
+                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
                         {circleLabels[c.circle]}
                       </Badge>
-                    </div>
-                    <p className="flex items-center gap-1 text-xs text-muted-foreground/80 mt-0.5 ml-4">
-                      <Clock className="w-3 h-3 shrink-0" />
-                      <span className="truncate">
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground/80">
+                        <Clock className="w-3 h-3 shrink-0" />
                         {c.nudge_interval_value && c.nudge_interval_unit
                           ? formatNudgeInterval(c.nudge_interval_value, c.nudge_interval_unit)
                           : nudgeFrequencyLabels[c.nudge_frequency] || c.nudge_frequency}
                       </span>
-                    </p>
+                    </div>
                     <p className="text-sm text-muted-foreground mt-0.5 ml-4">
                       {c.last_interaction_at
                         ? formatDistanceToNow(new Date(c.last_interaction_at), { addSuffix: true })
