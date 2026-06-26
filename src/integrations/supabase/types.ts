@@ -225,6 +225,36 @@ export type Database = {
           },
         ]
       }
+      onboarding_state: {
+        Row: {
+          created_at: string
+          last_tip_shown_at: string | null
+          seen_tips: string[]
+          tour_completed_at: string | null
+          tour_skipped: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          last_tip_shown_at?: string | null
+          seen_tips?: string[]
+          tour_completed_at?: string | null
+          tour_skipped?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          last_tip_shown_at?: string | null
+          seen_tips?: string[]
+          tour_completed_at?: string | null
+          tour_skipped?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
