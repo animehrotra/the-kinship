@@ -26,6 +26,7 @@ export default function Index() {
   const [nudgePage, setNudgePage] = useState(0);
   const [windowDays, setWindowDays] = useState<number>(7);
   const NUDGES_PER_PAGE = 5;
+  const { shouldShowTour, completeTour, skipTour } = useOnboarding();
 
   useEffect(() => {
     if (!user) return;
