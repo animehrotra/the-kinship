@@ -328,6 +328,9 @@ export default function Index() {
           </div>
         </section>
       )}
+
+      <DidYouKnowCard />
+      <OnboardingTour open={shouldShowTour} onComplete={completeTour} onSkip={skipTour} />
     </div>
   );
 }
