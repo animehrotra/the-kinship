@@ -142,6 +142,7 @@ export function AppSidebar() {
               <HelpCircle className="mr-2 h-4 w-4" />
               {!collapsed && <span>Replay tour</span>}
             </SidebarMenuButton>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton onClick={signOut} className="text-muted-foreground hover:text-destructive">
               <LogOut className="mr-2 h-4 w-4" />
