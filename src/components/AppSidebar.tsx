@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { Heart, Users, Archive, LogOut, MessageSquare, Megaphone } from "lucide-react";
+import { Heart, Users, Archive, LogOut, MessageSquare, Megaphone, HelpCircle } from "lucide-react";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { InviteFriendButton } from "@/components/InviteFriendButton";
 import { FeedbackDialog } from "@/components/FeedbackWidget";
 import { NavLink } from "@/components/NavLink";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useUnreadFeedback } from "@/hooks/useUnreadFeedback";
+import { useOnboarding } from "@/lib/useOnboarding";
 import { Badge } from "@/components/ui/badge";
 import {
   Sidebar,
