@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { Heart, Users, Archive, LogOut, MessageSquare, Megaphone } from "lucide-react";
+import { Heart, Users, Archive, LogOut, MessageSquare, Megaphone, HelpCircle } from "lucide-react";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { InviteFriendButton } from "@/components/InviteFriendButton";
 import { FeedbackDialog } from "@/components/FeedbackWidget";
 import { NavLink } from "@/components/NavLink";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useUnreadFeedback } from "@/hooks/useUnreadFeedback";
+import { useOnboarding } from "@/lib/useOnboarding";
 import { Badge } from "@/components/ui/badge";
 import {
   Sidebar,
@@ -39,6 +40,8 @@ export function AppSidebar() {
   const { signOut, user } = useAuth();
   const { isAdmin } = useIsAdmin();
   const { count: unreadFeedback } = useUnreadFeedback();
+  const { replayTour } = useOnboarding();
+  const navigate = useNavigate();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   return (
@@ -53,7 +56,7 @@ export function AppSidebar() {
 
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu data-tour="nav">
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
@@ -126,6 +129,18 @@ export function AppSidebar() {
             >
               <Megaphone className="mr-2 h-4 w-4" />
               {!collapsed && <span>Share feedback</span>}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={async () => {
+                await replayTour();
+                navigate("/dashboard");
+              }}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <HelpCircle className="mr-2 h-4 w-4" />
+              {!collapsed && <span>Replay tour</span>}
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>

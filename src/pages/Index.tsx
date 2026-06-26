@@ -12,6 +12,9 @@ import AddContactDialog from "@/components/AddContactDialog";
 import { Button } from "@/components/ui/button";
 import LogInteractionSheet from "@/components/LogInteractionSheet";
 import { MessageSquare } from "lucide-react";
+import { OnboardingTour } from "@/components/OnboardingTour";
+import { DidYouKnowCard } from "@/components/DidYouKnowCard";
+import { useOnboarding } from "@/lib/useOnboarding";
 
 export default function Index() {
   const { data: contacts = [], isLoading } = useContacts();
@@ -23,6 +26,7 @@ export default function Index() {
   const [nudgePage, setNudgePage] = useState(0);
   const [windowDays, setWindowDays] = useState<number>(7);
   const NUDGES_PER_PAGE = 5;
+  const { shouldShowTour, completeTour, skipTour } = useOnboarding();
 
   useEffect(() => {
     if (!user) return;
@@ -80,27 +84,31 @@ export default function Index() {
 
   if (contacts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] p-6 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
-          <Heart className="w-8 h-8 text-primary" />
+      <>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] p-6 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+            <Heart className="w-8 h-8 text-primary" />
+          </div>
+          <h1 className="text-2xl font-serif mb-2">Your inner circle starts here</h1>
+          <p className="text-muted-foreground mb-6 max-w-sm">
+            Add people you care about and Kinship will help you stay in touch.
+          </p>
+          <button
+            data-tour="add-contact"
+            onClick={() => setAddDialogOpen(true)}
+            className="px-6 py-2.5 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
+          >
+            Add someone
+          </button>
+          <AddContactDialog open={addDialogOpen} onOpenChange={setAddDialogOpen} />
         </div>
-        <h1 className="text-2xl font-serif mb-2">Your inner circle starts here</h1>
-        <p className="text-muted-foreground mb-6 max-w-sm">
-          Add people you care about and Kinship will help you stay in touch.
-        </p>
-        <button
-          onClick={() => setAddDialogOpen(true)}
-          className="px-6 py-2.5 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
-        >
-          Add someone
-        </button>
-        <AddContactDialog open={addDialogOpen} onOpenChange={setAddDialogOpen} />
-      </div>
+        <OnboardingTour open={shouldShowTour} onComplete={completeTour} onSkip={skipTour} />
+      </>
     );
   }
 
   return (
-    <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-6">
+    <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-6" data-tour="nudges">
       <h1 className="text-2xl font-serif">Nudges</h1>
 
       {/* Circle Summary */}
@@ -320,6 +328,9 @@ export default function Index() {
           </div>
         </section>
       )}
+
+      <DidYouKnowCard />
+      <OnboardingTour open={shouldShowTour} onComplete={completeTour} onSkip={skipTour} />
     </div>
   );
 }

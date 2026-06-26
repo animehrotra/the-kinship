@@ -54,7 +54,7 @@ export function MobileNav() {
 
   return (
     <>
-      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/95 backdrop-blur-sm md:hidden">
+      <nav data-tour="nav" className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/95 backdrop-blur-sm md:hidden">
       <div className="flex items-center justify-around h-14">
         {leadingNavItems.map((item) => (
           <NavLink
