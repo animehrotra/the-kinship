@@ -12,6 +12,9 @@ import AddContactDialog from "@/components/AddContactDialog";
 import { Button } from "@/components/ui/button";
 import LogInteractionSheet from "@/components/LogInteractionSheet";
 import { MessageSquare } from "lucide-react";
+import { OnboardingTour } from "@/components/OnboardingTour";
+import { DidYouKnowCard } from "@/components/DidYouKnowCard";
+import { useOnboarding } from "@/lib/useOnboarding";
 
 export default function Index() {
   const { data: contacts = [], isLoading } = useContacts();
