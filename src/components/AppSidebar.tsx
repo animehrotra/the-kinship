@@ -40,6 +40,8 @@ export function AppSidebar() {
   const { signOut, user } = useAuth();
   const { isAdmin } = useIsAdmin();
   const { count: unreadFeedback } = useUnreadFeedback();
+  const { replayTour } = useOnboarding();
+  const navigate = useNavigate();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   return (
