@@ -132,6 +132,17 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={async () => {
+                await replayTour();
+                navigate("/dashboard");
+              }}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <HelpCircle className="mr-2 h-4 w-4" />
+              {!collapsed && <span>Replay tour</span>}
+            </SidebarMenuButton>
+          <SidebarMenuItem>
             <SidebarMenuButton onClick={signOut} className="text-muted-foreground hover:text-destructive">
               <LogOut className="mr-2 h-4 w-4" />
               {!collapsed && <span>Sign out</span>}
