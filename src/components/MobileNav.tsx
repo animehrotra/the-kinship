@@ -71,6 +71,7 @@ export function MobileNav() {
 
         <button
           type="button"
+          data-tour="add-contact"
           onClick={() => setAddContactOpen(true)}
           className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md transition-colors hover:bg-primary/90"
           aria-label="Add contact"
