@@ -108,8 +108,8 @@ export default function Index() {
   }
 
   return (
-    <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-6" data-tour="nudges">
-      <h1 className="text-2xl font-serif">Nudges</h1>
+    <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-6">
+      <h1 className="text-2xl font-serif" data-tour="nudges">Nudges</h1>
 
       {/* Circle Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
