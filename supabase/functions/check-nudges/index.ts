@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
       // Fetch contacts due today or earlier.
       const { data: dueContacts, error: contactsErr } = await supabase
         .from("contacts")
-        .select("id, name, next_nudge_at")
+        .select("id, name, next_nudge_at, last_notified_for_nudge_at")
         .eq("user_id", p.id)
         .eq("archived", false)
         .not("next_nudge_at", "is", null)
@@ -80,9 +80,15 @@ Deno.serve(async (req) => {
       }
       if (!dueContacts || dueContacts.length === 0) continue;
 
+      // Only notify for contacts we haven't already notified about for this nudge cycle.
+      const fresh = dueContacts.filter(
+        (c) => !c.last_notified_for_nudge_at || c.last_notified_for_nudge_at !== c.next_nudge_at,
+      );
+      if (fresh.length === 0) continue;
+
       usersDue++;
-      const count = dueContacts.length;
-      const names = dueContacts.slice(0, 3).map((c) => c.name);
+      const count = fresh.length;
+      const names = fresh.slice(0, 3).map((c) => c.name);
       const title = `Kinship: ${count} nudge${count > 1 ? "s" : ""} due today`;
       const body =
         count <= 3
@@ -99,11 +105,19 @@ Deno.serve(async (req) => {
         const json = await resp.json();
         const sent = json.sent || 0;
         pushSent += sent;
-        // Stamp dedupe regardless of subscription count — we don't want to retry next hour.
+        // Stamp per-user dedupe so cron's other half-hour runs don't double up today.
         await supabase
           .from("profiles")
           .update({ last_nudge_notified_on: date })
           .eq("id", p.id);
+        // Stamp each notified contact so we don't re-notify until next_nudge_at changes
+        // (which happens when the user logs an interaction or edits the schedule).
+        for (const c of fresh) {
+          await supabase
+            .from("contacts")
+            .update({ last_notified_for_nudge_at: c.next_nudge_at })
+            .eq("id", c.id);
+        }
       }
     }
 
