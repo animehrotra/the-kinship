@@ -47,6 +47,7 @@ export const contacts: Contact[] = [
     notes: "Best friend",
     created_at: monthAgo.toISOString(),
     updated_at: now.toISOString(),
+    last_notified_for_nudge_at: null,
   },
   {
     id: "c2",
@@ -67,6 +68,7 @@ export const contacts: Contact[] = [
     notes: null,
     created_at: monthAgo.toISOString(),
     updated_at: now.toISOString(),
+    last_notified_for_nudge_at: null,
   },
   {
     id: "c3",
@@ -87,6 +89,7 @@ export const contacts: Contact[] = [
     notes: null,
     created_at: monthAgo.toISOString(),
     updated_at: now.toISOString(),
+    last_notified_for_nudge_at: null,
   },
 ];
 
@@ -110,6 +113,7 @@ export const archivedContacts: Contact[] = [
     notes: null,
     created_at: monthAgo.toISOString(),
     updated_at: now.toISOString(),
+    last_notified_for_nudge_at: null,
   },
 ];
 

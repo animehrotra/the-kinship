@@ -56,6 +56,7 @@ export type Database = {
           email: string | null
           id: string
           last_interaction_at: string | null
+          last_notified_for_nudge_at: string | null
           name: string
           next_nudge_at: string | null
           notes: string | null
@@ -76,6 +77,7 @@ export type Database = {
           email?: string | null
           id?: string
           last_interaction_at?: string | null
+          last_notified_for_nudge_at?: string | null
           name: string
           next_nudge_at?: string | null
           notes?: string | null
@@ -96,6 +98,7 @@ export type Database = {
           email?: string | null
           id?: string
           last_interaction_at?: string | null
+          last_notified_for_nudge_at?: string | null
           name?: string
           next_nudge_at?: string | null
           notes?: string | null
