@@ -150,6 +150,45 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
             />
           </div>
 
+          <div className="space-y-2">
+            <Label>Screenshot (optional)</Label>
+            {previewUrl ? (
+              <div className="relative inline-block">
+                <img
+                  src={previewUrl}
+                  alt="Screenshot preview"
+                  className="max-h-40 rounded-md border"
+                />
+                <button
+                  type="button"
+                  onClick={clearScreenshot}
+                  className="absolute -top-2 -right-2 rounded-full bg-background border p-1 shadow-sm hover:bg-accent"
+                  aria-label="Remove screenshot"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            ) : (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <ImagePlus className="h-4 w-4" />
+                Attach screenshot
+              </Button>
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+            <p className="text-xs text-muted-foreground">PNG, JPEG, or WebP. Max 5 MB.</p>
+          </div>
+
           <Button
             onClick={handleSubmit}
             disabled={!message.trim() || submitting}
