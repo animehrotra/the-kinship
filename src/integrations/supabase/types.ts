@@ -122,6 +122,7 @@ export type Database = {
           id: string
           message: string
           page_url: string | null
+          screenshot_path: string | null
           user_agent: string | null
           user_id: string
           viewport: string | null
@@ -134,6 +135,7 @@ export type Database = {
           id?: string
           message: string
           page_url?: string | null
+          screenshot_path?: string | null
           user_agent?: string | null
           user_id: string
           viewport?: string | null
@@ -146,6 +148,7 @@ export type Database = {
           id?: string
           message?: string
           page_url?: string | null
+          screenshot_path?: string | null
           user_agent?: string | null
           user_id?: string
           viewport?: string | null

@@ -1,49 +1,35 @@
-# Stop re-notifying about the same overdue contact
+# Attach screenshot to feedback
 
-## Today's behavior
-- Daily push fires for every overdue contact, every day, until you log a connection or archive them.
-- Dashboard correctly keeps showing overdue people so nothing is forgotten — that part stays.
+Let users optionally attach one screenshot when submitting feedback, and let admins view it from the feedback table.
 
-## Goal
-Each overdue contact triggers a push notification **once**. No repeat pushes until you act on it (log a connection, edit, or archive). The dashboard is unchanged — overdue people still appear there as before.
+## Backend
 
-## What gets built
+1. **Storage bucket** `feedback-screenshots` (private). RLS on `storage.objects`:
+   - Authenticated users can `INSERT` into this bucket only under a path prefixed by their own `auth.uid()` (e.g. `{user_id}/{uuid}.png`).
+   - Users can `SELECT` their own files. Admins (via `has_role('admin')`) can `SELECT` any file in the bucket.
+2. **Migration** on `public.feedback`:
+   - Add column `screenshot_path text` (nullable) — stores the object path inside the bucket.
+   - No grant changes needed (existing grants cover the new column).
 
-### 1. Track "already notified" per contact
-Add a column `last_notified_for_nudge_at` (timestamptz, nullable) on `contacts`. It stores the `next_nudge_at` value the contact was last notified for.
+## Submission flow (`src/components/FeedbackWidget.tsx`)
 
-### 2. `check-nudges` edge function — only notify new overdue contacts
-When picking contacts due for a user:
-- Skip contacts where `last_notified_for_nudge_at` already equals the current `next_nudge_at` (already notified for this cycle).
-- For contacts that pass, include them in the push and stamp `last_notified_for_nudge_at = next_nudge_at` after sending.
-- If no contacts qualify, send no push that day (even if there are still-overdue ones from earlier).
+- Add a file input (accept `image/png,image/jpeg,image/webp`, single file, max ~5 MB validated client-side) with a small preview thumbnail and a "Remove" button.
+- On submit: if a file is chosen, upload to `feedback-screenshots/{user.id}/{crypto.randomUUID()}.{ext}` first, then insert the feedback row with `screenshot_path` set. If upload fails, surface a toast and abort (don't half-submit).
+- Reset the file state alongside `message`/`category` on success.
 
-Result: the moment a contact becomes overdue → one push. Day 2, 3, 4 with no action → silence. Once you log a connection, `next_nudge_at` advances; when that new date arrives and lapses, you get one fresh push.
+## Admin view (`src/pages/AdminFeedback.tsx`)
 
-### 3. Keep the per-user daily dedupe
-`last_nudge_notified_on` stays — it still prevents two pushes in the same local day if cron runs twice.
-
-### 4. Dashboard
-No changes. "It's been a while" still lists every overdue contact until you act.
-
-## Technical details
-
-**Migration**
-```sql
-ALTER TABLE public.contacts
-  ADD COLUMN last_notified_for_nudge_at timestamptz;
-```
-No backfill needed — existing overdue contacts will each get one "catch-up" push the next time cron runs, then go quiet.
-
-**Edge function change (`supabase/functions/check-nudges/index.ts`)**
-- Query: select `id, name, next_nudge_at, last_notified_for_nudge_at`.
-- Filter in code: keep only rows where `last_notified_for_nudge_at IS NULL` or `last_notified_for_nudge_at <> next_nudge_at`.
-- After successful `send-push`, bulk-update `contacts` setting `last_notified_for_nudge_at = next_nudge_at` for the notified ids.
-- If filtered list is empty for a user → continue without sending, and do **not** stamp `last_nudge_notified_on` (so the dedupe doesn't block a legitimate notification later that same day if a new contact tips into overdue).
-
-**Reset on action**
-`useLogInteraction` already sets a new `next_nudge_at` — that naturally re-arms notifications because the stored stamp no longer matches. No code change needed in log/edit flows.
+- Fetch `screenshot_path` with the rest of the row (type regen handles the rest).
+- In the Message column, when `screenshot_path` is present, show a small "View screenshot" link below the message text. Clicking it calls `supabase.storage.from('feedback-screenshots').createSignedUrl(path, 60)` and opens the resulting URL in a new tab.
+- No bulk download or inline preview; keep the table compact.
 
 ## Out of scope
-- No Snooze button, no auto-roll-forward.
-- No changes to email or in-app UI.
+
+- Multiple attachments, drag-and-drop, image cropping/annotation, auto-capture of current screen, video attachments.
+- Deleting the file when feedback is auto-deleted after 30 days (acceptable orphan for now; can be revisited later).
+
+## Technical notes
+
+- Bucket is created via `supabase--storage_create_bucket` (private). RLS policies on `storage.objects` go in the same migration as the `screenshot_path` column.
+- Path convention `{user_id}/{uuid}.{ext}` lets the INSERT policy check `(storage.foldername(name))[1] = auth.uid()::text`.
+- Signed URL TTL kept short (60s) since admins open them on demand.

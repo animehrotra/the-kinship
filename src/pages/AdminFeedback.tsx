@@ -39,6 +39,7 @@ type FeedbackRow = {
   app_version: string | null;
   created_at: string;
   closed_at: string | null;
+  screenshot_path: string | null;
 };
 
 type Profile = { id: string; display_name: string | null };
@@ -163,6 +164,17 @@ export default function AdminFeedback() {
       closedByCategory: groupBy(closedList),
     };
   }, [rows, filter]);
+  const openScreenshot = async (path: string) => {
+    const { data, error } = await supabase.storage
+      .from("feedback-screenshots")
+      .createSignedUrl(path, 60);
+    if (error || !data) {
+      toast({ title: "Error", description: "Could not load screenshot", variant: "destructive" });
+      return;
+    }
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  };
+
 
   const visibleCategories = filter === "all"
     ? CATEGORIES.map((c) => c.value)
@@ -238,7 +250,16 @@ export default function AdminFeedback() {
                 <Badge variant="secondary">{r.category}</Badge>
               </TableCell>
               <TableCell className="min-w-[280px] whitespace-pre-wrap text-sm">
-                {r.message}
+                <div>{r.message}</div>
+                {r.screenshot_path && (
+                  <button
+                    type="button"
+                    onClick={() => openScreenshot(r.screenshot_path!)}
+                    className="mt-2 text-xs text-primary underline underline-offset-2"
+                  >
+                    View screenshot
+                  </button>
+                )}
               </TableCell>
               <TableCell className="hidden lg:table-cell text-xs">
                 {r.page_url ? (

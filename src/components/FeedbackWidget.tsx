@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Megaphone } from "lucide-react";
+import { useRef, useState } from "react";
+import { ImagePlus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,6 +27,9 @@ const categories = [
   { value: "other", label: "Other" },
 ];
 
+const ACCEPTED_TYPES = ["image/png", "image/jpeg", "image/webp"];
+const MAX_BYTES = 5 * 1024 * 1024;
+
 interface FeedbackDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -36,12 +39,54 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
   const [category, setCategory] = useState("suggestion");
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [screenshot, setScreenshot] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!ACCEPTED_TYPES.includes(file.type)) {
+      toast.error("Please attach a PNG, JPEG, or WebP image");
+      return;
+    }
+    if (file.size > MAX_BYTES) {
+      toast.error("Screenshot must be under 5 MB");
+      return;
+    }
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setScreenshot(file);
+    setPreviewUrl(URL.createObjectURL(file));
+  };
+
+  const clearScreenshot = () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setScreenshot(null);
+    setPreviewUrl(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const handleSubmit = async () => {
     if (!message.trim() || !user) return;
 
     setSubmitting(true);
+    let screenshotPath: string | null = null;
+
+    if (screenshot) {
+      const ext = screenshot.name.split(".").pop()?.toLowerCase() || "png";
+      const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from("feedback-screenshots")
+        .upload(path, screenshot, { contentType: screenshot.type });
+      if (uploadError) {
+        setSubmitting(false);
+        toast.error("Failed to upload screenshot");
+        return;
+      }
+      screenshotPath = path;
+    }
+
     const { error } = await supabase.from("feedback").insert({
       user_id: user.id,
       category,
@@ -50,6 +95,7 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
       user_agent: navigator.userAgent,
       viewport: `${window.innerWidth}x${window.innerHeight}`,
       app_version: __APP_VERSION__,
+      screenshot_path: screenshotPath,
     });
     setSubmitting(false);
 
@@ -61,6 +107,7 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
     toast.success("Thanks for your feedback!");
     setMessage("");
     setCategory("suggestion");
+    clearScreenshot();
     onOpenChange(false);
   };
 
@@ -101,6 +148,45 @@ export function FeedbackDialog({ open, onOpenChange }: FeedbackDialogProps) {
               maxLength={1000}
               rows={4}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Screenshot (optional)</Label>
+            {previewUrl ? (
+              <div className="relative inline-block">
+                <img
+                  src={previewUrl}
+                  alt="Screenshot preview"
+                  className="max-h-40 rounded-md border"
+                />
+                <button
+                  type="button"
+                  onClick={clearScreenshot}
+                  className="absolute -top-2 -right-2 rounded-full bg-background border p-1 shadow-sm hover:bg-accent"
+                  aria-label="Remove screenshot"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            ) : (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <ImagePlus className="h-4 w-4" />
+                Attach screenshot
+              </Button>
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+            <p className="text-xs text-muted-foreground">PNG, JPEG, or WebP. Max 5 MB.</p>
           </div>
 
           <Button
