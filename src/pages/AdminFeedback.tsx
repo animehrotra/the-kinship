@@ -239,7 +239,16 @@ export default function AdminFeedback() {
                 <Badge variant="secondary">{r.category}</Badge>
               </TableCell>
               <TableCell className="min-w-[280px] whitespace-pre-wrap text-sm">
-                {r.message}
+                <div>{r.message}</div>
+                {r.screenshot_path && (
+                  <button
+                    type="button"
+                    onClick={() => openScreenshot(r.screenshot_path!)}
+                    className="mt-2 text-xs text-primary underline underline-offset-2"
+                  >
+                    View screenshot
+                  </button>
+                )}
               </TableCell>
               <TableCell className="hidden lg:table-cell text-xs">
                 {r.page_url ? (
