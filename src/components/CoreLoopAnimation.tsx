@@ -35,12 +35,10 @@ export function CoreLoopAnimation() {
           <div className="absolute top-2 left-1/2 -translate-x-1/2 w-20 h-5 rounded-full bg-foreground/80 z-20" />
 
           {/* Screens */}
-          <div className="absolute inset-0 pt-10 px-4 pb-6">
-            <ScreenAdd active={step === 0} />
-            <ScreenFrequency active={step === 1} />
-            <ScreenNudge active={step === 2} />
-            <ScreenLog active={step === 3} />
-          </div>
+          <ScreenAdd active={step === 0} />
+          <ScreenFrequency active={step === 1} />
+          <ScreenNudge active={step === 2} />
+          <ScreenLog active={step === 3} />
 
           {/* Progress bar */}
           <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary/10">
