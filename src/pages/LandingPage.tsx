@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Heart, Users, Bell, ArchiveRestore, ArrowRight } from "lucide-react";
 import { useNavigate, Navigate, Link } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
+import { CoreLoopAnimation } from "@/components/CoreLoopAnimation";
 
 const features = [
   {
@@ -77,6 +78,14 @@ export default function LandingPage() {
         >
           Start reconnecting <ArrowRight className="w-4 h-4" />
         </button>
+      </section>
+
+      {/* Core loop animation */}
+      <section className="px-6 pb-16 max-w-5xl mx-auto">
+        <h2 className="uppercase tracking-widest text-muted-foreground text-center mb-10 font-sans text-xl font-bold">
+          The loop
+        </h2>
+        <CoreLoopAnimation />
       </section>
 
       {/* How it works */}
