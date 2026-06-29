@@ -39,6 +39,7 @@ type FeedbackRow = {
   app_version: string | null;
   created_at: string;
   closed_at: string | null;
+  screenshot_path: string | null;
 };
 
 type Profile = { id: string; display_name: string | null };
