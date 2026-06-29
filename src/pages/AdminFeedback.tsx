@@ -164,6 +164,17 @@ export default function AdminFeedback() {
       closedByCategory: groupBy(closedList),
     };
   }, [rows, filter]);
+  const openScreenshot = async (path: string) => {
+    const { data, error } = await supabase.storage
+      .from("feedback-screenshots")
+      .createSignedUrl(path, 60);
+    if (error || !data) {
+      toast({ title: "Error", description: "Could not load screenshot", variant: "destructive" });
+      return;
+    }
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  };
+
 
   const visibleCategories = filter === "all"
     ? CATEGORIES.map((c) => c.value)
