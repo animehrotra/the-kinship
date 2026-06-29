@@ -80,6 +80,14 @@ export default function LandingPage() {
         </button>
       </section>
 
+      {/* Core loop animation */}
+      <section className="px-6 pb-16 max-w-5xl mx-auto">
+        <h2 className="uppercase tracking-widest text-muted-foreground text-center mb-10 font-sans text-xl font-bold">
+          The loop
+        </h2>
+        <CoreLoopAnimation />
+      </section>
+
       {/* How it works */}
       <section className="px-6 pb-20 max-w-4xl mx-auto">
         <h2 className="uppercase tracking-widest text-muted-foreground text-center mb-10 font-sans text-xl font-bold">
