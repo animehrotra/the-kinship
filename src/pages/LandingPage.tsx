@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Heart, Users, Bell, ArchiveRestore, ArrowRight } from "lucide-react";
 import { useNavigate, Navigate, Link } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
+import { CoreLoopAnimation } from "@/components/CoreLoopAnimation";
 
 const features = [
   {
