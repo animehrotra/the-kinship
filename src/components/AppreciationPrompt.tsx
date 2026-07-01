@@ -45,7 +45,7 @@ export default function AppreciationPrompt({ open, onClose, source }: Appreciati
       updated_at: new Date().toISOString(),
     };
     if (setPositive) update.positive_response = true;
-    await supabase.from("onboarding_state").update(update).eq("user_id", user.id);
+    await (supabase.from("onboarding_state") as any).update(update).eq("user_id", user.id);
   };
 
   const submit = async (skipText = false) => {
