@@ -57,7 +57,7 @@ export default function AdminAppreciation() {
     let cancelled = false;
     (async () => {
       try {
-        const { data, error } = await (supabase.from("appreciation_responses") as any)
+        const { data, error } = await supabase.from("appreciation_responses")
           .select("*")
           .order("created_at", { ascending: false });
         if (error) {
