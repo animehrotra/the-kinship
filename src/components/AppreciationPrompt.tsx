@@ -40,7 +40,7 @@ export default function AppreciationPrompt({ open, onClose, source }: Appreciati
     if (!user) return;
     const field = MILESTONE_FIELD[source];
     if (!field) return;
-    const update: Record<string, any> = {
+    const update: Database["public"]["Tables"]["onboarding_state"]["Update"] = {
       [field]: true,
       updated_at: new Date().toISOString(),
     };
@@ -52,7 +52,7 @@ export default function AppreciationPrompt({ open, onClose, source }: Appreciati
     if (!user || !sentiment) return;
     setSubmitting(true);
     try {
-      await (supabase.from("appreciation_responses") as any).insert({
+      await supabase.from("appreciation_responses").insert({
         user_id: user.id,
         sentiment: sentiment === "positive" ? "positive" : "negative",
         response_text: skipText ? null : text.trim() || null,
@@ -64,7 +64,7 @@ export default function AppreciationPrompt({ open, onClose, source }: Appreciati
       } else if (sentiment === "positive") {
         await supabase
           .from("onboarding_state")
-          .update({ positive_response: true, updated_at: new Date().toISOString() } as any)
+          .update({ positive_response: true, updated_at: new Date().toISOString() })
           .eq("user_id", user.id);
       }
     } finally {
