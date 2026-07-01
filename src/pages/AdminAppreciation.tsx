@@ -91,7 +91,7 @@ export default function AdminAppreciation() {
 
   const toggleTestimonial = async (row: AppreciationRow) => {
     const newVal = !row.is_testimonial_candidate;
-    const { error } = await (supabase.from("appreciation_responses") as any)
+    const { error } = await supabase.from("appreciation_responses")
       .update({ is_testimonial_candidate: newVal })
       .eq("id", row.id);
     if (error) {
