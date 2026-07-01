@@ -10,7 +10,7 @@ export function useUnreadAppreciation() {
     if (!isAdmin) return;
     const lastViewed = localStorage.getItem("last_viewed_appreciation_at");
     (async () => {
-      let query = (supabase.from("appreciation_responses") as any)
+      let query = supabase.from("appreciation_responses")
         .select("id", { count: "exact", head: true });
       if (lastViewed) {
         query = query.gt("created_at", lastViewed);

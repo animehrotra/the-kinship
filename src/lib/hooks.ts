@@ -89,9 +89,9 @@ export function useCreateContact() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (data: Omit<ContactInsert, "user_id">) => {
-      const intervalValue = (data as any).nudge_interval_value || 1;
-      const intervalUnit = (data as any).nudge_interval_unit || "month";
-      const rawStart = (data as any).nudge_start_date;
+      const intervalValue = data.nudge_interval_value || 1;
+      const intervalUnit = data.nudge_interval_unit || "month";
+      const rawStart = data.nudge_start_date;
       // If user picked a start date, the first nudge IS that date.
       // Otherwise, schedule the first nudge one interval from today.
       const nextNudge = rawStart

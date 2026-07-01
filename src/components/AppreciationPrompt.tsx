@@ -12,6 +12,7 @@ import {
   DrawerFooter,
 } from "@/components/ui/drawer";
 import type { AppreciationSource } from "@/hooks/useAppreciationPrompt";
+import type { Database } from "@/integrations/supabase/types";
 
 interface AppreciationPromptProps {
   open: boolean;
@@ -40,19 +41,19 @@ export default function AppreciationPrompt({ open, onClose, source }: Appreciati
     if (!user) return;
     const field = MILESTONE_FIELD[source];
     if (!field) return;
-    const update: Record<string, any> = {
+    const update: Database["public"]["Tables"]["onboarding_state"]["Update"] = {
       [field]: true,
       updated_at: new Date().toISOString(),
     };
     if (setPositive) update.positive_response = true;
-    await (supabase.from("onboarding_state") as any).update(update).eq("user_id", user.id);
+    await supabase.from("onboarding_state").update(update).eq("user_id", user.id);
   };
 
   const submit = async (skipText = false) => {
     if (!user || !sentiment) return;
     setSubmitting(true);
     try {
-      await (supabase.from("appreciation_responses") as any).insert({
+      await supabase.from("appreciation_responses").insert({
         user_id: user.id,
         sentiment: sentiment === "positive" ? "positive" : "negative",
         response_text: skipText ? null : text.trim() || null,
@@ -64,7 +65,7 @@ export default function AppreciationPrompt({ open, onClose, source }: Appreciati
       } else if (sentiment === "positive") {
         await supabase
           .from("onboarding_state")
-          .update({ positive_response: true, updated_at: new Date().toISOString() } as any)
+          .update({ positive_response: true, updated_at: new Date().toISOString() })
           .eq("user_id", user.id);
       }
     } finally {
