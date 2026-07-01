@@ -12,6 +12,7 @@ import {
   DrawerFooter,
 } from "@/components/ui/drawer";
 import type { AppreciationSource } from "@/hooks/useAppreciationPrompt";
+import type { Database } from "@/integrations/supabase/types";
 
 interface AppreciationPromptProps {
   open: boolean;
