@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      appreciation_responses: {
+        Row: {
+          created_at: string
+          id: string
+          is_testimonial_candidate: boolean
+          response_text: string | null
+          sentiment: string
+          source: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_testimonial_candidate?: boolean
+          response_text?: string | null
+          sentiment: string
+          source: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_testimonial_candidate?: boolean
+          response_text?: string | null
+          sentiment?: string
+          source?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       contact_tags: {
         Row: {
           contact_id: string
@@ -235,6 +265,10 @@ export type Database = {
         Row: {
           created_at: string
           last_tip_shown_at: string | null
+          milestone_1_seen: boolean
+          milestone_2_seen: boolean
+          milestone_3_seen: boolean
+          positive_response: boolean
           seen_tips: string[]
           tour_completed_at: string | null
           tour_skipped: boolean
@@ -244,6 +278,10 @@ export type Database = {
         Insert: {
           created_at?: string
           last_tip_shown_at?: string | null
+          milestone_1_seen?: boolean
+          milestone_2_seen?: boolean
+          milestone_3_seen?: boolean
+          positive_response?: boolean
           seen_tips?: string[]
           tour_completed_at?: string | null
           tour_skipped?: boolean
@@ -253,6 +291,10 @@ export type Database = {
         Update: {
           created_at?: string
           last_tip_shown_at?: string | null
+          milestone_1_seen?: boolean
+          milestone_2_seen?: boolean
+          milestone_3_seen?: boolean
+          positive_response?: boolean
           seen_tips?: string[]
           tour_completed_at?: string | null
           tour_skipped?: boolean
