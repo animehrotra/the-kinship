@@ -231,10 +231,47 @@ export type Database = {
           },
         ]
       }
+      appreciation_responses: {
+        Row: {
+          id: string
+          user_id: string
+          sentiment: string
+          response_text: string | null
+          source: string
+          is_testimonial_candidate: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          sentiment: string
+          response_text?: string | null
+          source: string
+          is_testimonial_candidate?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          sentiment?: string
+          response_text?: string | null
+          source?: string
+          is_testimonial_candidate?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
       onboarding_state: {
         Row: {
+          appreciation_response: string | null
+          appreciation_sentiment: string | null
           created_at: string
           last_tip_shown_at: string | null
+          milestone_1_seen: boolean
+          milestone_2_seen: boolean
+          milestone_3_seen: boolean
+          positive_response: boolean
+          seen_appreciation_prompt: boolean
           seen_tips: string[]
           tour_completed_at: string | null
           tour_skipped: boolean
@@ -242,8 +279,15 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          appreciation_response?: string | null
+          appreciation_sentiment?: string | null
           created_at?: string
           last_tip_shown_at?: string | null
+          milestone_1_seen?: boolean
+          milestone_2_seen?: boolean
+          milestone_3_seen?: boolean
+          positive_response?: boolean
+          seen_appreciation_prompt?: boolean
           seen_tips?: string[]
           tour_completed_at?: string | null
           tour_skipped?: boolean
@@ -251,8 +295,15 @@ export type Database = {
           user_id: string
         }
         Update: {
+          appreciation_response?: string | null
+          appreciation_sentiment?: string | null
           created_at?: string
           last_tip_shown_at?: string | null
+          milestone_1_seen?: boolean
+          milestone_2_seen?: boolean
+          milestone_3_seen?: boolean
+          positive_response?: boolean
+          seen_appreciation_prompt?: boolean
           seen_tips?: string[]
           tour_completed_at?: string | null
           tour_skipped?: boolean

@@ -86,7 +86,6 @@ export default function AdminFeedback() {
   const [closedOpen, setClosedOpen] = useState(false);
   const [openCategoryState, setOpenCategoryState] = useState<Record<string, boolean>>({});
   const [closedCategoryState, setClosedCategoryState] = useState<Record<string, boolean>>({});
-
   const load = async () => {
     const { data, error } = await supabase
       .from("feedback")
@@ -352,6 +351,7 @@ export default function AdminFeedback() {
               )}
             </CollapsibleContent>
           </Collapsible>
+
         </>
       )}
     </div>

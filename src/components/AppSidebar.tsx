@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Heart, Users, Archive, LogOut, MessageSquare, Megaphone, HelpCircle } from "lucide-react";
+import { Heart, Users, Archive, LogOut, MessageSquare, Megaphone, HelpCircle, HeartHandshake } from "lucide-react";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { InviteFriendButton } from "@/components/InviteFriendButton";
 import { FeedbackDialog } from "@/components/FeedbackWidget";
@@ -8,7 +8,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useUnreadFeedback } from "@/hooks/useUnreadFeedback";
+import { useUnreadAppreciation } from "@/hooks/useUnreadAppreciation";
 import { useOnboarding } from "@/lib/useOnboarding";
+import { openSpontaneousAppreciation } from "@/hooks/useAppreciationPrompt";
 import { Badge } from "@/components/ui/badge";
 import {
   Sidebar,
@@ -31,6 +33,7 @@ const items = [
 
 const adminItems = [
   { title: "Feedback", url: "/admin/feedback", icon: MessageSquare },
+  { title: "Appreciation ♥", url: "/admin/appreciation", icon: HeartHandshake },
 ];
 
 export function AppSidebar() {
@@ -40,6 +43,7 @@ export function AppSidebar() {
   const { signOut, user } = useAuth();
   const { isAdmin } = useIsAdmin();
   const { count: unreadFeedback } = useUnreadFeedback();
+  const { count: unreadAppreciation } = useUnreadAppreciation();
   const { replayTour } = useOnboarding();
   const navigate = useNavigate();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
@@ -99,6 +103,13 @@ export function AppSidebar() {
                             {unreadFeedback > 99 ? "99+" : unreadFeedback}
                           </Badge>
                         )}
+                        {item.title === "Appreciation ♥" && unreadAppreciation > 0 && (
+                          <Badge
+                            className={`bg-green-600 text-white ${collapsed ? "absolute top-1 right-1 h-4 min-w-4 px-1 text-[10px]" : "ml-auto h-5 min-w-5 px-1.5 text-xs"}`}
+                          >
+                            {unreadAppreciation > 99 ? "99+" : unreadAppreciation}
+                          </Badge>
+                        )}
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -129,6 +140,15 @@ export function AppSidebar() {
             >
               <Megaphone className="mr-2 h-4 w-4" />
               {!collapsed && <span>Share feedback</span>}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={openSpontaneousAppreciation}
+              className="text-green-600 hover:text-green-700 hover:bg-green-50"
+            >
+              <HeartHandshake className="mr-2 h-4 w-4" />
+              {!collapsed && <span>Share Love ♥</span>}
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>

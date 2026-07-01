@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Heart, Users, Archive, Share2, LogOut, UserCircle, MessageSquare, Megaphone, Plus } from "lucide-react";
+import { Heart, Users, Archive, Share2, LogOut, UserCircle, MessageSquare, Megaphone, HeartHandshake, Plus } from "lucide-react";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { FeedbackDialog } from "@/components/FeedbackWidget";
 import { NavLink } from "@/components/NavLink";
@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useUnreadFeedback } from "@/hooks/useUnreadFeedback";
+import { useUnreadAppreciation } from "@/hooks/useUnreadAppreciation";
+import { openSpontaneousAppreciation } from "@/hooks/useAppreciationPrompt";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useToast } from "@/hooks/use-toast";
@@ -29,6 +31,7 @@ export function MobileNav() {
   const { signOut, user } = useAuth();
   const { isAdmin } = useIsAdmin();
   const { count: unreadFeedback } = useUnreadFeedback();
+  const { count: unreadAppreciation } = useUnreadAppreciation();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -134,6 +137,17 @@ export function MobileNav() {
                 type="button"
                 onClick={() => {
                   setMenuOpen(false);
+                  openSpontaneousAppreciation();
+                }}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-green-600 transition-colors hover:bg-green-50"
+              >
+                <HeartHandshake className="h-5 w-5" />
+                <span className="text-sm font-medium text-left">Share Love ♥</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false);
                   setFeedbackOpen(true);
                 }}
                 className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-muted"
@@ -142,22 +156,40 @@ export function MobileNav() {
                 <span className="text-sm font-medium text-left">Send feedback</span>
               </button>
               {isAdmin && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    navigate("/admin/feedback");
-                  }}
-                  className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-muted"
-                >
-                  <MessageSquare className="h-5 w-5" />
-                  <span className="text-sm font-medium flex-1 text-left">Feedback</span>
-                  {unreadFeedback > 0 && (
-                    <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-xs">
-                      {unreadFeedback > 99 ? "99+" : unreadFeedback}
-                    </Badge>
-                  )}
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      navigate("/admin/feedback");
+                    }}
+                    className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-muted"
+                  >
+                    <MessageSquare className="h-5 w-5" />
+                    <span className="text-sm font-medium flex-1 text-left">Feedback</span>
+                    {unreadFeedback > 0 && (
+                      <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-xs">
+                        {unreadFeedback > 99 ? "99+" : unreadFeedback}
+                      </Badge>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      navigate("/admin/appreciation");
+                    }}
+                    className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-muted"
+                  >
+                    <HeartHandshake className="h-5 w-5" />
+                    <span className="text-sm font-medium flex-1 text-left">Appreciation ♥</span>
+                    {unreadAppreciation > 0 && (
+                      <Badge className="bg-green-600 text-white h-5 min-w-5 px-1.5 text-xs">
+                        {unreadAppreciation > 99 ? "99+" : unreadAppreciation}
+                      </Badge>
+                    )}
+                  </button>
+                </>
               )}
               <button
                 type="button"

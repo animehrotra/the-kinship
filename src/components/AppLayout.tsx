@@ -3,9 +3,12 @@ import { useAuth } from "@/lib/auth";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { MobileNav } from "@/components/MobileNav";
+import AppreciationPrompt from "@/components/AppreciationPrompt";
+import { useAppreciationPrompt } from "@/hooks/useAppreciationPrompt";
 
 export function AppLayout() {
   const { session, loading } = useAuth();
+  const { showPrompt, setShowPrompt, promptSource } = useAppreciationPrompt();
 
   if (loading) {
     return (
@@ -33,6 +36,7 @@ export function AppLayout() {
           <MobileNav />
         </div>
       </div>
+      <AppreciationPrompt open={showPrompt} onClose={() => setShowPrompt(false)} source={promptSource} />
     </SidebarProvider>
   );
 }

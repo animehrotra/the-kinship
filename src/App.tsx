@@ -14,6 +14,7 @@ import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 import AdminFeedback from "./pages/AdminFeedback";
+import AdminAppreciation from "./pages/AdminAppreciation";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 
@@ -37,7 +38,8 @@ const App = () => (
               <Route path="/people/:id" element={<ContactDetail />} />
               <Route path="/archive" element={<ArchivePage />} />
               <Route path="/admin/feedback" element={<AdminFeedback />} />
-              
+              <Route path="/admin/appreciation" element={<AdminAppreciation />} />
+
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
