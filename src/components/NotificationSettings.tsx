@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Bell, BellOff, BellRing, Send, ChevronDown, ChevronRight } from "lucide-react";
+import { Bell, BellOff, BellRing, Send, ChevronDown, ChevronRight, CalendarClock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -58,7 +58,6 @@ export function NotificationSettings() {
   const [hour, setHour] = useState<number>(8);
   const [minute, setMinute] = useState<number>(30);
   const [tz, setTz] = useState<string>("UTC");
-  const [windowDays, setWindowDays] = useState<number>(7);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -68,13 +67,12 @@ export function NotificationSettings() {
     (async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("notify_hour, notify_minute, notify_timezone, upcoming_nudge_window_days")
+        .select("notify_hour, notify_minute, notify_timezone")
         .eq("id", user.id)
         .maybeSingle();
       if (data) {
         setHour(data.notify_hour ?? 8);
         setMinute((data.notify_minute ?? 30) >= 30 ? 30 : 0);
-        setWindowDays(data.upcoming_nudge_window_days ?? 7);
         const stored = data.notify_timezone;
         const detected = detectTimezone();
         if ((!stored || stored === "UTC") && detected && detected !== "UTC") {
@@ -203,21 +201,6 @@ export function NotificationSettings() {
     }
   };
 
-  const saveWindow = async (value: string) => {
-    const days = parseInt(value, 10);
-    setWindowDays(days);
-    if (!user) return;
-    const { error } = await supabase
-      .from("profiles")
-      .update({ upcoming_nudge_window_days: days })
-      .eq("id", user.id);
-    if (error) {
-      toast({ title: "Couldn't save", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Saved", description: `Upcoming nudges will show ${days} days ahead.` });
-    }
-  };
-
   const sendTest = async () => {
     if (!user) return;
     setTesting(true);
@@ -314,22 +297,6 @@ export function NotificationSettings() {
             <p className="text-[10px] text-muted-foreground">Timezone: {tz}</p>
           </div>
 
-          <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">Show upcoming nudges within</Label>
-            <Select value={String(windowDays)} onValueChange={saveWindow}>
-              <SelectTrigger className="h-8 text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {[7, 14, 30, 60, 90].map((d) => (
-                  <SelectItem key={d} value={String(d)} className="text-xs">
-                    Next {d} days
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
           {state === "subscribed" && (
             <Button
               variant="ghost"
@@ -353,6 +320,80 @@ export function NotificationSettings() {
               On iPhone, add Kinship to your Home Screen first, then open it from there to enable notifications.
             </p>
           )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function UpcomingNudgesSettings() {
+  const { user } = useAuth();
+  const [windowDays, setWindowDays] = useState<number>(7);
+  const [expanded, setExpanded] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("upcoming_nudge_window_days")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (data) {
+        setWindowDays(data.upcoming_nudge_window_days ?? 7);
+      }
+    })();
+  }, [user]);
+
+  const saveWindow = async (value: string) => {
+    const days = parseInt(value, 10);
+    setWindowDays(days);
+    if (!user) return;
+    const { error } = await supabase
+      .from("profiles")
+      .update({ upcoming_nudge_window_days: days })
+      .eq("id", user.id);
+    if (error) {
+      toast({ title: "Couldn't save", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Saved", description: `Upcoming nudges will show ${days} days ahead.` });
+    }
+  };
+
+  return (
+    <div className="rounded-lg border border-border/60 bg-card">
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        className="flex w-full items-center justify-between gap-2 p-3 text-left"
+        aria-expanded={expanded}
+      >
+        <span className="flex items-center gap-1.5 text-xs font-medium truncate">
+          <CalendarClock className="h-3.5 w-3.5 shrink-0" />
+          Upcoming nudges · Next {windowDays} days
+        </span>
+        {expanded ? (
+          <ChevronDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+        ) : (
+          <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+        )}
+      </button>
+
+      {expanded && (
+        <div className="space-y-1.5 p-3 pt-0">
+          <Label className="text-xs text-muted-foreground">Show upcoming nudges within</Label>
+          <Select value={String(windowDays)} onValueChange={saveWindow}>
+            <SelectTrigger className="h-8 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {[7, 14, 30, 60, 90].map((d) => (
+                <SelectItem key={d} value={String(d)} className="text-xs">
+                  Next {d} days
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       )}
     </div>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Heart, Users, Archive, LogOut, MessageSquare, Megaphone, HelpCircle, HeartHandshake } from "lucide-react";
-import { NotificationSettings } from "@/components/NotificationSettings";
+import { NotificationSettings, UpcomingNudgesSettings } from "@/components/NotificationSettings";
 import { InviteFriendButton } from "@/components/InviteFriendButton";
 import { FeedbackDialog } from "@/components/FeedbackWidget";
 import { NavLink } from "@/components/NavLink";
@@ -120,8 +120,9 @@ export function AppSidebar() {
 
       <SidebarContent>
         {!collapsed && (
-          <div className="px-2 my-2">
+          <div className="px-2 my-2 space-y-2">
             <NotificationSettings />
+            <UpcomingNudgesSettings />
           </div>
         )}
       </SidebarContent>
