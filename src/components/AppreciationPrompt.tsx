@@ -99,7 +99,7 @@ export default function AppreciationPrompt({ open, onClose, source }: Appreciati
   const followupTitle = sentiment === "positive" ? "That's wonderful!" : "We hear you";
   const followupPlaceholder =
     sentiment === "positive"
-      ? "Would you like to share your story? (optional)"
+      ? "What's changed for you since using Kinship? (optional)"
       : "What could be better? (optional)";
 
   if (!sentiment) {
