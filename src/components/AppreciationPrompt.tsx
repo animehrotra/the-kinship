@@ -72,6 +72,7 @@ export default function AppreciationPrompt({ open, onClose, source }: Appreciati
         sentiment: sentiment === "positive" ? "positive" : "negative",
         response_text: skipText ? null : text.trim() || null,
         source,
+        testimonial_consent: skipText ? false : testimonialConsent,
       });
 
       if (source !== "spontaneous") {
