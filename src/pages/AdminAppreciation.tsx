@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "@/hooks/use-toast";
 
 type AppreciationRow = {
@@ -21,6 +22,7 @@ type AppreciationRow = {
   response_text: string | null;
   source: string;
   is_testimonial_candidate: boolean;
+  testimonial_consent: boolean;
   created_at: string;
 };
 
