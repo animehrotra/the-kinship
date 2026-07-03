@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "@/hooks/use-toast";
 
 type AppreciationRow = {
@@ -21,6 +22,7 @@ type AppreciationRow = {
   response_text: string | null;
   source: string;
   is_testimonial_candidate: boolean;
+  testimonial_consent: boolean;
   created_at: string;
 };
 
@@ -90,6 +92,7 @@ export default function AdminAppreciation() {
   }, [isAdmin]);
 
   const toggleTestimonial = async (row: AppreciationRow) => {
+    if (!row.testimonial_consent) return;
     const newVal = !row.is_testimonial_candidate;
     const { error } = await supabase.from("appreciation_responses")
       .update({ is_testimonial_candidate: newVal })
@@ -145,41 +148,64 @@ export default function AdminAppreciation() {
         </div>
       ) : (
         <div className="rounded-lg border bg-card overflow-x-auto">
-          <Table className="min-w-[700px]">
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[120px]">Date</TableHead>
-                <TableHead className="w-[120px]">User</TableHead>
-                <TableHead className="w-[140px]">Source</TableHead>
-                <TableHead className="w-[120px]">Sentiment</TableHead>
-                <TableHead>Message</TableHead>
-                <TableHead className="w-[100px] text-center">Testimonial</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rows.map((r) => (
-                <TableRow key={r.id}>
-                  <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
-                    {formatDate(r.created_at)}
-                  </TableCell>
-                  <TableCell className="whitespace-nowrap text-sm">
-                    {profiles[r.user_id] || r.user_id.slice(0, 8)}
-                  </TableCell>
-                  <TableCell>{sourceBadge(r.source)}</TableCell>
-                  <TableCell>{sentimentBadge(r.sentiment)}</TableCell>
-                  <TableCell className="text-sm whitespace-pre-wrap">
-                    {r.response_text || <span className="text-muted-foreground italic">No message</span>}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <Checkbox
-                      checked={r.is_testimonial_candidate}
-                      onCheckedChange={() => toggleTestimonial(r)}
-                    />
-                  </TableCell>
+          <TooltipProvider delayDuration={200}>
+            <Table className="min-w-[780px]">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[120px]">Date</TableHead>
+                  <TableHead className="w-[120px]">User</TableHead>
+                  <TableHead className="w-[140px]">Source</TableHead>
+                  <TableHead className="w-[120px]">Sentiment</TableHead>
+                  <TableHead>Message</TableHead>
+                  <TableHead className="w-[110px]">Consent</TableHead>
+                  <TableHead className="w-[100px] text-center">Testimonial</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {rows.map((r) => (
+                  <TableRow key={r.id}>
+                    <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
+                      {formatDate(r.created_at)}
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap text-sm">
+                      {profiles[r.user_id] || r.user_id.slice(0, 8)}
+                    </TableCell>
+                    <TableCell>{sourceBadge(r.source)}</TableCell>
+                    <TableCell>{sentimentBadge(r.sentiment)}</TableCell>
+                    <TableCell className="text-sm whitespace-pre-wrap">
+                      {r.response_text || <span className="text-muted-foreground italic">No message</span>}
+                    </TableCell>
+                    <TableCell>
+                      {r.testimonial_consent ? (
+                        <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200">✓ Consented</Badge>
+                      ) : (
+                        <Badge variant="secondary" className="bg-stone-100 text-stone-500">No consent</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {r.testimonial_consent ? (
+                        <Checkbox
+                          checked={r.is_testimonial_candidate}
+                          onCheckedChange={() => toggleTestimonial(r)}
+                        />
+                      ) : (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="inline-flex">
+                              <Checkbox checked={false} disabled aria-label="Testimonial disabled" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent side="left" className="text-xs">
+                            User has not consented to testimonial use
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TooltipProvider>
         </div>
       )}
     </div>

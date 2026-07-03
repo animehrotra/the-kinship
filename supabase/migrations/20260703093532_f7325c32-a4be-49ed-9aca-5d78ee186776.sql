@@ -1,0 +1,1 @@
+ALTER TABLE public.appreciation_responses ADD COLUMN IF NOT EXISTS testimonial_consent boolean NOT NULL DEFAULT false;
