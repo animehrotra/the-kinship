@@ -22,6 +22,7 @@ export type Database = {
           response_text: string | null
           sentiment: string
           source: string
+          testimonial_consent: boolean
           user_id: string
         }
         Insert: {
@@ -31,6 +32,7 @@ export type Database = {
           response_text?: string | null
           sentiment: string
           source: string
+          testimonial_consent?: boolean
           user_id: string
         }
         Update: {
@@ -40,6 +42,7 @@ export type Database = {
           response_text?: string | null
           sentiment?: string
           source?: string
+          testimonial_consent?: boolean
           user_id?: string
         }
         Relationships: []
