@@ -42,6 +42,7 @@ export default function AppreciationPrompt({ open, onClose, source }: Appreciati
   const isMobile = useIsMobile();
   const [sentiment, setSentiment] = useState<"positive" | "negative" | null>(null);
   const [text, setText] = useState("");
+  const [testimonialConsent, setTestimonialConsent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const reset = () => {
