@@ -48,6 +48,7 @@ export default function AppreciationPrompt({ open, onClose, source }: Appreciati
   const reset = () => {
     setSentiment(null);
     setText("");
+    setTestimonialConsent(false);
   };
 
   const markMilestoneSeen = async (setPositive: boolean) => {
