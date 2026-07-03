@@ -155,8 +155,21 @@ export default function AppreciationPrompt({ open, onClose, source }: Appreciati
           <DrawerHeader className="text-center pb-2">
             <DrawerTitle className="text-lg font-serif">{followupTitle}</DrawerTitle>
           </DrawerHeader>
-          <div className="px-4">
+          <div className="px-4 space-y-3">
             <Textarea placeholder={followupPlaceholder} value={text} onChange={(e) => setText(e.target.value)} rows={3} />
+            {sentiment === "positive" && (
+              <div className="flex items-start gap-2">
+                <Checkbox
+                  id="testimonial-consent-mobile"
+                  checked={testimonialConsent}
+                  onCheckedChange={(v) => setTestimonialConsent(v === true)}
+                  className="mt-0.5"
+                />
+                <Label htmlFor="testimonial-consent-mobile" className="text-xs text-muted-foreground font-normal leading-snug cursor-pointer">
+                  I'm happy for Kinship to share my story anonymously as a testimonial
+                </Label>
+              </div>
+            )}
           </div>
           <DrawerFooter className="pb-8">
             <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => submit(false)} disabled={submitting}>
