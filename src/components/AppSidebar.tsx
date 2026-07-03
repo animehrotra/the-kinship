@@ -50,28 +50,65 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarContent>
-        <div className={`p-4 ${collapsed ? "px-2" : ""}`}>
-          <div className="flex items-center gap-2">
-            <img src="/favicon.png" alt="Kinship logo" className="w-8 h-8 rounded-xl shrink-0" />
-            {!collapsed && <span className="font-serif text-lg tracking-tight">Kinship</span>}
-          </div>
+      <div className={`p-4 ${collapsed ? "px-2" : ""} shrink-0`}>
+        <div className="flex items-center gap-2">
+          <img src="/favicon.png" alt="Kinship logo" className="w-8 h-8 rounded-xl shrink-0" />
+          {!collapsed && <span className="font-serif text-lg tracking-tight">Kinship</span>}
         </div>
+      </div>
 
-        <SidebarGroup>
+      <SidebarGroup className="shrink-0">
+        <SidebarGroupContent>
+          <SidebarMenu data-tour="nav">
+            {items.map((item) => (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton asChild>
+                  <NavLink
+                    to={item.url}
+                    end={item.url === "/dashboard"}
+                    className="hover:bg-sidebar-accent/50"
+                    activeClassName="bg-sidebar-accent text-primary font-medium"
+                  >
+                    <item.icon className="mr-2 h-4 w-4" />
+                    {!collapsed && <span>{item.title}</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+
+      {isAdmin && (
+        <SidebarGroup className="shrink-0">
+          {!collapsed && <SidebarGroupLabel>Admin</SidebarGroupLabel>}
           <SidebarGroupContent>
-            <SidebarMenu data-tour="nav">
-              {items.map((item) => (
+            <SidebarMenu>
+              {adminItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={item.url}
-                      end={item.url === "/dashboard"}
                       className="hover:bg-sidebar-accent/50"
                       activeClassName="bg-sidebar-accent text-primary font-medium"
                     >
                       <item.icon className="mr-2 h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
+                      {!collapsed && <span className="flex-1">{item.title}</span>}
+                      {item.title === "Feedback" && unreadFeedback > 0 && (
+                        <Badge
+                          variant="destructive"
+                          className={collapsed ? "absolute top-1 right-1 h-4 min-w-4 px-1 text-[10px]" : "ml-auto h-5 min-w-5 px-1.5 text-xs"}
+                        >
+                          {unreadFeedback > 99 ? "99+" : unreadFeedback}
+                        </Badge>
+                      )}
+                      {item.title === "Appreciation ♥" && unreadAppreciation > 0 && (
+                        <Badge
+                          className={`bg-green-600 text-white ${collapsed ? "absolute top-1 right-1 h-4 min-w-4 px-1 text-[10px]" : "ml-auto h-5 min-w-5 px-1.5 text-xs"}`}
+                        >
+                          {unreadAppreciation > 99 ? "99+" : unreadAppreciation}
+                        </Badge>
+                      )}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -79,56 +116,17 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+      )}
 
-        {isAdmin && (
-          <SidebarGroup>
-            {!collapsed && <SidebarGroupLabel>Admin</SidebarGroupLabel>}
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {adminItems.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <NavLink
-                        to={item.url}
-                        className="hover:bg-sidebar-accent/50"
-                        activeClassName="bg-sidebar-accent text-primary font-medium"
-                      >
-                        <item.icon className="mr-2 h-4 w-4" />
-                        {!collapsed && <span className="flex-1">{item.title}</span>}
-                        {item.title === "Feedback" && unreadFeedback > 0 && (
-                          <Badge
-                            variant="destructive"
-                            className={collapsed ? "absolute top-1 right-1 h-4 min-w-4 px-1 text-[10px]" : "ml-auto h-5 min-w-5 px-1.5 text-xs"}
-                          >
-                            {unreadFeedback > 99 ? "99+" : unreadFeedback}
-                          </Badge>
-                        )}
-                        {item.title === "Appreciation ♥" && unreadAppreciation > 0 && (
-                          <Badge
-                            className={`bg-green-600 text-white ${collapsed ? "absolute top-1 right-1 h-4 min-w-4 px-1 text-[10px]" : "ml-auto h-5 min-w-5 px-1.5 text-xs"}`}
-                          >
-                            {unreadAppreciation > 99 ? "99+" : unreadAppreciation}
-                          </Badge>
-                        )}
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
-      </SidebarContent>
-
-      <SidebarFooter className="p-2">
+      <SidebarContent>
         {!collapsed && (
           <div className="px-2 my-2">
             <NotificationSettings />
           </div>
         )}
-        {!collapsed && user && (
-          <p className="text-xs text-muted-foreground px-2 truncate mb-1">{user.email}</p>
-        )}
+      </SidebarContent>
+
+      <SidebarFooter className="p-2 shrink-0">
         <SidebarMenu>
           <SidebarMenuItem>
             <InviteFriendButton collapsed={collapsed} />
@@ -170,6 +168,9 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
+        {!collapsed && user && (
+          <p className="text-xs text-muted-foreground px-2 pt-1 truncate">{user.email}</p>
+        )}
       </SidebarFooter>
       <FeedbackDialog open={feedbackOpen} onOpenChange={setFeedbackOpen} />
     </Sidebar>
