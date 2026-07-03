@@ -52,7 +52,7 @@ const formatSlot = (h: number, m: number) => {
 
 const slotValue = (h: number, m: number) => `${h}:${m}`;
 
-export function NotificationSettings() {
+export function NotificationSettings({ bare = false }: { bare?: boolean }) {
   const { user } = useAuth();
   const { state, subscribe, unsubscribe } = usePushNotifications();
   const [hour, setHour] = useState<number>(8);
@@ -240,6 +240,74 @@ export function NotificationSettings() {
   const showIosHint = isIosSafari() && !isStandalone();
   const showPreviewHint = isPreviewContext();
 
+  const content = (
+    <div className={bare ? "space-y-4" : "space-y-3 p-3 pt-0"}>
+      <div className="flex items-center justify-between gap-2">
+        <Label className={bare ? "text-sm font-medium" : "text-xs font-medium"}>Daily nudge reminder</Label>
+        <Button
+          variant={state === "subscribed" ? "secondary" : "outline"}
+          size="sm"
+          onClick={handleToggle}
+          disabled={state === "loading" || state === "denied"}
+          className={bare ? "gap-1.5" : "gap-1.5 h-7 text-xs"}
+        >
+          {state === "subscribed" ? (
+            <><BellRing className="h-3.5 w-3.5" /> On</>
+          ) : state === "denied" ? (
+            <><BellOff className="h-3.5 w-3.5" /> Blocked</>
+          ) : (
+            <><Bell className="h-3.5 w-3.5" /> Enable</>
+          )}
+        </Button>
+      </div>
+
+      <div className="space-y-1.5">
+        <Label className={bare ? "text-sm text-muted-foreground" : "text-xs text-muted-foreground"}>Send time</Label>
+        <Select value={slotValue(hour, minute)} onValueChange={saveSlot} disabled={saving}>
+          <SelectTrigger className={bare ? "h-9 text-sm" : "h-8 text-xs"}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {SLOTS.map((s) => (
+              <SelectItem key={slotValue(s.hour, s.minute)} value={slotValue(s.hour, s.minute)} className="text-xs">
+                {formatSlot(s.hour, s.minute)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className={bare ? "text-xs text-muted-foreground" : "text-[10px] text-muted-foreground"}>Timezone: {tz}</p>
+      </div>
+
+      {state === "subscribed" && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={sendTest}
+          disabled={testing}
+          className={bare ? "w-full gap-1.5" : "w-full gap-1.5 h-7 text-xs"}
+        >
+          <Send className="h-3.5 w-3.5" /> {testing ? "Sending…" : "Send test notification"}
+        </Button>
+      )}
+
+      {showPreviewHint && (
+        <p className="text-xs text-muted-foreground leading-snug">
+          You're in the editor preview — push only works in the published app. Open the-kinship.lovable.app on your phone.
+        </p>
+      )}
+
+      {showIosHint && (
+        <p className="text-xs text-muted-foreground leading-snug">
+          On iPhone, add Kinship to your Home Screen first, then open it from there to enable notifications.
+        </p>
+      )}
+    </div>
+  );
+
+  if (bare) {
+    return content;
+  }
+
   return (
     <div className="rounded-lg border border-border/60 bg-card">
       <button
@@ -259,74 +327,12 @@ export function NotificationSettings() {
         )}
       </button>
 
-      {expanded && (
-        <div className="space-y-3 p-3 pt-0">
-          <div className="flex items-center justify-between gap-2">
-            <Label className="text-xs font-medium">Daily nudge reminder</Label>
-            <Button
-              variant={state === "subscribed" ? "secondary" : "outline"}
-              size="sm"
-              onClick={handleToggle}
-              disabled={state === "loading" || state === "denied"}
-              className="gap-1.5 h-7 text-xs"
-            >
-              {state === "subscribed" ? (
-                <><BellRing className="h-3.5 w-3.5" /> On</>
-              ) : state === "denied" ? (
-                <><BellOff className="h-3.5 w-3.5" /> Blocked</>
-              ) : (
-                <><Bell className="h-3.5 w-3.5" /> Enable</>
-              )}
-            </Button>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">Send time</Label>
-            <Select value={slotValue(hour, minute)} onValueChange={saveSlot} disabled={saving}>
-              <SelectTrigger className="h-8 text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {SLOTS.map((s) => (
-                  <SelectItem key={slotValue(s.hour, s.minute)} value={slotValue(s.hour, s.minute)} className="text-xs">
-                    {formatSlot(s.hour, s.minute)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className="text-[10px] text-muted-foreground">Timezone: {tz}</p>
-          </div>
-
-          {state === "subscribed" && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={sendTest}
-              disabled={testing}
-              className="w-full gap-1.5 h-7 text-xs"
-            >
-              <Send className="h-3.5 w-3.5" /> {testing ? "Sending…" : "Send test notification"}
-            </Button>
-          )}
-
-          {showPreviewHint && (
-            <p className="text-[10px] text-muted-foreground leading-snug">
-              You're in the editor preview — push only works in the published app. Open the-kinship.lovable.app on your phone.
-            </p>
-          )}
-
-          {showIosHint && (
-            <p className="text-[10px] text-muted-foreground leading-snug">
-              On iPhone, add Kinship to your Home Screen first, then open it from there to enable notifications.
-            </p>
-          )}
-        </div>
-      )}
+      {expanded && content}
     </div>
   );
 }
 
-export function UpcomingNudgesSettings() {
+export function UpcomingNudgesSettings({ bare = false }: { bare?: boolean }) {
   const { user } = useAuth();
   const [windowDays, setWindowDays] = useState<number>(7);
   const [expanded, setExpanded] = useState(false);
@@ -360,6 +366,30 @@ export function UpcomingNudgesSettings() {
     }
   };
 
+  const content = (
+    <div className={bare ? "space-y-1.5" : "space-y-1.5 p-3 pt-0"}>
+      <Label className={bare ? "text-sm text-muted-foreground" : "text-xs text-muted-foreground"}>
+        Show upcoming nudges within
+      </Label>
+      <Select value={String(windowDays)} onValueChange={saveWindow}>
+        <SelectTrigger className={bare ? "h-9 text-sm" : "h-8 text-xs"}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {[7, 14, 30, 60, 90].map((d) => (
+            <SelectItem key={d} value={String(d)} className="text-xs">
+              Next {d} days
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+
+  if (bare) {
+    return content;
+  }
+
   return (
     <div className="rounded-lg border border-border/60 bg-card">
       <button
@@ -379,23 +409,7 @@ export function UpcomingNudgesSettings() {
         )}
       </button>
 
-      {expanded && (
-        <div className="space-y-1.5 p-3 pt-0">
-          <Label className="text-xs text-muted-foreground">Show upcoming nudges within</Label>
-          <Select value={String(windowDays)} onValueChange={saveWindow}>
-            <SelectTrigger className="h-8 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {[7, 14, 30, 60, 90].map((d) => (
-                <SelectItem key={d} value={String(d)} className="text-xs">
-                  Next {d} days
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      )}
+      {expanded && content}
     </div>
   );
 }

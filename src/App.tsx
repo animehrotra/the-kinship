@@ -16,6 +16,7 @@ import ResetPassword from "./pages/ResetPassword";
 import AdminFeedback from "./pages/AdminFeedback";
 import AdminAppreciation from "./pages/AdminAppreciation";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Settings from "./pages/Settings";
 
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/people" element={<People />} />
               <Route path="/people/:id" element={<ContactDetail />} />
               <Route path="/archive" element={<ArchivePage />} />
+              <Route path="/settings" element={<Settings />} />
               <Route path="/admin/feedback" element={<AdminFeedback />} />
               <Route path="/admin/appreciation" element={<AdminAppreciation />} />
 

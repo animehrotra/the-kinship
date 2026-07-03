@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Heart, Users, Archive, LogOut, MessageSquare, Megaphone, HelpCircle, HeartHandshake } from "lucide-react";
-import { NotificationSettings, UpcomingNudgesSettings } from "@/components/NotificationSettings";
 import { InviteFriendButton } from "@/components/InviteFriendButton";
 import { FeedbackDialog } from "@/components/FeedbackWidget";
 import { NavLink } from "@/components/NavLink";
@@ -118,14 +117,7 @@ export function AppSidebar() {
         </SidebarGroup>
       )}
 
-      <SidebarContent>
-        {!collapsed && (
-          <div className="px-2 my-2 space-y-2">
-            <NotificationSettings />
-            <UpcomingNudgesSettings />
-          </div>
-        )}
-      </SidebarContent>
+      <SidebarContent />
 
       <SidebarFooter className="p-2 shrink-0">
         <SidebarMenu>
@@ -160,6 +152,18 @@ export function AppSidebar() {
             >
               <HelpCircle className="mr-2 h-4 w-4" />
               {!collapsed && <span>Replay tour</span>}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <NavLink
+                to="/settings"
+                className="text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50"
+                activeClassName="bg-sidebar-accent text-primary font-medium"
+              >
+                <span className="mr-2">⚙️</span>
+                {!collapsed && <span>Settings</span>}
+              </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
