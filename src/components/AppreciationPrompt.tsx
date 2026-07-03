@@ -11,6 +11,15 @@ import {
   DrawerDescription,
   DrawerFooter,
 } from "@/components/ui/drawer";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { AppreciationSource } from "@/hooks/useAppreciationPrompt";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -28,6 +37,7 @@ const MILESTONE_FIELD: Record<string, string> = {
 
 export default function AppreciationPrompt({ open, onClose, source }: AppreciationPromptProps) {
   const { user } = useAuth();
+  const isMobile = useIsMobile();
   const [sentiment, setSentiment] = useState<"positive" | "negative" | null>(null);
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -84,29 +94,68 @@ export default function AppreciationPrompt({ open, onClose, source }: Appreciati
     onClose();
   };
 
+  const sentimentTitle = "Loving Kinship?";
+  const sentimentDesc = "Has Kinship helped you stay closer to someone?";
+  const followupTitle = sentiment === "positive" ? "That's wonderful!" : "We hear you";
+  const followupPlaceholder =
+    sentiment === "positive"
+      ? "Would you like to share your story? (optional)"
+      : "What could be better? (optional)";
+
   if (!sentiment) {
+    if (isMobile) {
+      return (
+        <Drawer open={open} onOpenChange={(o) => { if (!o) dismiss(); }}>
+          <DrawerContent>
+            <DrawerHeader className="text-center pb-2">
+              <DrawerTitle className="text-xl font-serif">{sentimentTitle}</DrawerTitle>
+              <DrawerDescription className="text-base mt-1">{sentimentDesc}</DrawerDescription>
+            </DrawerHeader>
+            <DrawerFooter className="flex-row gap-3 pb-8">
+              <Button variant="ghost" className="flex-1 text-muted-foreground" onClick={() => setSentiment("negative")}>
+                Not really
+              </Button>
+              <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white" onClick={() => setSentiment("positive")}>
+                Yes, it has ♥
+              </Button>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+      );
+    }
     return (
-      <Drawer open={open} onOpenChange={(o) => { if (!o) dismiss(); }}>
-        <DrawerContent>
-          <DrawerHeader className="text-center pb-2">
-            <DrawerTitle className="text-xl font-serif">Loving Kinship?</DrawerTitle>
-            <DrawerDescription className="text-base mt-1">
-              Has Kinship helped you stay closer to someone?
-            </DrawerDescription>
-          </DrawerHeader>
-          <DrawerFooter className="flex-row gap-3 pb-8">
-            <Button
-              variant="ghost"
-              className="flex-1 text-muted-foreground"
-              onClick={() => setSentiment("negative")}
-            >
+      <Dialog open={open} onOpenChange={(o) => { if (!o) dismiss(); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader className="text-center">
+            <DialogTitle className="text-xl font-serif">{sentimentTitle}</DialogTitle>
+            <DialogDescription className="text-base mt-1">{sentimentDesc}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-row gap-3 sm:justify-center">
+            <Button variant="ghost" className="flex-1 text-muted-foreground" onClick={() => setSentiment("negative")}>
               Not really
             </Button>
-            <Button
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-              onClick={() => setSentiment("positive")}
-            >
+            <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white" onClick={() => setSentiment("positive")}>
               Yes, it has ♥
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  if (isMobile) {
+    return (
+      <Drawer open={open} onOpenChange={(o) => { if (!o) submit(true); }}>
+        <DrawerContent>
+          <DrawerHeader className="text-center pb-2">
+            <DrawerTitle className="text-lg font-serif">{followupTitle}</DrawerTitle>
+          </DrawerHeader>
+          <div className="px-4">
+            <Textarea placeholder={followupPlaceholder} value={text} onChange={(e) => setText(e.target.value)} rows={3} />
+          </div>
+          <DrawerFooter className="pb-8">
+            <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => submit(false)} disabled={submitting}>
+              Submit
             </Button>
           </DrawerFooter>
         </DrawerContent>
@@ -115,35 +164,18 @@ export default function AppreciationPrompt({ open, onClose, source }: Appreciati
   }
 
   return (
-    <Drawer open={open} onOpenChange={(o) => { if (!o) submit(true); }}>
-      <DrawerContent>
-        <DrawerHeader className="text-center pb-2">
-          <DrawerTitle className="text-lg font-serif">
-            {sentiment === "positive" ? "That's wonderful!" : "We hear you"}
-          </DrawerTitle>
-        </DrawerHeader>
-        <div className="px-4">
-          <Textarea
-            placeholder={
-              sentiment === "positive"
-                ? "Would you like to share your story? (optional)"
-                : "What could be better? (optional)"
-            }
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            rows={3}
-          />
-        </div>
-        <DrawerFooter className="pb-8">
-          <Button
-            className="bg-green-600 hover:bg-green-700 text-white"
-            onClick={() => submit(false)}
-            disabled={submitting}
-          >
+    <Dialog open={open} onOpenChange={(o) => { if (!o) submit(true); }}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader className="text-center">
+          <DialogTitle className="text-lg font-serif">{followupTitle}</DialogTitle>
+        </DialogHeader>
+        <Textarea placeholder={followupPlaceholder} value={text} onChange={(e) => setText(e.target.value)} rows={3} />
+        <DialogFooter>
+          <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => submit(false)} disabled={submitting}>
             Submit
           </Button>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
