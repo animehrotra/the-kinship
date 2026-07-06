@@ -68,7 +68,19 @@ export function OnboardingTour({
     if (!open || !step) return;
     let raf = 0;
     const update = () => {
-      const el = document.querySelector(step.selector);
+      // Multiple elements can share a data-tour attribute (mobile + desktop
+      // variants of the same nav/button). Pick the one that is actually
+      // visible so the spotlight lines up with what the user sees.
+      const candidates = Array.from(
+        document.querySelectorAll<HTMLElement>(step.selector),
+      );
+      const el = candidates.find((node) => {
+        if (node.offsetParent === null && getComputedStyle(node).position !== "fixed") {
+          return false;
+        }
+        const r = node.getBoundingClientRect();
+        return r.width > 0 && r.height > 0;
+      });
       if (el) {
         // scroll into view if needed
         const r = el.getBoundingClientRect();
