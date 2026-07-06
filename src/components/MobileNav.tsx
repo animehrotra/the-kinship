@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Heart, Users, Archive, Share2, LogOut, UserCircle, MessageSquare, Megaphone, HeartHandshake, Plus } from "lucide-react";
+import { Heart, Users, Archive, Share2, LogOut, UserCircle, MessageSquare, Megaphone, HeartHandshake, Plus, HelpCircle } from "lucide-react";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { FeedbackDialog } from "@/components/FeedbackWidget";
 import { NavLink } from "@/components/NavLink";
@@ -10,7 +10,9 @@ import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useUnreadFeedback } from "@/hooks/useUnreadFeedback";
 import { useUnreadAppreciation } from "@/hooks/useUnreadAppreciation";
 import { openSpontaneousAppreciation } from "@/hooks/useAppreciationPrompt";
+import { useOnboarding } from "@/lib/useOnboarding";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useToast } from "@/hooks/use-toast";
 
