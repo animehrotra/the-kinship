@@ -188,8 +188,12 @@ export default function Auth() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm space-y-8">
-        <div className="text-center space-y-2">
+        <div className="w-full max-w-sm space-y-8">
+          <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="h-4 w-4" />
+            Home
+          </Link>
+          <div className="text-center space-y-2">
             <img src="/favicon.png" alt="Kinship logo" className="w-12 h-12 mb-2 rounded-2xl mx-auto" />
           <Link to="/" className="inline-block">
             <h1 className="text-3xl font-serif tracking-tight text-foreground hover:opacity-80 transition-opacity">Kinship</h1>
