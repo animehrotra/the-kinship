@@ -60,7 +60,7 @@ export function InviteFriendButton({ collapsed, variant = "sidebar" }: InviteFri
       className="text-muted-foreground hover:text-foreground"
     >
       <Share2 className="mr-2 h-4 w-4" />
-      {!collapsed && <span>Invite a friend</span>}
+      {!collapsed && <span>Invite a Friend</span>}
     </SidebarMenuButton>
   );
 }
