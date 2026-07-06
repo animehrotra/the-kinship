@@ -11,6 +11,8 @@ import { useUnreadAppreciation } from "@/hooks/useUnreadAppreciation";
 import { useOnboarding } from "@/lib/useOnboarding";
 import { openSpontaneousAppreciation } from "@/hooks/useAppreciationPrompt";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 import {
   Sidebar,
   SidebarContent,
@@ -46,6 +48,8 @@ export function AppSidebar() {
   const { replayTour } = useOnboarding();
   const navigate = useNavigate();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const { state: pushState, subscribe, unsubscribe } = usePushNotifications();
+  const notifEnabled = pushState === "subscribed";
 
   return (
     <Sidebar collapsible="icon">
@@ -154,6 +158,29 @@ export function AppSidebar() {
               {!collapsed && <span>Replay tour</span>}
             </SidebarMenuButton>
           </SidebarMenuItem>
+          {!collapsed && pushState !== "unsupported" && pushState !== "denied" && (
+            <SidebarMenuItem>
+              <div className="px-2 py-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-foreground">🔔 Daily nudge reminder</span>
+                  <Switch
+                    checked={notifEnabled}
+                    disabled={pushState === "loading"}
+                    onCheckedChange={(checked) => checked ? subscribe() : unsubscribe()}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Adjust time and timezone in{" "}
+                  <button
+                    onClick={() => navigate("/settings")}
+                    className="underline hover:text-foreground transition-colors"
+                  >
+                    Settings
+                  </button>
+                </p>
+              </div>
+            </SidebarMenuItem>
+          )}
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <NavLink
