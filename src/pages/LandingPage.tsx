@@ -83,7 +83,7 @@ export default function LandingPage() {
       {/* Core loop animation */}
       <section className="px-6 pb-16 max-w-5xl mx-auto">
         <h2 className="uppercase tracking-widest text-muted-foreground text-center mb-10 font-sans text-xl font-bold">
-          The loop
+          HOW KINSHIP WORKS
         </h2>
         <CoreLoopAnimation />
       </section>
@@ -91,7 +91,7 @@ export default function LandingPage() {
       {/* How it works */}
       <section className="px-6 pb-20 max-w-4xl mx-auto">
         <h2 className="uppercase tracking-widest text-muted-foreground text-center mb-10 font-sans text-xl font-bold">
-          How it works
+          HOW KINSHIP HELPS
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
           {features.map((f) => (
