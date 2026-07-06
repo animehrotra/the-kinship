@@ -36,6 +36,7 @@ export function MobileNav() {
   const { count: unreadAppreciation } = useUnreadAppreciation();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { replayTour } = useOnboarding();
   const [menuOpen, setMenuOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [addContactOpen, setAddContactOpen] = useState(false);
