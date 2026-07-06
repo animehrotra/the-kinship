@@ -205,6 +205,18 @@ export function MobileNav() {
                   </button>
                 </>
               )}
+              <Separator className="my-1" />
+              <button
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false);
+                  navigate("/settings");
+                }}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-muted"
+              >
+                <span className="h-5 w-5 flex items-center justify-center text-base">⚙️</span>
+                <span className="text-sm font-medium text-left">Settings</span>
+              </button>
               <button
                 type="button"
                 onClick={() => {
