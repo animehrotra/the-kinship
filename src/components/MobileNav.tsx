@@ -122,9 +122,6 @@ export function MobileNav() {
             </SheetHeader>
             <div className="mt-4 space-y-3">
               <NotificationSettings />
-              {user && (
-                <p className="text-sm text-muted-foreground truncate pb-1">{user.email}</p>
-              )}
               <button
                 type="button"
                 onClick={() => {
@@ -134,7 +131,7 @@ export function MobileNav() {
                 className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-muted"
               >
                 <Share2 className="h-5 w-5" />
-                <span className="text-sm font-medium text-left">Invite a friend</span>
+                <span className="text-sm font-medium text-left">Invite a Friend</span>
               </button>
               <button
                 type="button"
@@ -156,10 +153,24 @@ export function MobileNav() {
                 className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-muted"
               >
                 <Megaphone className="h-5 w-5" />
-                <span className="text-sm font-medium text-left">Send feedback</span>
+                <span className="text-sm font-medium text-left">Share Feedback</span>
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  setMenuOpen(false);
+                  await replayTour();
+                  navigate("/dashboard");
+                }}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-muted-foreground transition-colors hover:bg-muted"
+              >
+                <HelpCircle className="h-5 w-5" />
+                <span className="text-sm font-medium text-left">Replay Tour</span>
               </button>
               {isAdmin && (
                 <>
+                  <Separator className="my-1" />
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider px-3">Admin</p>
                   <button
                     type="button"
                     onClick={() => {
@@ -169,7 +180,7 @@ export function MobileNav() {
                     className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-foreground transition-colors hover:bg-muted"
                   >
                     <MessageSquare className="h-5 w-5" />
-                    <span className="text-sm font-medium flex-1 text-left">Feedback</span>
+                    <span className="text-sm font-medium flex-1 text-left">View Feedback</span>
                     {unreadFeedback > 0 && (
                       <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-xs">
                         {unreadFeedback > 99 ? "99+" : unreadFeedback}
@@ -203,8 +214,11 @@ export function MobileNav() {
                 className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-destructive transition-colors hover:bg-destructive/10"
               >
                 <LogOut className="h-5 w-5" />
-                <span className="text-sm font-medium">Sign out</span>
+                <span className="text-sm font-medium">Sign Out</span>
               </button>
+              {user && (
+                <p className="text-xs text-muted-foreground px-3 pt-1 truncate">{user.email}</p>
+              )}
             </div>
           </SheetContent>
         </Sheet>
