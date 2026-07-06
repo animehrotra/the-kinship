@@ -33,7 +33,7 @@ const items = [
 ];
 
 const adminItems = [
-  { title: "Feedback", url: "/admin/feedback", icon: MessageSquare },
+  { title: "View Feedback", url: "/admin/feedback", icon: MessageSquare },
   { title: "Appreciation ♥", url: "/admin/appreciation", icon: HeartHandshake },
 ];
 
@@ -97,7 +97,7 @@ export function AppSidebar() {
                     >
                       <item.icon className="mr-2 h-4 w-4" />
                       {!collapsed && <span className="flex-1">{item.title}</span>}
-                      {item.title === "Feedback" && unreadFeedback > 0 && (
+                      {item.title === "View Feedback" && unreadFeedback > 0 && (
                         <Badge
                           variant="destructive"
                           className={collapsed ? "absolute top-1 right-1 h-4 min-w-4 px-1 text-[10px]" : "ml-auto h-5 min-w-5 px-1.5 text-xs"}
@@ -134,7 +134,7 @@ export function AppSidebar() {
               className="text-muted-foreground hover:text-foreground"
             >
               <Megaphone className="mr-2 h-4 w-4" />
-              {!collapsed && <span>Share feedback</span>}
+              {!collapsed && <span>Share Feedback</span>}
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
@@ -155,7 +155,7 @@ export function AppSidebar() {
               className="text-muted-foreground hover:text-foreground"
             >
               <HelpCircle className="mr-2 h-4 w-4" />
-              {!collapsed && <span>Replay tour</span>}
+              {!collapsed && <span>Replay Tour</span>}
             </SidebarMenuButton>
           </SidebarMenuItem>
           {!collapsed && pushState !== "unsupported" && pushState !== "denied" && (
@@ -196,7 +196,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton onClick={signOut} className="text-muted-foreground hover:text-destructive">
               <LogOut className="mr-2 h-4 w-4" />
-              {!collapsed && <span>Sign out</span>}
+              {!collapsed && <span>Sign Out</span>}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
