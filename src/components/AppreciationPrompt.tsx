@@ -65,23 +65,40 @@ export default function AppreciationPrompt({ open, onClose, source }: Appreciati
 
   const submit = async (skipText = false) => {
     if (!user || !sentiment) return;
+    const trimmedText = text.trim();
     setSubmitting(true);
     try {
-      await supabase.from("appreciation_responses").insert({
-        user_id: user.id,
-        sentiment: sentiment === "positive" ? "positive" : "negative",
-        response_text: skipText ? null : text.trim() || null,
-        source,
-        testimonial_consent: skipText ? false : testimonialConsent,
-      });
+      if (sentiment === "positive") {
+        await supabase.from("appreciation_responses").insert({
+          user_id: user.id,
+          response_text: skipText ? null : trimmedText || null,
+          source,
+          testimonial_consent: skipText ? false : testimonialConsent,
+        });
 
-      if (source !== "spontaneous") {
-        await markMilestoneSeen(sentiment === "positive");
-      } else if (sentiment === "positive") {
-        await supabase
-          .from("onboarding_state")
-          .update({ positive_response: true, updated_at: new Date().toISOString() })
-          .eq("user_id", user.id);
+        if (source !== "spontaneous") {
+          await markMilestoneSeen(true);
+        } else {
+          await supabase
+            .from("onboarding_state")
+            .update({ positive_response: true, updated_at: new Date().toISOString() })
+            .eq("user_id", user.id);
+        }
+      } else {
+        // Closing the "What could be better?" box without typing anything is
+        // treated as an accidental click: nothing is saved and the milestone
+        // stays unseen so it can fire again.
+        if (skipText || !trimmedText) return;
+
+        await supabase.from("feedback").insert({
+          user_id: user.id,
+          category: "improvement_suggestion",
+          message: trimmedText,
+        });
+
+        if (source !== "spontaneous") {
+          await markMilestoneSeen(false);
+        }
       }
     } finally {
       setSubmitting(false);

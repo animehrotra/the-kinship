@@ -30,7 +30,7 @@ export type Database = {
           id?: string
           is_testimonial_candidate?: boolean
           response_text?: string | null
-          sentiment: string
+          sentiment?: string
           source: string
           testimonial_consent?: boolean
           user_id: string

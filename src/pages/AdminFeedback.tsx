@@ -70,6 +70,7 @@ function shortUA(ua: string | null) {
 const CATEGORIES: { value: string; label: string }[] = [
   { value: "suggestion", label: "Suggestion" },
   { value: "bug", label: "Bug Report" },
+  { value: "improvement_suggestion", label: "Improvement suggestion" },
   { value: "other", label: "Other" },
 ];
 
@@ -246,7 +247,13 @@ export default function AdminFeedback() {
                 {profiles[r.user_id] || r.user_id.slice(0, 8)}
               </TableCell>
               <TableCell>
-                <Badge variant="secondary">{r.category}</Badge>
+                {r.category === "improvement_suggestion" ? (
+                  <Badge className="bg-rose-100 text-rose-800 border-rose-200">
+                    ♥ Improvement suggestion
+                  </Badge>
+                ) : (
+                  <Badge variant="secondary">{categoryLabel(r.category)}</Badge>
+                )}
               </TableCell>
               <TableCell className="min-w-[280px] whitespace-pre-wrap text-sm">
                 <div>{r.message}</div>
@@ -305,6 +312,7 @@ export default function AdminFeedback() {
             <SelectItem value="all">All categories</SelectItem>
             <SelectItem value="suggestion">Suggestion</SelectItem>
             <SelectItem value="bug">Bug Report</SelectItem>
+            <SelectItem value="improvement_suggestion">Improvement suggestion</SelectItem>
             <SelectItem value="other">Other</SelectItem>
           </SelectContent>
         </Select>

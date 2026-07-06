@@ -18,7 +18,6 @@ import { toast } from "@/hooks/use-toast";
 type AppreciationRow = {
   id: string;
   user_id: string;
-  sentiment: string;
   response_text: string | null;
   source: string;
   is_testimonial_candidate: boolean;
@@ -39,13 +38,6 @@ function sourceBadge(source: string) {
   }
   const label = source.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
   return <Badge className="bg-amber-100 text-amber-800 border-amber-200">🔔 {label}</Badge>;
-}
-
-function sentimentBadge(sentiment: string) {
-  if (sentiment === "positive") {
-    return <Badge className="bg-green-100 text-green-800 border-green-200">♥ Loved it</Badge>;
-  }
-  return <Badge variant="secondary" className="bg-stone-100 text-stone-600">Not really</Badge>;
 }
 
 export default function AdminAppreciation() {
@@ -108,7 +100,6 @@ export default function AdminAppreciation() {
   if (!isAdmin) return <Navigate to="/dashboard" replace />;
 
   const totalResponses = rows.length;
-  const positiveCount = rows.filter((r) => r.sentiment === "positive").length;
   const spontaneousCount = rows.filter((r) => r.source === "spontaneous").length;
   const testimonialCount = rows.filter((r) => r.is_testimonial_candidate).length;
 
@@ -121,14 +112,10 @@ export default function AdminAppreciation() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <div className="rounded-lg border bg-card p-4 text-center">
-          <p className="text-2xl font-semibold">{totalResponses}</p>
-          <p className="text-xs text-muted-foreground mt-1">Total Responses</p>
-        </div>
-        <div className="rounded-lg border bg-card p-4 text-center">
-          <p className="text-2xl font-semibold text-green-600">{positiveCount}</p>
-          <p className="text-xs text-muted-foreground mt-1">Positive</p>
+          <p className="text-2xl font-semibold text-green-600">{totalResponses}</p>
+          <p className="text-xs text-muted-foreground mt-1">Total Responses ♥</p>
         </div>
         <div className="rounded-lg border bg-card p-4 text-center">
           <p className="text-2xl font-semibold">{spontaneousCount}</p>
@@ -155,7 +142,6 @@ export default function AdminAppreciation() {
                   <TableHead className="w-[120px]">Date</TableHead>
                   <TableHead className="w-[120px]">User</TableHead>
                   <TableHead className="w-[140px]">Source</TableHead>
-                  <TableHead className="w-[120px]">Sentiment</TableHead>
                   <TableHead>Message</TableHead>
                   <TableHead className="w-[110px]">Consent</TableHead>
                   <TableHead className="w-[100px] text-center">Testimonial</TableHead>
@@ -171,7 +157,6 @@ export default function AdminAppreciation() {
                       {profiles[r.user_id] || r.user_id.slice(0, 8)}
                     </TableCell>
                     <TableCell>{sourceBadge(r.source)}</TableCell>
-                    <TableCell>{sentimentBadge(r.sentiment)}</TableCell>
                     <TableCell className="text-sm whitespace-pre-wrap">
                       {r.response_text || <span className="text-muted-foreground italic">No message</span>}
                     </TableCell>
