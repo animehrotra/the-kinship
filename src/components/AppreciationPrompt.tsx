@@ -73,6 +73,7 @@ export default function AppreciationPrompt({ open, onClose, source }: Appreciati
           user_id: user.id,
           response_text: skipText ? null : trimmedText || null,
           source,
+          sentiment,
           testimonial_consent: skipText ? false : testimonialConsent,
         });
 
