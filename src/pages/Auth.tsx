@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -133,9 +134,15 @@ export default function Auth() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
         <div className="w-full max-w-sm space-y-8">
+          <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="h-4 w-4" />
+            Home
+          </Link>
           <div className="text-center space-y-2">
             <img src="/favicon.png" alt="Kinship logo" className="w-12 h-12 mb-2 rounded-2xl mx-auto" />
-            <h1 className="text-3xl font-serif tracking-tight text-foreground">Kinship</h1>
+            <Link to="/" className="inline-block">
+              <h1 className="text-3xl font-serif tracking-tight text-foreground hover:opacity-80 transition-opacity">Kinship</h1>
+            </Link>
             <p className="text-muted-foreground text-sm">Reset your password</p>
           </div>
 
@@ -181,10 +188,16 @@ export default function Auth() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm space-y-8">
-        <div className="text-center space-y-2">
+        <div className="w-full max-w-sm space-y-8">
+          <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="h-4 w-4" />
+            Home
+          </Link>
+          <div className="text-center space-y-2">
             <img src="/favicon.png" alt="Kinship logo" className="w-12 h-12 mb-2 rounded-2xl mx-auto" />
-          <h1 className="text-3xl font-serif tracking-tight text-foreground">Kinship</h1>
+          <Link to="/" className="inline-block">
+            <h1 className="text-3xl font-serif tracking-tight text-foreground hover:opacity-80 transition-opacity">Kinship</h1>
+          </Link>
           <p className="text-muted-foreground text-sm">Nurture the relationships that matter</p>
         </div>
 
