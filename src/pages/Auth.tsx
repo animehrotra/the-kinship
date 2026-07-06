@@ -136,7 +136,9 @@ export default function Auth() {
         <div className="w-full max-w-sm space-y-8">
           <div className="text-center space-y-2">
             <img src="/favicon.png" alt="Kinship logo" className="w-12 h-12 mb-2 rounded-2xl mx-auto" />
-            <h1 className="text-3xl font-serif tracking-tight text-foreground">Kinship</h1>
+            <Link to="/" className="inline-block">
+              <h1 className="text-3xl font-serif tracking-tight text-foreground hover:opacity-80 transition-opacity">Kinship</h1>
+            </Link>
             <p className="text-muted-foreground text-sm">Reset your password</p>
           </div>
 
