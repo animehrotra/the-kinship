@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useContacts, useUpcomingEvents, getContactStatus, useAllContactTags, useOverdueNudgeAction } from "@/lib/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Clock, Calendar, Users, Bell, ChevronLeft, ChevronRight } from "lucide-react";
+import { Heart, Clock, Calendar, Users, Bell, ChevronLeft, ChevronRight, SkipForward } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { isPast, format, differenceInCalendarDays } from "date-fns";
 import { circleLabels, circleOptions, nudgeFrequencyLabels, formatNudgeInterval } from "@/lib/constants";
@@ -11,7 +11,7 @@ import { useAuth } from "@/lib/auth";
 import AddContactDialog from "@/components/AddContactDialog";
 import { Button } from "@/components/ui/button";
 import LogInteractionSheet from "@/components/LogInteractionSheet";
-import { MessageSquare } from "lucide-react";
+import KinshipActionIcon from "@/components/KinshipActionIcon";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { DidYouKnowCard } from "@/components/DidYouKnowCard";
 import { useOnboarding } from "@/lib/useOnboarding";
@@ -219,9 +219,9 @@ export default function Index() {
                       intervalUnit={c.nudge_interval_unit}
                       isSaving={nudgeAction.isPending}
                       onSave={(interaction) => nudgeAction.mutateAsync({ contactId: c.id, action: "completed", interaction })}
-                      trigger={<Button size="sm" disabled={nudgeAction.isPending}>Done</Button>}
+                      trigger={<Button size="icon" variant="outline" className="h-9 w-9 border-primary bg-primary/5 hover:bg-primary/10" disabled={nudgeAction.isPending} title="Done — log connection" aria-label={`Done — log connection with ${c.name}`}><KinshipActionIcon className="h-6 w-6" /></Button>}
                     />
-                    <Button size="sm" variant="outline" disabled={nudgeAction.isPending} onClick={() => nudgeAction.mutate({ contactId: c.id, action: "skipped" })}>Skip</Button>
+                    <Button size="icon" className="h-9 w-9" variant="outline" disabled={nudgeAction.isPending} title="Skip" aria-label={`Skip nudge for ${c.name}`} onClick={() => nudgeAction.mutate({ contactId: c.id, action: "skipped" })}><SkipForward className="h-4 w-4" /></Button>
                   </div>
                 </CardContent>
               </Card>
@@ -285,8 +285,8 @@ export default function Index() {
                     intervalValue={c.nudge_interval_value}
                     intervalUnit={c.nudge_interval_unit}
                     trigger={
-                      <Button variant="ghost" size="icon" className="shrink-0" title="Log connection">
-                        <MessageSquare className="w-4 h-4" />
+                      <Button variant="ghost" size="icon" className="shrink-0" title="Log connection" aria-label={`Log connection with ${c.name}`}>
+                        <KinshipActionIcon className="h-6 w-6" />
                       </Button>
                     }
                   />
