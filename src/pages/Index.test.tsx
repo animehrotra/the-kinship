@@ -16,6 +16,10 @@ vi.mock("@/lib/hooks", () => ({
   useAllContactTags: () => ({ data: {} }),
   useOverdueNudgeAction: () => ({ mutate: mockAction, isPending: false }),
   getContactStatus: () => "overdue",
+  useCreateContact: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useAddContactTag: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useCreateLifeEvent: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useTags: () => ({ data: [] }),
 }));
 
 vi.mock("@/lib/auth", () => ({
@@ -59,8 +63,9 @@ describe("Index (Dashboard)", () => {
   it("renders circle summary cards for all three tiers", () => {
     renderIndex();
     expect(screen.getAllByText("Inner Circle").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("Close Friends").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("Extended").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Close").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Casual").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Reconnect").length).toBeGreaterThanOrEqual(1);
     // Verify summary stat text exists
     const reached = screen.getAllByText(/reached this month/i);
     expect(reached.length).toBe(3);
@@ -100,6 +105,6 @@ describe("Index (Dashboard)", () => {
     renderIndex();
     // Extended should show 0 / 0
     const cards = screen.getAllByText(/reached this month/i);
-    expect(cards.length).toBe(3); // all three tiers rendered
+    expect(cards.length).toBe(4); // all four tiers rendered
   });
 });
