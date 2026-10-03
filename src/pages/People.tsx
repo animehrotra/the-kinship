@@ -151,9 +151,9 @@ export default function People() {
                           className="h-8 w-8"
                           onClick={(e) => e.stopPropagation()}
                           title="Log connection"
-                           aria-label={`Log connection with ${c.name}`}
+                          aria-label={`Log connection with ${c.name}`}
                         >
-                           <KinshipActionIcon className="h-5 w-5" />
+                          <KinshipActionIcon className="h-5 w-5" />
                         </Button>
                       }
                     />

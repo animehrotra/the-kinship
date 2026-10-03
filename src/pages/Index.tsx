@@ -219,7 +219,7 @@ export default function Index() {
                       intervalUnit={c.nudge_interval_unit}
                       isSaving={nudgeAction.isPending}
                       onSave={(interaction) => nudgeAction.mutateAsync({ contactId: c.id, action: "completed", interaction })}
-                      trigger={<Button size="icon" className="h-9 w-9" disabled={nudgeAction.isPending} title="Done — log connection" aria-label={`Done — log connection with ${c.name}`}><KinshipActionIcon className="h-6 w-6" /></Button>}
+                      trigger={<Button size="icon" variant="outline" className="h-9 w-9 border-primary bg-primary/5 hover:bg-primary/10" disabled={nudgeAction.isPending} title="Done — log connection" aria-label={`Done — log connection with ${c.name}`}><KinshipActionIcon className="h-6 w-6" /></Button>}
                     />
                     <Button size="icon" className="h-9 w-9" variant="outline" disabled={nudgeAction.isPending} title="Skip" aria-label={`Skip nudge for ${c.name}`} onClick={() => nudgeAction.mutate({ contactId: c.id, action: "skipped" })}><SkipForward className="h-4 w-4" /></Button>
                   </div>
