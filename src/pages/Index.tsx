@@ -15,6 +15,7 @@ import { MessageSquare } from "lucide-react";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { DidYouKnowCard } from "@/components/DidYouKnowCard";
 import { useOnboarding } from "@/lib/useOnboarding";
+import { WhatsNewBanner } from "@/components/WhatsNewBanner";
 
 export default function Index() {
   const { data: contacts = [], isLoading } = useContacts();
@@ -25,20 +26,38 @@ export default function Index() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [nudgePage, setNudgePage] = useState(0);
   const [windowDays, setWindowDays] = useState<number>(7);
+  const [releaseProfile, setReleaseProfile] = useState<{ created_at: string; last_seen_release: string | null } | null>(null);
   const NUDGES_PER_PAGE = 5;
   const { shouldShowTour, completeTour, skipTour } = useOnboarding();
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setReleaseProfile(null);
+      return;
+    }
+    let cancelled = false;
+    setReleaseProfile(null);
     (async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("upcoming_nudge_window_days")
+        .select("upcoming_nudge_window_days, created_at, last_seen_release")
         .eq("id", user.id)
         .maybeSingle();
+      if (cancelled) return;
       if (data?.upcoming_nudge_window_days) setWindowDays(data.upcoming_nudge_window_days);
+      if (data) setReleaseProfile(data);
     })();
+    return () => { cancelled = true; };
   }, [user]);
+
+  const whatsNew = user && releaseProfile ? (
+    <WhatsNewBanner
+      key={user.id}
+      userId={user.id}
+      accountCreatedAt={user.created_at || releaseProfile.created_at}
+      lastSeenRelease={releaseProfile.last_seen_release}
+    />
+  ) : null;
 
   const overdueContacts = contacts
     .filter((c) => c.next_nudge_at && isPast(new Date(c.next_nudge_at)))
@@ -85,6 +104,7 @@ export default function Index() {
   if (contacts.length === 0) {
     return (
       <>
+        <div className="p-4 md:p-6 max-w-2xl mx-auto">{whatsNew}</div>
         <div className="flex flex-col items-center justify-center min-h-[60vh] p-6 text-center">
           <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
             <Heart className="w-8 h-8 text-primary" />
@@ -109,6 +129,7 @@ export default function Index() {
 
   return (
     <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-6">
+      {whatsNew}
       <h1 className="text-2xl font-serif" data-tour="nudges">Nudges</h1>
 
       {/* Circle Summary */}
