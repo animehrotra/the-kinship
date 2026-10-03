@@ -1,10 +1,10 @@
 import { useState, useMemo, useEffect } from "react";
-import { useContacts, useUpcomingEvents, getContactStatus, useAllContactTags } from "@/lib/hooks";
+import { useContacts, useUpcomingEvents, getContactStatus, useAllContactTags, useOverdueNudgeAction } from "@/lib/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Heart, Clock, Calendar, Users, Bell, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { formatDistanceToNow, isPast, format } from "date-fns";
+import { formatDistanceToNow, isPast, format, differenceInCalendarDays } from "date-fns";
 import { circleLabels, circleOptions, nudgeFrequencyLabels, formatNudgeInterval } from "@/lib/constants";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -19,6 +19,7 @@ import { WhatsNewBanner } from "@/components/WhatsNewBanner";
 
 export default function Index() {
   const { data: contacts = [], isLoading } = useContacts();
+  const nudgeAction = useOverdueNudgeAction();
   const { data: tagsByContact = {} } = useAllContactTags();
   const { data: upcomingEvents = [] } = useUpcomingEvents();
   const { user } = useAuth();
@@ -181,7 +182,7 @@ export default function Index() {
                 key={c.id}
                 className="border-border/50 hover:shadow-md transition-shadow"
               >
-                <CardContent className="p-4 flex items-start justify-between">
+                <CardContent className="p-4">
                   <div
                     className="flex-1 cursor-pointer active:scale-[0.98]"
                     onClick={() => navigate(`/people/${c.id}`)}
@@ -206,23 +207,13 @@ export default function Index() {
                       ))}
                     </div>
                     <p className="text-sm text-muted-foreground mt-1 ml-4">
-                      {c.last_interaction_at
-                        ? `Last seen ${formatDistanceToNow(new Date(c.last_interaction_at), { addSuffix: true })}`
-                        : "No connections yet"}
+                      Overdue by {Math.max(0, differenceInCalendarDays(new Date(), new Date(c.next_nudge_at!)))} days
                     </p>
                   </div>
-                  <LogInteractionSheet
-                    contactId={c.id}
-                    contactName={c.name}
-                    nudgeFrequency={c.nudge_frequency}
-                    intervalValue={c.nudge_interval_value}
-                    intervalUnit={c.nudge_interval_unit}
-                    trigger={
-                      <Button variant="ghost" size="icon" className="shrink-0" title="Log connection">
-                        <MessageSquare className="w-4 h-4" />
-                      </Button>
-                    }
-                  />
+                  <div className="flex gap-2 mt-3 ml-4">
+                    <Button size="sm" disabled={nudgeAction.isPending} onClick={() => nudgeAction.mutate({ contactId: c.id, action: "completed" })}>Done</Button>
+                    <Button size="sm" variant="outline" disabled={nudgeAction.isPending} onClick={() => nudgeAction.mutate({ contactId: c.id, action: "skipped" })}>Skip</Button>
+                  </div>
                 </CardContent>
               </Card>
             );
