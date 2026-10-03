@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useContacts, useDeleteContact, getContactStatus, useAllContactTags } from "@/lib/hooks";
+import { useContacts, useDeleteContact, getContactStatus, useAllContactTags, useLogCompletedConnection } from "@/lib/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ export default function People() {
   const { data: contacts = [], isLoading } = useContacts();
   const { data: tagsByContact = {} } = useAllContactTags();
   const deleteContact = useDeleteContact();
+  const logCompletedConnection = useLogCompletedConnection();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [circleFilter, setCircleFilter] = useState<string>("all");
@@ -140,6 +141,8 @@ export default function People() {
                       nudgeFrequency={c.nudge_frequency}
                       intervalValue={c.nudge_interval_value}
                       intervalUnit={c.nudge_interval_unit}
+                      onSave={(details) => logCompletedConnection.mutateAsync({ contactId: c.id, ...details })}
+                      isSaving={logCompletedConnection.isPending}
                       trigger={
                         <Button
                           variant="ghost"

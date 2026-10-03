@@ -182,6 +182,34 @@ export function useOverdueNudgeAction() {
   });
 }
 
+export function useLogCompletedConnection() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ contactId, type, notes, interactionDate }: {
+      contactId: string;
+      type: Database["public"]["Enums"]["interaction_type"];
+      notes?: string;
+      interactionDate: Date;
+    }) => {
+      const { error } = await supabase.rpc("log_contact_connection", {
+        p_contact_id: contactId,
+        p_interaction_type: type,
+        p_notes: notes ?? null,
+        p_interaction_at: interactionDate.toISOString(),
+      });
+      if (error) throw error;
+    },
+    onSuccess: (_, { contactId }) => {
+      qc.invalidateQueries({ queryKey: ["contacts"] });
+      qc.invalidateQueries({ queryKey: ["contact", contactId] });
+      qc.invalidateQueries({ queryKey: ["interactions", contactId] });
+      toast({ title: "Connection logged" });
+      window.dispatchEvent(new CustomEvent("interaction-logged"));
+    },
+    onError: (error: Error) => toast({ title: "Could not log connection", description: error.message, variant: "destructive" }),
+  });
+}
+
 export function useInteractions(contactId: string) {
   return useQuery({
     queryKey: ["interactions", contactId],
