@@ -182,9 +182,9 @@ export default function Index() {
                 key={c.id}
                 className="border-border/50 hover:shadow-md transition-shadow"
               >
-                <CardContent className="p-4">
+                <CardContent className="p-4 flex items-start justify-between gap-2">
                   <div
-                    className="flex-1 cursor-pointer active:scale-[0.98]"
+                    className="min-w-0 flex-1 cursor-pointer active:scale-[0.98]"
                     onClick={() => navigate(`/people/${c.id}`)}
                   >
                     <div className="flex items-start gap-2">
@@ -210,7 +210,7 @@ export default function Index() {
                       Overdue by {Math.max(0, differenceInCalendarDays(new Date(), new Date(c.next_nudge_at!)))} days
                     </p>
                   </div>
-                  <div className="flex gap-2 mt-3 ml-4">
+                  <div className="flex items-center gap-1 shrink-0 ml-2">
                     <LogInteractionSheet
                       contactId={c.id}
                       contactName={c.name}
