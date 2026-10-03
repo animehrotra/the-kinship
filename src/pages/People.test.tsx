@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import People from "./People";
@@ -7,6 +7,7 @@ import { contacts } from "@/test/fixtures";
 
 const mockUseContacts = vi.fn();
 const mockCreateContact = { mutateAsync: vi.fn(), isPending: false };
+const mockLogCompletedConnection = { mutateAsync: vi.fn().mockResolvedValue(undefined), isPending: false };
 
 vi.mock("@/lib/hooks", () => ({
   useContacts: () => mockUseContacts(),
@@ -18,6 +19,7 @@ vi.mock("@/lib/hooks", () => ({
   useCreateLifeEvent: () => ({ mutateAsync: vi.fn(), isPending: false }),
   useTags: () => ({ data: [] }),
   useLogInteraction: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useLogCompletedConnection: () => mockLogCompletedConnection,
 }));
 
 vi.mock("@/lib/auth", () => ({
@@ -44,6 +46,25 @@ describe("People Page", () => {
   // Happy path: renders contacts
   it("renders contact names and circle badges", () => {
     renderPeople();
+    expect(screen.getByText("Alice Johnson")).toBeInTheDocument();
+    expect(screen.getByText("Bob Smith")).toBeInTheDocument();
+    expect(screen.getByText("Carol Davis")).toBeInTheDocument();
+  });
+
+  it("logs a backdated connection for a non-overdue person and keeps all people visible", async () => {
+    renderPeople();
+    const bob = screen.getByText("Bob Smith").closest(".cursor-pointer");
+    expect(bob).not.toBeNull();
+    fireEvent.click(bob!.querySelector('[title="Log connection"]')!);
+    fireEvent.change(screen.getByLabelText("When did this happen?"), { target: { value: "2025-01-15" } });
+    fireEvent.click(screen.getByRole("button", { name: "Called" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(mockLogCompletedConnection.mutateAsync).toHaveBeenCalledWith({
+      contactId: "c2",
+      type: "called",
+      notes: undefined,
+      interactionDate: new Date("2025-01-15T12:00:00"),
+    }));
     expect(screen.getByText("Alice Johnson")).toBeInTheDocument();
     expect(screen.getByText("Bob Smith")).toBeInTheDocument();
     expect(screen.getByText("Carol Davis")).toBeInTheDocument();
