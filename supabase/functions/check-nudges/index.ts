@@ -1,135 +1,75 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { createClient } from "npm:@supabase/supabase-js@2";
+import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
-
-// Returns { hour, minute, date } in IANA tz for "now". Falls back to UTC on bad tz.
-function localNow(timezone: string): { hour: number; minute: number; date: string } {
+function localNow(timezone: string) {
   try {
-    const parts = new Intl.DateTimeFormat("en-CA", {
-      timeZone: timezone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    }).formatToParts(new Date());
-    const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
-    const date = `${get("year")}-${get("month")}-${get("day")}`;
-    const hourStr = get("hour");
-    const hour = parseInt(hourStr === "24" ? "0" : hourStr, 10);
-    const minute = parseInt(get("minute") || "0", 10);
-    return { hour, minute, date };
+    const parts = new Intl.DateTimeFormat("en-CA", { timeZone: timezone, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(new Date());
+    const get = (key: string) => parts.find((part) => part.type === key)?.value ?? "";
+    return { hour: Number(get("hour")) % 24, minute: Number(get("minute")), date: `${get("year")}-${get("month")}-${get("day")}` };
   } catch {
-    const d = new Date();
-    return {
-      hour: d.getUTCHours(),
-      minute: d.getUTCMinutes(),
-      date: d.toISOString().slice(0, 10),
-    };
+    return localNow("UTC");
   }
 }
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-
+  const headers = { ...corsHeaders, "Content-Type": "application/json" };
+  const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!key || req.headers.get("apikey") !== Deno.env.get("SUPABASE_ANON_KEY")) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers });
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, serviceRoleKey);
-
-    // Pull all users with notification prefs. Push subs join filters to opted-in only.
-    const { data: profiles, error: profErr } = await supabase
-      .from("profiles")
-      .select("id, notify_hour, notify_minute, notify_timezone, last_nudge_notified_on");
-    if (profErr) throw profErr;
-
-    let usersConsidered = 0;
-    let usersDue = 0;
-    let pushSent = 0;
-
-    for (const p of profiles ?? []) {
-      const tz = p.notify_timezone || "UTC";
-      const { hour, minute, date } = localNow(tz);
-
-      // Only fire within a 30-minute window of the user's preferred local time.
-      // Cron runs every 30 min on the :00 / :30 — bucket "now" to the matching slot.
-      const targetHour = p.notify_hour ?? 8;
-      const targetMinute = (p.notify_minute ?? 30) >= 30 ? 30 : 0;
-      const slotMinute = minute >= 30 ? 30 : 0;
-      if (hour !== targetHour || slotMinute !== targetMinute) continue;
-      usersConsidered++;
-
-      // Dedupe — already notified today (in their local tz)?
-      if (p.last_nudge_notified_on === date) continue;
-
-      // Fetch contacts due today or earlier.
-      const { data: dueContacts, error: contactsErr } = await supabase
-        .from("contacts")
-        .select("id, name, next_nudge_at, last_notified_for_nudge_at")
-        .eq("user_id", p.id)
-        .eq("archived", false)
-        .not("next_nudge_at", "is", null)
-        .lte("next_nudge_at", `${date}T23:59:59.999Z`);
-      if (contactsErr) {
-        console.error(`contacts query failed for ${p.id}:`, contactsErr);
-        continue;
-      }
-      if (!dueContacts || dueContacts.length === 0) continue;
-
-      // Only notify for contacts we haven't already notified about for this nudge cycle.
-      const fresh = dueContacts.filter(
-        (c) => !c.last_notified_for_nudge_at || c.last_notified_for_nudge_at !== c.next_nudge_at,
-      );
-      if (fresh.length === 0) continue;
-
-      usersDue++;
-      const count = fresh.length;
-      const names = fresh.slice(0, 3).map((c) => c.name);
-      const title = `Kinship: ${count} nudge${count > 1 ? "s" : ""} due today`;
-      const body =
-        count <= 3
-          ? `Time to reach out to ${names.join(", ")}`
-          : `Time to reach out to ${names.join(", ")} and ${count - 3} more`;
-
-      const resp = await fetch(`${supabaseUrl}/functions/v1/send-push`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceRoleKey}` },
-        body: JSON.stringify({ user_id: p.id, title, body, url: "/dashboard" }),
+    const url = Deno.env.get("SUPABASE_URL");
+    if (!url) throw new Error("Missing backend URL");
+    const db = createClient(url, key);
+    const { data: profiles, error } = await db.from("profiles").select("id, notify_hour, notify_minute, notify_timezone, last_nudge_notified_on");
+    if (error) throw error;
+    let initial = 0;
+    let repeated = 0;
+    for (const profile of profiles ?? []) {
+      const { hour, minute, date } = localNow(profile.notify_timezone || "UTC");
+      const slot = (profile.notify_minute ?? 30) >= 30 ? 30 : 0;
+      if (hour !== (profile.notify_hour ?? 8) || (minute >= 30 ? 30 : 0) !== slot) continue;
+      // Repeat nudges are processed by the same scheduled invocation and at the same local time.
+      const repeatResponse = await fetch(`${url}/functions/v1/re-nudge-contacts`, {
+        method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+        body: JSON.stringify({ user_id: profile.id }),
       });
+      if (repeatResponse.ok) repeated += (await repeatResponse.json()).renudged ?? 0;
+      else console.error("Repeat check failed", repeatResponse.status);
 
-      if (resp.ok) {
-        const json = await resp.json();
-        const sent = json.sent || 0;
-        pushSent += sent;
-        // Stamp per-user dedupe so cron's other half-hour runs don't double up today.
-        await supabase
-          .from("profiles")
-          .update({ last_nudge_notified_on: date })
-          .eq("id", p.id);
-        // Stamp each notified contact so we don't re-notify until next_nudge_at changes
-        // (which happens when the user logs an interaction or edits the schedule).
-        for (const c of fresh) {
-          await supabase
-            .from("contacts")
-            .update({ last_notified_for_nudge_at: c.next_nudge_at })
-            .eq("id", c.id);
-        }
+      if (profile.last_nudge_notified_on === date) continue;
+      const { data: contacts, error: contactError } = await db.from("contacts")
+        .select("id, name, next_nudge_at, last_notified_for_nudge_at, renudge_count")
+        .eq("user_id", profile.id).eq("archived", false).not("next_nudge_at", "is", null)
+        .lte("next_nudge_at", new Date().toISOString());
+      if (contactError) { console.error("Initial check failed", contactError); continue; }
+      const claimed: string[] = [];
+      for (const contact of contacts ?? []) {
+        if (contact.last_notified_for_nudge_at === contact.next_nudge_at) continue;
+        const { data: didClaim, error: claimError } = await db.rpc("claim_contact_nudge", {
+          p_contact_id: contact.id, p_expected_at: contact.next_nudge_at,
+          p_expected_count: contact.renudge_count, p_type: "notified",
+        });
+        if (claimError) console.error("Initial claim failed", claimError);
+        if (didClaim) claimed.push(contact.name);
+      }
+      if (!claimed.length) continue;
+      const count = claimed.length;
+      const names = claimed.slice(0, 3);
+      const title = `Kinship: ${count} nudge${count > 1 ? "s" : ""} due today`;
+      const body = `Time to reach out to ${names.join(", ")}${count > 3 ? ` and ${count - 3} more` : ""}`;
+      const response = await fetch(`${url}/functions/v1/send-push`, {
+        method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+        body: JSON.stringify({ user_id: profile.id, title, body, url: "/dashboard" }),
+      });
+      if (!response.ok) console.error("Initial push failed", response.status);
+      else {
+        initial += count;
+        await db.from("profiles").update({ last_nudge_notified_on: date }).eq("id", profile.id);
       }
     }
-
-    return new Response(
-      JSON.stringify({ usersConsidered, usersDue, pushSent }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
-  } catch (err) {
-    console.error("check-nudges error:", err);
-    return new Response(JSON.stringify({ error: (err as Error).message }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(JSON.stringify({ initial, renudged: repeated }), { headers });
+  } catch (error) {
+    console.error("check-nudges error", error);
+    return new Response(JSON.stringify({ error: "Notification check failed" }), { status: 500, headers });
   }
 });

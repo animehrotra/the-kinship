@@ -90,6 +90,7 @@ export type Database = {
           id: string
           last_interaction_at: string | null
           last_notified_for_nudge_at: string | null
+          last_nudged_at: string | null
           name: string
           next_nudge_at: string | null
           notes: string | null
@@ -99,6 +100,7 @@ export type Database = {
           nudge_interval_value: number
           nudge_start_date: string | null
           phone: string | null
+          renudge_count: number
           updated_at: string
           user_id: string
         }
@@ -111,6 +113,7 @@ export type Database = {
           id?: string
           last_interaction_at?: string | null
           last_notified_for_nudge_at?: string | null
+          last_nudged_at?: string | null
           name: string
           next_nudge_at?: string | null
           notes?: string | null
@@ -120,6 +123,7 @@ export type Database = {
           nudge_interval_value?: number
           nudge_start_date?: string | null
           phone?: string | null
+          renudge_count?: number
           updated_at?: string
           user_id: string
         }
@@ -132,6 +136,7 @@ export type Database = {
           id?: string
           last_interaction_at?: string | null
           last_notified_for_nudge_at?: string | null
+          last_nudged_at?: string | null
           name?: string
           next_nudge_at?: string | null
           notes?: string | null
@@ -141,6 +146,7 @@ export type Database = {
           nudge_interval_value?: number
           nudge_start_date?: string | null
           phone?: string | null
+          renudge_count?: number
           updated_at?: string
           user_id?: string
         }
@@ -260,6 +266,45 @@ export type Database = {
             columns: ["contact_id"]
             isOneToOne: false
             referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nudge_events: {
+        Row: {
+          contact_id: string
+          created_at: string
+          event_type: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          contact_id: string
+          created_at?: string
+          event_type: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          contact_id?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nudge_events_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nudge_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -422,6 +467,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      act_on_overdue_nudge: {
+        Args: { p_action: string; p_contact_id: string }
+        Returns: undefined
+      }
+      claim_contact_nudge: {
+        Args: {
+          p_contact_id: string
+          p_expected_at: string
+          p_expected_count: number
+          p_type: string
+        }
+        Returns: boolean
+      }
       cleanup_closed_feedback: { Args: never; Returns: undefined }
       has_role: {
         Args: { _role: Database["public"]["Enums"]["app_role"] }

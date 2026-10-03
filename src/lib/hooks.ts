@@ -149,6 +149,22 @@ export function useDeleteContact() {
   });
 }
 
+export function useOverdueNudgeAction() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ contactId, action }: { contactId: string; action: "skipped" | "completed" }) => {
+      const { error } = await supabase.rpc("act_on_overdue_nudge", { p_contact_id: contactId, p_action: action });
+      if (error) throw error;
+    },
+    onSuccess: (_, { contactId, action }) => {
+      qc.invalidateQueries({ queryKey: ["contacts"] });
+      qc.invalidateQueries({ queryKey: ["contact", contactId] });
+      toast({ title: action === "skipped" ? "Next nudge scheduled" : "Contact moved to Archive" });
+    },
+    onError: (error: Error) => toast({ title: "Could not update nudge", description: error.message, variant: "destructive" }),
+  });
+}
+
 export function useInteractions(contactId: string) {
   return useQuery({
     queryKey: ["interactions", contactId],
@@ -192,7 +208,7 @@ export function useLogInteraction() {
 
       const { error: upErr } = await supabase
         .from("contacts")
-        .update({ last_interaction_at: now, next_nudge_at: nextNudge })
+        .update({ last_interaction_at: now, next_nudge_at: nextNudge, renudge_count: 0, last_nudged_at: null, last_notified_for_nudge_at: null })
         .eq("id", contactId);
       if (upErr) throw upErr;
     },

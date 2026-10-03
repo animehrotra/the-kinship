@@ -33,6 +33,7 @@ vi.mock("@/lib/hooks", () => ({
   useAddContactTag: () => mockAddContactTag,
   useRemoveContactTag: () => mockRemoveContactTag,
   useCreateTag: () => mockCreateTag,
+  useDeleteContact: () => ({ mutateAsync: vi.fn(), isPending: false }),
 }));
 
 vi.mock("@/lib/auth", () => ({

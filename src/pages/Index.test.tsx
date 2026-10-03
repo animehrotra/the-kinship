@@ -8,10 +8,18 @@ import { contacts } from "@/test/fixtures";
 // Mock hooks
 const mockUseContacts = vi.fn();
 const mockUseUpcomingEvents = vi.fn();
+const mockAction = vi.fn();
 
 vi.mock("@/lib/hooks", () => ({
   useContacts: () => mockUseContacts(),
   useUpcomingEvents: () => mockUseUpcomingEvents(),
+  useAllContactTags: () => ({ data: {} }),
+  useOverdueNudgeAction: () => ({ mutate: mockAction, isPending: false }),
+  getContactStatus: () => "overdue",
+  useCreateContact: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useAddContactTag: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useCreateLifeEvent: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useTags: () => ({ data: [] }),
 }));
 
 vi.mock("@/lib/auth", () => ({
@@ -55,11 +63,12 @@ describe("Index (Dashboard)", () => {
   it("renders circle summary cards for all three tiers", () => {
     renderIndex();
     expect(screen.getAllByText("Inner Circle").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("Close Friends").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("Extended").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Close").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Casual").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Reconnect").length).toBeGreaterThanOrEqual(1);
     // Verify summary stat text exists
     const reached = screen.getAllByText(/reached this month/i);
-    expect(reached.length).toBe(3);
+    expect(reached.length).toBe(4);
   });
 
   // Happy path: overdue contacts
@@ -69,17 +78,16 @@ describe("Index (Dashboard)", () => {
     expect(screen.getByText("Alice Johnson")).toBeInTheDocument();
   });
 
-  // Negative: contact with no last_interaction_at shows fallback text
-  it("shows 'No interactions yet' for contacts without last_interaction_at", () => {
-    // Carol Davis has null last_interaction_at and is overdue (null next_nudge_at, so not in overdue list)
-    // But Alice is overdue with last_interaction_at set. Let's use a contact with null.
+  it("shows overdue days and Done and Skip actions", () => {
     const overdueNoInteraction = [{
       ...contacts[2], // Carol
       next_nudge_at: new Date(Date.now() - 86400000).toISOString(), // make overdue
     }];
     mockUseContacts.mockReturnValue({ data: overdueNoInteraction, isLoading: false });
     renderIndex();
-    expect(screen.getByText(/no connections yet/i)).toBeInTheDocument();
+    expect(screen.getByText(/overdue by \d+ days/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Done" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Skip" })).toBeInTheDocument();
   });
 
   // Negative: contacts with null next_nudge_at don't appear in overdue
@@ -97,6 +105,6 @@ describe("Index (Dashboard)", () => {
     renderIndex();
     // Extended should show 0 / 0
     const cards = screen.getAllByText(/reached this month/i);
-    expect(cards.length).toBe(3); // all three tiers rendered
+    expect(cards.length).toBe(4); // all four tiers rendered
   });
 });

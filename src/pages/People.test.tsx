@@ -11,6 +11,13 @@ const mockCreateContact = { mutateAsync: vi.fn(), isPending: false };
 vi.mock("@/lib/hooks", () => ({
   useContacts: () => mockUseContacts(),
   useCreateContact: () => mockCreateContact,
+  useAllContactTags: () => ({ data: {} }),
+  useDeleteContact: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  getContactStatus: () => "on-track",
+  useAddContactTag: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useCreateLifeEvent: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useTags: () => ({ data: [] }),
+  useLogInteraction: () => ({ mutateAsync: vi.fn(), isPending: false }),
 }));
 
 vi.mock("@/lib/auth", () => ({
