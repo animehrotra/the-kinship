@@ -15,6 +15,7 @@ vi.mock("@/lib/hooks", () => ({
   useUpcomingEvents: () => mockUseUpcomingEvents(),
   useAllContactTags: () => ({ data: {} }),
   useOverdueNudgeAction: () => ({ mutate: mockAction, isPending: false }),
+  getContactStatus: () => "overdue",
 }));
 
 vi.mock("@/lib/auth", () => ({

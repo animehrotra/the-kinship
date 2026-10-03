@@ -39,6 +39,7 @@ Deno.serve(async (req) => {
       const elapsed = daysBetween(localDate(new Date(contact.next_nudge_at), timezone), today);
       // Fixed schedule from the ORIGINAL due date; no daily repeat after a missed window.
       if (elapsed < (contact.renudge_count === 0 ? 14 : 42)) continue;
+      if (contact.renudge_count === 0 && contact.last_nudged_at && daysBetween(localDate(new Date(contact.last_nudged_at), timezone), today) < 14) continue;
       if (contact.renudge_count === 1 && contact.last_nudged_at && daysBetween(localDate(new Date(contact.last_nudged_at), timezone), today) < 28) continue;
       if (contact.last_nudged_at && localDate(new Date(contact.last_nudged_at), timezone) === today) continue;
       const { data: claimed, error: claimError } = await db.rpc("claim_contact_nudge", {
