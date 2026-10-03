@@ -88,8 +88,8 @@ describe("Index (Dashboard)", () => {
     mockUseContacts.mockReturnValue({ data: overdueNoInteraction, isLoading: false });
     renderIndex();
     expect(screen.getByText(/overdue by \d+ days/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Done" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Skip" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Done — log connection with Carol Davis/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Skip nudge for Carol Davis/ })).toBeInTheDocument();
   });
 
   it("opens Log Connection from Done and completes only after saving", async () => {
@@ -101,7 +101,7 @@ describe("Index (Dashboard)", () => {
     mockActionAsync.mockResolvedValue(undefined);
     renderIndex();
 
-    fireEvent.click(screen.getByRole("button", { name: "Done" }));
+    fireEvent.click(screen.getByRole("button", { name: /Done — log connection with Alice Johnson/ }));
     expect(screen.getByText("Log connection with Alice Johnson")).toBeInTheDocument();
     expect(mockActionAsync).not.toHaveBeenCalled();
 
@@ -121,7 +121,7 @@ describe("Index (Dashboard)", () => {
     mockUseContacts.mockReturnValue({ data: overdueContact, isLoading: false });
     renderIndex();
 
-    fireEvent.click(screen.getByRole("button", { name: "Skip" }));
+    fireEvent.click(screen.getByRole("button", { name: /Skip nudge for Alice Johnson/ }));
     expect(mockAction).toHaveBeenCalledWith({ contactId: "c1", action: "skipped" });
     expect(screen.queryByText("Log connection with Alice Johnson")).not.toBeInTheDocument();
   });

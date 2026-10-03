@@ -13,6 +13,7 @@ import { ArrowLeft, MessageSquare, Phone, Video, Users, Calendar, Archive, Plus,
 import { formatDistanceToNow, format, isPast, differenceInDays } from "date-fns";
 import TagPicker from "@/components/TagPicker";
 import LogInteractionSheet from "@/components/LogInteractionSheet";
+import KinshipActionIcon from "@/components/KinshipActionIcon";
 import EditContactDialog from "@/components/EditContactDialog";
 import { circleLabels } from "@/lib/constants";
 
@@ -233,7 +234,7 @@ export default function ContactDetail() {
             intervalUnit={contact.nudge_interval_unit}
             trigger={
               <Button className="flex-1 gap-2">
-                <MessageSquare className="w-4 h-4" />
+                <KinshipActionIcon className="h-5 w-5" />
                 Log connection
               </Button>
             }
