@@ -23,15 +23,16 @@ describe("What's new banner", () => {
     mount(null);
     expect(screen.getByRole("region", { name: "What's new in Kinship" })).toBeInTheDocument();
     expect(screen.getByText("See what's new in Kinship right here when features ship.")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Take me there" })).not.toBeInTheDocument();
+    expect(screen.getByText("Missed a nudge? Kinship reminds you again after two and six weeks. Use Done or Skip on overdue contacts.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Take me there" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Got it" }));
-    await waitFor(() => expect(update).toHaveBeenCalledWith({ last_seen_release: "v1.1-phase-0" }));
+    await waitFor(() => expect(update).toHaveBeenCalledWith({ last_seen_release: "v1.2-phase-1" }));
     expect(eq).toHaveBeenCalledWith("id", "user-1");
     expect(screen.queryByRole("region", { name: "What's new in Kinship" })).not.toBeInTheDocument();
   });
 
   it("does not announce releases already seen or predating signup", () => {
-    const seen = mount("v1.1-phase-0");
+    const seen = mount("v1.2-phase-1");
     expect(screen.queryByRole("region")).not.toBeInTheDocument();
     seen.unmount();
     mount(null, "2026-10-04T00:00:00Z");
