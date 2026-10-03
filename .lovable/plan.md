@@ -4,7 +4,7 @@
 Bring the existing Phase 1 implementation in line with the corrective prompt without rebuilding work that already matches it.
 
 ## Changes
-- Change **Done** so it keeps the contact active, schedules the next regular nudge from now, resets re-nudge state, and records `completed` atomically.
+- Change **Done** so it opens the existing **Log Connection** action from the prior published experience; saving the connection records the interaction, keeps the contact active, schedules the next regular nudge from the logged connection date, resets re-nudge state, and records `completed` atomically.
 - Keep **Skip** as the existing next-cycle reset action and retain the fixed day 0/14/42 reminder timeline.
 - Update the Phase 1 release announcement so it clearly reflects the six-week timeline and corrected Done behavior.
 - Add focused tests for Done and Skip scheduling/state changes, then run the relevant app tests.
