@@ -228,9 +228,9 @@ export default function Index() {
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Skip this nudge for {c.name}?</AlertDialogTitle>
+                          <AlertDialogTitle>Skip {c.name} this time?</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Their next reminder will be scheduled from today using their usual frequency. No connection will be logged, and they'll stay in People.
+                            Their next reminder will be scheduled from today at their usual interval.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>

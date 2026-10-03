@@ -122,8 +122,8 @@ describe("Index (Dashboard)", () => {
     renderIndex();
 
     fireEvent.click(screen.getByRole("button", { name: /Skip nudge for Alice Johnson/ }));
-    expect(screen.getByText("Skip this nudge for Alice Johnson?")).toBeInTheDocument();
-    expect(screen.getByText(/next reminder will be scheduled from today using their usual frequency/i)).toBeInTheDocument();
+    expect(screen.getByText("Skip Alice Johnson this time?")).toBeInTheDocument();
+    expect(screen.getByText(/next reminder will be scheduled from today at their usual interval/i)).toBeInTheDocument();
     expect(mockAction).not.toHaveBeenCalled();
     expect(screen.queryByText("Log connection with Alice Johnson")).not.toBeInTheDocument();
 
