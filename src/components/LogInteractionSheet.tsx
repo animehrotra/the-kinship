@@ -29,9 +29,15 @@ interface LogInteractionSheetProps {
   intervalValue?: number;
   intervalUnit?: string;
   trigger: React.ReactNode;
+  onSave?: (details: {
+    type: InteractionType;
+    notes?: string;
+    interactionDate: Date;
+  }) => Promise<void>;
+  isSaving?: boolean;
 }
 
-export default function LogInteractionSheet({ contactId, contactName, nudgeFrequency, intervalValue, intervalUnit, trigger }: LogInteractionSheetProps) {
+export default function LogInteractionSheet({ contactId, contactName, nudgeFrequency, intervalValue, intervalUnit, trigger, onSave, isSaving }: LogInteractionSheetProps) {
   const [logType, setLogType] = useState<InteractionType>("texted");
   const [notes, setNotes] = useState("");
   const [date, setDate] = useState(todayISO());
@@ -39,15 +45,22 @@ export default function LogInteractionSheet({ contactId, contactName, nudgeFrequ
   const logInteraction = useLogInteraction();
 
   const handleLog = async () => {
-    await logInteraction.mutateAsync({
-      contactId,
+    const details = {
       type: logType,
       notes: notes.trim() || undefined,
       interactionDate: new Date(date + "T12:00:00"),
-      nudgeFrequency,
-      intervalValue,
-      intervalUnit,
-    });
+    };
+    if (onSave) {
+      await onSave(details);
+    } else {
+      await logInteraction.mutateAsync({
+        contactId,
+        ...details,
+        nudgeFrequency,
+        intervalValue,
+        intervalUnit,
+      });
+    }
     setOpen(false);
     setLogType("texted");
     setNotes("");
@@ -111,9 +124,9 @@ export default function LogInteractionSheet({ contactId, contactName, nudgeFrequ
           <Button
             onClick={handleLog}
             className="w-full"
-            disabled={logInteraction.isPending}
+            disabled={isSaving ?? logInteraction.isPending}
           >
-            {logInteraction.isPending ? "Saving..." : "Save"}
+            {(isSaving ?? logInteraction.isPending) ? "Saving..." : "Save"}
           </Button>
         </div>
       </DialogContent>
