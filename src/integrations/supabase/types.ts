@@ -313,6 +313,7 @@ export type Database = {
           display_name: string | null
           id: string
           last_nudge_notified_on: string | null
+          last_seen_release: string | null
           notify_hour: number
           notify_minute: number
           notify_timezone: string
@@ -325,6 +326,7 @@ export type Database = {
           display_name?: string | null
           id: string
           last_nudge_notified_on?: string | null
+          last_seen_release?: string | null
           notify_hour?: number
           notify_minute?: number
           notify_timezone?: string
@@ -337,6 +339,7 @@ export type Database = {
           display_name?: string | null
           id?: string
           last_nudge_notified_on?: string | null
+          last_seen_release?: string | null
           notify_hour?: number
           notify_minute?: number
           notify_timezone?: string
