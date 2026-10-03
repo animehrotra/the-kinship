@@ -56,6 +56,8 @@ export default function EditContactDialog({ contact, open, onOpenChange }: EditC
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    const startDate = form.nudge_start_date ? format(form.nudge_start_date, "yyyy-MM-dd") : null;
+    const scheduleChanged = startDate !== contact.nudge_start_date || form.nudge_interval_value !== contact.nudge_interval_value || form.nudge_interval_unit !== contact.nudge_interval_unit;
     await updateContact.mutateAsync({
       id: contact.id,
       name: form.name,
@@ -65,8 +67,14 @@ export default function EditContactDialog({ contact, open, onOpenChange }: EditC
       circle: form.circle,
       nudge_interval_value: form.nudge_interval_value,
       nudge_interval_unit: form.nudge_interval_unit,
-      nudge_start_date: form.nudge_start_date ? format(form.nudge_start_date, "yyyy-MM-dd") : null,
+      nudge_start_date: startDate,
       nudge_end_date: form.nudge_end_date ? format(form.nudge_end_date, "yyyy-MM-dd") : null,
+      ...(scheduleChanged ? {
+        next_nudge_at: startDate ? new Date(startDate + "T09:00:00").toISOString() : contact.next_nudge_at,
+        renudge_count: 0,
+        last_nudged_at: null,
+        last_notified_for_nudge_at: null,
+      } : {}),
     });
     onOpenChange(false);
   };
