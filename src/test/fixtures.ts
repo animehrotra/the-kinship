@@ -48,6 +48,8 @@ export const contacts: Contact[] = [
     created_at: monthAgo.toISOString(),
     updated_at: now.toISOString(),
     last_notified_for_nudge_at: null,
+    last_nudged_at: null,
+    renudge_count: 0,
   },
   {
     id: "c2",
@@ -69,6 +71,8 @@ export const contacts: Contact[] = [
     created_at: monthAgo.toISOString(),
     updated_at: now.toISOString(),
     last_notified_for_nudge_at: null,
+    last_nudged_at: null,
+    renudge_count: 0,
   },
   {
     id: "c3",
@@ -90,6 +94,8 @@ export const contacts: Contact[] = [
     created_at: monthAgo.toISOString(),
     updated_at: now.toISOString(),
     last_notified_for_nudge_at: null,
+    last_nudged_at: null,
+    renudge_count: 0,
   },
 ];
 
@@ -114,6 +120,8 @@ export const archivedContacts: Contact[] = [
     created_at: monthAgo.toISOString(),
     updated_at: now.toISOString(),
     last_notified_for_nudge_at: null,
+    last_nudged_at: null,
+    renudge_count: 0,
   },
 ];
 
