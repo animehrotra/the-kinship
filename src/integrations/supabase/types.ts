@@ -468,7 +468,13 @@ export type Database = {
     }
     Functions: {
       act_on_overdue_nudge: {
-        Args: { p_action: string; p_contact_id: string }
+        Args: {
+          p_action: string
+          p_contact_id: string
+          p_interaction_at?: string
+          p_interaction_type?: Database["public"]["Enums"]["interaction_type"]
+          p_notes?: string
+        }
         Returns: undefined
       }
       claim_contact_nudge: {
