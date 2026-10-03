@@ -245,9 +245,9 @@ export default function Index() {
                 key={c.id}
                 className="border-border/50 hover:shadow-md transition-shadow"
               >
-                <CardContent className="p-4 flex items-start justify-between">
+                <CardContent className="p-4 flex items-start justify-between gap-2">
                   <div
-                    className="flex-1 cursor-pointer active:scale-[0.98]"
+                    className="min-w-0 flex-1 cursor-pointer active:scale-[0.98]"
                     onClick={() => navigate(`/people/${c.id}`)}
                   >
                     <div className="flex items-start gap-2">
@@ -285,7 +285,7 @@ export default function Index() {
                     intervalValue={c.nudge_interval_value}
                     intervalUnit={c.nudge_interval_unit}
                     trigger={
-                      <Button variant="ghost" size="icon" className="shrink-0" title="Log connection" aria-label={`Log connection with ${c.name}`}>
+                      <Button variant="outline" size="icon" className="h-9 w-9 shrink-0 border-primary bg-primary/5 hover:bg-primary/10" title="Log connection" aria-label={`Log connection with ${c.name}`}>
                         <KinshipActionIcon className="h-6 w-6" />
                       </Button>
                     }
