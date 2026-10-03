@@ -55,7 +55,10 @@ describe("People Page", () => {
     renderPeople();
     const bob = screen.getByText("Bob Smith").closest(".cursor-pointer");
     expect(bob).not.toBeNull();
-    fireEvent.click(bob!.querySelector('[title="Log connection"]')!);
+    const logButton = bob?.querySelector('[title="Log connection"]');
+    expect(logButton).not.toBeNull();
+    if (!logButton) throw new Error("Bob's Log button was not found");
+    fireEvent.click(logButton);
     fireEvent.change(screen.getByLabelText("When did this happen?"), { target: { value: "2025-01-15" } });
     fireEvent.click(screen.getByRole("button", { name: "Called" }));
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
