@@ -68,7 +68,7 @@ describe("Index (Dashboard)", () => {
     expect(screen.getAllByText("Reconnect").length).toBeGreaterThanOrEqual(1);
     // Verify summary stat text exists
     const reached = screen.getAllByText(/reached this month/i);
-    expect(reached.length).toBe(3);
+    expect(reached.length).toBe(4);
   });
 
   // Happy path: overdue contacts
