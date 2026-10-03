@@ -152,14 +152,31 @@ export function useDeleteContact() {
 export function useOverdueNudgeAction() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ contactId, action }: { contactId: string; action: "skipped" | "completed" }) => {
-      const { error } = await supabase.rpc("act_on_overdue_nudge", { p_contact_id: contactId, p_action: action });
+    mutationFn: async ({ contactId, action, interaction }: {
+      contactId: string;
+      action: "skipped" | "completed";
+      interaction?: {
+        type: Database["public"]["Enums"]["interaction_type"];
+        notes?: string;
+        interactionDate: Date;
+      };
+    }) => {
+      const { error } = await supabase.rpc("act_on_overdue_nudge", {
+        p_contact_id: contactId,
+        p_action: action,
+        ...(interaction ? {
+          p_interaction_type: interaction.type,
+          p_notes: interaction.notes,
+          p_interaction_at: interaction.interactionDate.toISOString(),
+        } : {}),
+      });
       if (error) throw error;
     },
     onSuccess: (_, { contactId, action }) => {
       qc.invalidateQueries({ queryKey: ["contacts"] });
       qc.invalidateQueries({ queryKey: ["contact", contactId] });
-      toast({ title: action === "skipped" ? "Next nudge scheduled" : "Contact moved to Archive" });
+      qc.invalidateQueries({ queryKey: ["interactions", contactId] });
+      toast({ title: action === "skipped" ? "Next nudge scheduled" : "Connection logged" });
     },
     onError: (error: Error) => toast({ title: "Could not update nudge", description: error.message, variant: "destructive" }),
   });

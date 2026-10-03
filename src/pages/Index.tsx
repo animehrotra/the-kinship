@@ -211,7 +211,16 @@ export default function Index() {
                     </p>
                   </div>
                   <div className="flex gap-2 mt-3 ml-4">
-                    <Button size="sm" disabled={nudgeAction.isPending} onClick={() => nudgeAction.mutate({ contactId: c.id, action: "completed" })}>Done</Button>
+                    <LogInteractionSheet
+                      contactId={c.id}
+                      contactName={c.name}
+                      nudgeFrequency={c.nudge_frequency}
+                      intervalValue={c.nudge_interval_value}
+                      intervalUnit={c.nudge_interval_unit}
+                      isSaving={nudgeAction.isPending}
+                      onSave={(interaction) => nudgeAction.mutateAsync({ contactId: c.id, action: "completed", interaction })}
+                      trigger={<Button size="sm" disabled={nudgeAction.isPending}>Done</Button>}
+                    />
                     <Button size="sm" variant="outline" disabled={nudgeAction.isPending} onClick={() => nudgeAction.mutate({ contactId: c.id, action: "skipped" })}>Skip</Button>
                   </div>
                 </CardContent>

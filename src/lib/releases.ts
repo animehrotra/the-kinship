@@ -13,7 +13,7 @@ export const releases: readonly Release[] = [
     id: "v1.2-phase-1",
     date: "2026-10-03",
     title: "A little help staying in touch",
-    description: "Missed a nudge? Kinship reminds you again after two and six weeks. Use Done or Skip on overdue contacts.",
+    description: "Missed a nudge? Kinship reminds you again after two and six weeks. Done logs your connection and starts the next cycle; Skip moves to the next cycle.",
     link: "/dashboard",
   },
   {

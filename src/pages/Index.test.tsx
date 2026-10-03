@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Index from "./Index";
@@ -9,12 +9,14 @@ import { contacts } from "@/test/fixtures";
 const mockUseContacts = vi.fn();
 const mockUseUpcomingEvents = vi.fn();
 const mockAction = vi.fn();
+const mockActionAsync = vi.fn();
 
 vi.mock("@/lib/hooks", () => ({
   useContacts: () => mockUseContacts(),
   useUpcomingEvents: () => mockUseUpcomingEvents(),
   useAllContactTags: () => ({ data: {} }),
-  useOverdueNudgeAction: () => ({ mutate: mockAction, isPending: false }),
+  useOverdueNudgeAction: () => ({ mutate: mockAction, mutateAsync: mockActionAsync, isPending: false }),
+  useLogInteraction: () => ({ mutateAsync: vi.fn(), isPending: false }),
   getContactStatus: () => "overdue",
   useCreateContact: () => ({ mutateAsync: vi.fn(), isPending: false }),
   useAddContactTag: () => ({ mutateAsync: vi.fn(), isPending: false }),
@@ -88,6 +90,40 @@ describe("Index (Dashboard)", () => {
     expect(screen.getByText(/overdue by \d+ days/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Done" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Skip" })).toBeInTheDocument();
+  });
+
+  it("opens Log Connection from Done and completes only after saving", async () => {
+    const overdueContact = [{
+      ...contacts[0],
+      next_nudge_at: new Date(Date.now() - 86400000).toISOString(),
+    }];
+    mockUseContacts.mockReturnValue({ data: overdueContact, isLoading: false });
+    mockActionAsync.mockResolvedValue(undefined);
+    renderIndex();
+
+    fireEvent.click(screen.getByRole("button", { name: "Done" }));
+    expect(screen.getByText("Log connection with Alice Johnson")).toBeInTheDocument();
+    expect(mockActionAsync).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(mockActionAsync).toHaveBeenCalledWith(expect.objectContaining({
+        contactId: "c1",
+        action: "completed",
+        interaction: expect.objectContaining({ type: "texted" }),
+      })));
+  });
+
+  it("skips directly without opening Log Connection", () => {
+    const overdueContact = [{
+      ...contacts[0],
+      next_nudge_at: new Date(Date.now() - 86400000).toISOString(),
+    }];
+    mockUseContacts.mockReturnValue({ data: overdueContact, isLoading: false });
+    renderIndex();
+
+    fireEvent.click(screen.getByRole("button", { name: "Skip" }));
+    expect(mockAction).toHaveBeenCalledWith({ contactId: "c1", action: "skipped" });
+    expect(screen.queryByText("Log connection with Alice Johnson")).not.toBeInTheDocument();
   });
 
   // Negative: contacts with null next_nudge_at don't appear in overdue
