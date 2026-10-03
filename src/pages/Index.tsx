@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import AddContactDialog from "@/components/AddContactDialog";
 import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import LogInteractionSheet from "@/components/LogInteractionSheet";
 import KinshipActionIcon from "@/components/KinshipActionIcon";
 import { OnboardingTour } from "@/components/OnboardingTour";
@@ -221,7 +222,23 @@ export default function Index() {
                       onSave={(interaction) => nudgeAction.mutateAsync({ contactId: c.id, action: "completed", interaction })}
                       trigger={<Button size="icon" variant="outline" className="h-9 w-9 border-primary bg-primary/5 hover:bg-primary/10" disabled={nudgeAction.isPending} title="Done — log connection" aria-label={`Done — log connection with ${c.name}`}><KinshipActionIcon className="h-6 w-6" /></Button>}
                     />
-                    <Button size="icon" className="h-9 w-9" variant="outline" disabled={nudgeAction.isPending} title="Skip" aria-label={`Skip nudge for ${c.name}`} onClick={() => nudgeAction.mutate({ contactId: c.id, action: "skipped" })}><SkipForward className="h-4 w-4" /></Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button size="icon" className="h-9 w-9" variant="outline" disabled={nudgeAction.isPending} title="Skip" aria-label={`Skip nudge for ${c.name}`}><SkipForward className="h-4 w-4" /></Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Skip this nudge for {c.name}?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Their next reminder will be scheduled from today using their usual frequency. No connection will be logged, and they'll stay in People.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => nudgeAction.mutate({ contactId: c.id, action: "skipped" })}>Skip nudge</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </CardContent>
               </Card>
