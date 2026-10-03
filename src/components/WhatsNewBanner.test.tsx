@@ -23,7 +23,7 @@ describe("What's new banner", () => {
     mount(null);
     expect(screen.getByRole("region", { name: "What's new in Kinship" })).toBeInTheDocument();
     expect(screen.getByText("See what's new in Kinship right here when features ship.")).toBeInTheDocument();
-    expect(screen.getByText("Missed a nudge? Kinship reminds you again after two and six weeks. Use Done or Skip on overdue contacts.")).toBeInTheDocument();
+    expect(screen.getByText("Missed a nudge? Kinship reminds you again after two and six weeks. Done logs your connection and starts the next cycle; Skip moves to the next cycle.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Take me there" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Got it" }));
     await waitFor(() => expect(update).toHaveBeenCalledWith({ last_seen_release: "v1.2-phase-1" }));

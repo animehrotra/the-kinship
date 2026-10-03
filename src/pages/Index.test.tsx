@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Index from "./Index";
@@ -106,11 +106,11 @@ describe("Index (Dashboard)", () => {
     expect(mockActionAsync).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
-    expect(mockActionAsync).toHaveBeenCalledWith(expect.objectContaining({
-      contactId: "c1",
-      action: "completed",
-      interaction: expect.objectContaining({ type: "texted" }),
-    }));
+    await waitFor(() => expect(mockActionAsync).toHaveBeenCalledWith(expect.objectContaining({
+        contactId: "c1",
+        action: "completed",
+        interaction: expect.objectContaining({ type: "texted" }),
+      })));
   });
 
   it("skips directly without opening Log Connection", () => {
