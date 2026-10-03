@@ -491,6 +491,15 @@ export type Database = {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
         Returns: boolean
       }
+      log_contact_connection: {
+        Args: {
+          p_contact_id: string
+          p_interaction_at: string
+          p_interaction_type: Database["public"]["Enums"]["interaction_type"]
+          p_notes: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user"
