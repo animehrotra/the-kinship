@@ -113,7 +113,7 @@ describe("Index (Dashboard)", () => {
       })));
   });
 
-  it("skips directly without opening Log Connection", () => {
+  it("explains Skip and only reschedules after confirmation", () => {
     const overdueContact = [{
       ...contacts[0],
       next_nudge_at: new Date(Date.now() - 86400000).toISOString(),
@@ -122,8 +122,17 @@ describe("Index (Dashboard)", () => {
     renderIndex();
 
     fireEvent.click(screen.getByRole("button", { name: /Skip nudge for Alice Johnson/ }));
-    expect(mockAction).toHaveBeenCalledWith({ contactId: "c1", action: "skipped" });
+    expect(screen.getByText("Skip this nudge for Alice Johnson?")).toBeInTheDocument();
+    expect(screen.getByText(/next reminder will be scheduled from today using their usual frequency/i)).toBeInTheDocument();
+    expect(mockAction).not.toHaveBeenCalled();
     expect(screen.queryByText("Log connection with Alice Johnson")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(mockAction).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: /Skip nudge for Alice Johnson/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Skip nudge" }));
+    expect(mockAction).toHaveBeenCalledWith({ contactId: "c1", action: "skipped" });
   });
 
   // Negative: contacts with null next_nudge_at don't appear in overdue
